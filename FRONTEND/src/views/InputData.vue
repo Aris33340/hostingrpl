@@ -65,7 +65,7 @@ async function uploadData() {
   loading.value = true
   try {
     const response = await api.post('/api/mahasiswa/bulk', preview.value)
-    message.value = `Berhasil menambahkan ${response.data.count} mahasiswa!`
+    message.value = ` Berhasil menambahkan ${response.data.count} mahasiswa!`;
   } catch (error) {
     console.error(error)
     message.value = error;
