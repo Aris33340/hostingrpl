@@ -14,6 +14,7 @@ import { ScanController } from './scan/scan.controller';
 import { MahasiswaModule } from './mahasiswa/mahasiswa.module';
 import { MahasiswaController } from './mahasiswa/mahasiswa.controller';
 import { CryptoService } from './scan/CryptoService';
+import { FileModule } from './file/file.module';
 
 
 @Module({
@@ -24,7 +25,8 @@ import { CryptoService } from './scan/CryptoService';
     TamuModule,
     ScanModule,
     MahasiswaModule,
-    ConfigModule.forRoot({ isGlobal: true })
+    ConfigModule.forRoot({ isGlobal: true }),
+    FileModule
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],
