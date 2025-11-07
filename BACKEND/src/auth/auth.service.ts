@@ -2,12 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from '../../node_modules/bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { $Enums as Role} from 'generated/prisma/client';
 
 @Injectable()
 export class AuthService {
-    // Get the secret KEY
     private readonly jwtSecret: string;
     constructor(private prisma: PrismaService, private configService: ConfigService) {
         this.jwtSecret = this.configService.get<string>('SECRET_KEY') ?? 'supersecretkey';
@@ -19,7 +18,7 @@ export class AuthService {
     }
 
     async generateToken(userId: number): Promise<string> {
-        return jwt.sign({ userId }, this.jwtSecret, { expiresIn: '1H' });
+        return jwt.sign({ userId }, this.jwtSecret, { expiresIn: '1Y' });
     }
 
     async register(username: string, email: string, password: string): Promise<string> {
