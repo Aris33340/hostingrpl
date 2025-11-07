@@ -7,10 +7,8 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
 
-            <!-- Preview Container -->
             <div
                 class="lg:col-span-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 overflow-hidden flex flex-col">
-                <!-- Upload Section -->
                 <div class="p-4 border-b border-blue-500/20">
                     <div class="flex items-center gap-3">
                         <label class="flex-1 cursor-pointer">
@@ -32,14 +30,12 @@
                         </button>
                     </div>
 
-                    <!-- Progress Bar -->
                     <div v-if="uploading" class="mt-3 bg-gray-700/50 rounded-full h-2 overflow-hidden">
                         <div class="progress-bar-animated h-full bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 rounded-full transition-all duration-300"
                             :style="{ width: uploadProgress + '%' }"></div>
                     </div>
                 </div>
 
-                <!-- Preview Area -->
                 <div class="flex-1 overflow-auto custom-scrollbar p-6">
                     <div v-if="!previewUrl" class="h-full flex items-center justify-center">
                         <div class="text-center">
@@ -53,13 +49,11 @@
                         </div>
                     </div>
 
-                    <!-- Image Preview -->
                     <div v-else-if="previewType === 'image'" class="flex items-center justify-center h-full">
                         <img :src="previewUrl" alt="Preview"
                             class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
                     </div>
 
-                    <!-- PDF Preview -->
                     <div v-else-if="previewType === 'pdf'" class="h-full">
                         <iframe :src="previewUrl" class="w-full h-full rounded-lg border border-blue-500/20"></iframe>
                     </div>
@@ -141,36 +135,6 @@
             </div>
         </div>
 
-        <!-- Notification Popup -->
-        <transition name="slide-fade">
-            <div v-if="notification.show"
-                :class="['fixed top-6 right-6 max-w-md rounded-xl shadow-2xl border p-4 z-50', 
-                          notification.type === 'success' ? 'bg-green-500/90 border-green-400' : 'bg-red-500/90 border-red-400']">
-                <div class="flex items-start gap-3">
-                    <svg v-if="notification.type === 'success'" class="w-6 h-6 text-white flex-shrink-0" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <svg v-else class="w-6 h-6 text-white flex-shrink-0" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div class="flex-1">
-                        <h3 class="text-white font-semibold mb-1">{{ notification.type === 'success' ? 'Success' :
-                            'Error' }}</h3>
-                        <p class="text-white/90 text-sm">{{ notification.message }}</p>
-                    </div>
-                    <button @click="notification.show = false" class="text-white/80 hover:text-white">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </transition>
     </div>
 </template>
 
@@ -187,11 +151,7 @@
     const previewType = ref(null)
     const uploading = ref(false)
     const uploadProgress = ref(0)
-    const notification = ref({
-        show: false,
-        type: 'success',
-        message: ''
-    })
+
 
     const API_BASE = '/api/files'
     const getFileType = (fileName) => {
