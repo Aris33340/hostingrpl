@@ -1,7 +1,7 @@
 <template>
-  <div id="app" class="container">
+  <div id="app" class="main-content">
     <Navbar />
-    <main class="main-content">
+    <main class="flex-1 overflow-auto">
       <router-view />
     </main>
     <Notification :show="notification.show" :type="notification.type" :message="notification.message"
@@ -14,6 +14,7 @@ import Navbar from './components/Navbar.vue';
 import Notification from './components/Notification.vue';
 import {notification} from './composables/useNotification'
 </script>
+
 <style>
 .main-content {
   width: 100vw;
