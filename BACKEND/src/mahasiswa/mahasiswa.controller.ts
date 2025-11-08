@@ -1,7 +1,7 @@
-import { Body, Controller, Post, Get } from '@nestjs/common';
+import { Body, Controller, Post,Patch,Param, Get } from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
 import { Prisma } from 'generated/prisma';
-import { CryptoService } from 'src/scan/CryptoService';
+import { CryptoService } from 'src/crypto/crypto/CryptoService';
 
 @Controller('api/mahasiswa')
 export class MahasiswaController {

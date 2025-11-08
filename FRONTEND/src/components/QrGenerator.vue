@@ -1,33 +1,58 @@
 <template>
-  <button @click="generate" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Default</button>
-    <div v-if="mahasiswa">
-      <qrcode-vue :value="value" :size="size" level="H" render-as="svg" />
-      <qrcode-canvas :value="'QRCODE.VUE'" :size="size" level="H" />
-      <qrcode-svg value="QRCODE.VUE" level="H" />
+  <div class="p-4">
+    <button @click="generate"
+      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2">
+      Generate QR Codes
+    </button>
+
+    <div v-if="encrypted.length">
+      <h2 class="mb-2 font-bold">Generated QR Codes:</h2>
+      <div class="grid grid-cols-4 gap-4">
+        <div v-for="(code, index) in encrypted" :key="index" class="flex flex-col items-center">
+          <qrcode-canvas :value="code" :size="1080" level="H" />
+          <span class="mt-1 text-sm">{{ index + 1 }}</span>
+        </div>
+      </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue';
-  import QrcodeVue, { QrcodeCanvas, QrcodeSvg } from 'qrcode.vue'
-  import api from "@/api"
-  
-  const mahasiswa = ref('');
-  const encrypted = ref([]);
-  const generate = async () => { 
-      try {
-      const response = await api.get("/api/mahasiswa");
-      const res = response.data;
-      mahasiswa.value = res;
-    } catch (error) {
-    console.log(error);
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { QrcodeCanvas } from 'qrcode.vue';
+import api from "@/api";
+import { showNotification } from '../composables/useNotification';
+
+const encrypted = ref([]);
+const BASE_URL = 'api/';
+
+const generate = async () => {
+  try {
+    encrypted.value = [];
+
+    const responsePresensi = await api.get(`${BASE_URL}presensi`);
+    const presensiArray = responsePresensi.data;
+    if (!Array.isArray(presensiArray) || presensiArray.length === 0) {
+      console.warn("Data presensi kosong!");
+      return;
     }
-    console.log(mahasiswa)
+
+    const encryptedResults = await Promise.all(
+      presensiArray.map(async (element) => {
+        const responseEncrypt = await api.post(`${BASE_URL}crypto/encrypt`, { data: String(element.id_presensi) });
+        encrypted.value.push(responseEncrypt.data)
+        return responseEncrypt.data.data; 
+      })
+    );
+    encrypted.value = encryptedResults;
+  } catch (error) {
+    showNotification('error', 'error: ' + (error.response?.data?.message || error.message))
   }
-  </script>
-  
-  <style scoped>
-  button {
-    transition: background-color 0.2s;
-  }
-  </style>
+};
+</script>
+
+<style scoped>
+button {
+  transition: background-color 0.2s;
+}
+</style>

@@ -7,8 +7,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
 
-            <div
-                class="lg:col-span-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 overflow-hidden flex flex-col">
+            <div class="lg:col-span-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-blue-500/20">
                     <div class="flex items-center gap-3">
                         <label class="flex-1 cursor-pointer">
@@ -206,35 +205,35 @@
 
     const viewFile = async (file) => {
         try {
-          const res = await api.get(`${API_BASE}/${file.id_file}/file`, {
-            responseType: 'blob',
-          });
-      
-          let mimeType = res.headers['content-type'];
-          if (!mimeType || mimeType === 'application/octet-stream') {
-            const ext = file.file_name.split('.').pop().toLowerCase();
-            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) mimeType = `image/${ext}`;
-            else if (ext === 'pdf') mimeType = 'application/pdf';
-          }
-      
-          const blob = new Blob([res.data], { type: mimeType });
-          const url = URL.createObjectURL(blob);
-      
-          if (previewUrl.value) {
-            URL.revokeObjectURL(previewUrl.value);
-          }
-      
-          previewUrl.value = url;
-          previewType.value = mimeType.startsWith('image/')
-            ? 'image'
-            : mimeType === 'application/pdf'
-            ? 'pdf'
-            : 'other';
+            const res = await api.get(`${API_BASE}/${file.id_file}/file`, {
+                responseType: 'blob',
+            });
+
+            let mimeType = res.headers['content-type'];
+            if (!mimeType || mimeType === 'application/octet-stream') {
+                const ext = file.file_name.split('.').pop().toLowerCase();
+                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) mimeType = `image/${ext}`;
+                else if (ext === 'pdf') mimeType = 'application/pdf';
+            }
+
+            const blob = new Blob([res.data], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+
+            if (previewUrl.value) {
+                URL.revokeObjectURL(previewUrl.value);
+            }
+
+            previewUrl.value = url;
+            previewType.value = mimeType.startsWith('image/')
+                ? 'image'
+                : mimeType === 'application/pdf'
+                    ? 'pdf'
+                    : 'other';
         } catch (err) {
-          showNotification('error', 'Gagal menampilkan file.');
-          console.error('View error:', err);
+            showNotification('error', 'Gagal menampilkan file.');
+            console.error('View error:', err);
         }
-      };
+    };
 
     const deleteFile = async (file) => {
         if (!confirm(`Hapus file "${file.file_name}"?`)) return

@@ -13,8 +13,10 @@ import { ScanModule } from './scan/scan.module';
 import { ScanController } from './scan/scan.controller';
 import { MahasiswaModule } from './mahasiswa/mahasiswa.module';
 import { MahasiswaController } from './mahasiswa/mahasiswa.controller';
-import { CryptoService } from './scan/CryptoService';
+import { CryptoService } from './crypto/crypto/CryptoService';
 import { FileModule } from './file/file.module';
+import { CryptoModule } from './crypto/crypto/crypto.module';
+import { PresensiModule } from './presensi/presensi/presensi.module';
 
 
 @Module({
@@ -26,7 +28,9 @@ import { FileModule } from './file/file.module';
     ScanModule,
     MahasiswaModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    FileModule
+    FileModule,
+    CryptoModule,
+    PresensiModule
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],

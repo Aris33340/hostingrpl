@@ -13,8 +13,7 @@ export class FileService {
                 file_name: file.originalname,
                 path: file.path,
                 type: file.mimetype,
-                id_user: userId,
-                nim: nim,
+                userId_user:2
             },
         });
     }

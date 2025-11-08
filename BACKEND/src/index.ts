@@ -1,4 +1,4 @@
-import {CryptoService} from './scan/CryptoService'
+import {CryptoService} from './crypto/crypto/CryptoService'
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '../generated/prisma';
 

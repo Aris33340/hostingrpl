@@ -6,6 +6,7 @@ import FileManager from "../views/FileManager.vue";
 
 // 🧩 Impor ikon (bisa SVG component, lucide-react, Heroicons, dll)
 import { HomeIcon, FileTextIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
+import PetugasDashboard from "../views/PetugasDashboard.vue";
 
 const routes = [
   {
@@ -31,6 +32,12 @@ const routes = [
     name: "QrGenerator",
     component: QrGenerator,
     meta: { title: "Generate QR", icon: QrCodeIcon, showInNavbar: true },
+  },
+  {
+    path: "/petugas",
+    name: "DashboardPetugas",
+    component: PetugasDashboard,
+    meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true },
   },
 ];
 
