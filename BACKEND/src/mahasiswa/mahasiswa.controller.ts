@@ -1,8 +1,16 @@
-<<<<<<< HEAD
-import { Controller, Get, Query, Post, Body, Put, Param, Delete, ParseIntPipe, BadRequestException } from '@nestjs/common';
-=======
-import { Body, Controller, Post,Patch,Param, Get } from '@nestjs/common';
->>>>>>> 04d66ca9d62cc7ba453975989625e81bf4978a86
+import { 
+  Controller, 
+  Get, 
+  Query, 
+  Post, 
+  Body, 
+  Put, 
+  Patch, 
+  Param, 
+  Delete, 
+  ParseIntPipe, 
+  BadRequestException 
+} from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
 import { Prisma } from 'generated/prisma';
 import { CryptoService } from 'src/crypto/crypto/CryptoService';
