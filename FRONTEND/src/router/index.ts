@@ -5,7 +5,12 @@ import QrGenerator from "../components/QrGenerator.vue";
 import FileManager from "../views/FileManager.vue";
 
 // 🧩 Impor ikon (bisa SVG component, lucide-react, Heroicons, dll)
+<<<<<<< HEAD
 import { HomeIcon, UserIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
+=======
+import { HomeIcon, FileTextIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
+import PetugasDashboard from "../views/PetugasDashboard.vue";
+>>>>>>> 04d66ca9d62cc7ba453975989625e81bf4978a86
 
 const routes = [
   {
@@ -31,6 +36,12 @@ const routes = [
     name: "QrGenerator",
     component: QrGenerator,
     meta: { title: "Generate QR", icon: QrCodeIcon, showInNavbar: true },
+  },
+  {
+    path: "/petugas",
+    name: "DashboardPetugas",
+    component: PetugasDashboard,
+    meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true },
   },
 ];
 

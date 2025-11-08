@@ -71,14 +71,13 @@ async function main() {
 
     // ----------- Mahasiswa -----------
     for (let i = 1; i <= 10; i++) {
-        await prisma.mahasiswa.create({
+        const res = await prisma.mahasiswa.create({
             data: {
                 nim: 1000 + i,
                 nama: `Mahasiswa ${i}`,
                 prodi: `Prodi ${i}`,
                 kelas: `Kelas ${i}`,
                 no_telp: `0812345678${i}`,
-                penempatan: `Penempatan ${i}`,
                 nama_orang_tua: `Ortu ${i}`,
                 judul_skripsi: `Judul Skripsi ${i}`,
                 dosen_pembimbing: `Dosen ${i}`,
@@ -86,90 +85,69 @@ async function main() {
                 daerah_penempatan: `Penempatan ${i}`,
             },
         });
+        const pesertares =  await prisma.peserta.create({
+            data:{
+                jenis:"mahasiswa",
+                nim:res.nim,
+                createdAt:new Date()
+            }
+        })
+
+        await prisma.presensi.create({
+            data:{
+                id_peserta:pesertares.id_peserta,
+                status:0,
+                waktu_presensi: new Date(),
+                createdAt:new Date()
+            }
+        })
+        await prisma.emailSendStatus.create({
+            data:{
+                email:res.nim+'@stis.ac.id',
+                pesertaId_peserta:pesertares.id_peserta,
+                status:0,
+                waktu_dikirim:new Date(),
+                createdAt:new Date()
+            }
+        })
     }
 
     // ----------- Tamu -----------
     for (let i = 1; i <= 10; i++) {
-        await prisma.tamu.create({
+        const res = await prisma.tamu.create({
             data: {
                 nama: `Tamu ${i}`,
                 email: `tamu${i}@example.com`,
                 asal_instansi: `Instansi ${i}`,
+                createdAt:new Date()
             },
         });
-    }
-
-    // ----------- Presensi -----------
-    const mahasiswaList = await prisma.mahasiswa.findMany();
-    for (let i = 0; i < mahasiswaList.length; i++) {
-        const mhs = mahasiswaList[i];
-        if (i % 2 === 0) continue; // skip index genap
-
+        const pesertares = await prisma.peserta.create({
+            data:{
+                jenis:"tamu",
+                id_tamu:res.id_tamu,
+                createdAt:new Date()
+            }
+        })
         await prisma.presensi.create({
-            data: {
+            data:{
+                id_peserta:pesertares.id_peserta,
+                status:0,
                 waktu_presensi: new Date(),
-                status: 0,
-                nim: mhs.nim,
-            },
-        });
-    }
-
-    const tamuList = await prisma.tamu.findMany();
-    for (let i = 0; i < tamuList.length; i++) {
-        const tamu = tamuList[i];
-        if (i % 2 === 1) continue; // skip index genap
-
-        await prisma.presensi.create({
-            data: {
-                waktu_presensi: new Date(),
-                status: 0,
-                id_tamu: tamu.id_tamu,
-            },
-        });
-    }
-
-    // ----------- EmailSendStatus -----------
-    for( let i = 0; i < mahasiswaList.length; i++) {
-        const mhs = mahasiswaList[i];
-        if (i % 2 === 0) continue; // skip index genap
-
+                createdAt:new Date()
+            }
+        })
         await prisma.emailSendStatus.create({
             data: {
-                email:mhs.nim + '@stis.ac.id',
+                email: res.email,
+                pesertaId_peserta:pesertares.id_peserta,
                 status: 0,
                 waktu_dikirim: new Date(),
-            },
-        });
-    }
-    for( let i = 0; i < tamuList.length; i++) {
-        const tamu = tamuList[i];
-        if (i % 2 === 1) continue; // skip index genap
-
-        await prisma.emailSendStatus.create({
-            data: {
-                email:tamu.email,
-                status: 0,
-                waktu_dikirim: new Date(),
+                createdAt:new Date()
             },
         });
     }
 
-    // ----------- File -----------
-    const userList = await prisma.user.findMany();
-    for (let i = 0; i < mahasiswaList.length; i++) {
-        const user = userList[0];
-        const mhs = mahasiswaList[i];
-        console.log(mhs.nim);
-        await prisma.file.create({
-            data: {
-                id_user:user.id_user,
-                file_name: `file_mahasiswa${i}.pdf`,
-                path: `/files/mahasiswa${i}.pdf`,
-                type: 'pdf',
-                nim: mhs.nim,
-            },
-        });
-    }
 
     console.log('Seeding finished.');
 }

@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
   margin: 0;
   display: flex;
@@ -64,10 +70,55 @@ button {
   min-height: 100vh;
   background-image: linear-gradient(
     to bottom right,
-    rgb(17, 24, 39),   /* from-gray-900 */
-    rgb(30, 58, 138),  /* via-blue-900 */
-    rgb(17, 24, 39)    /* to-gray-900 */
+    rgb(17, 24, 39),   
+    rgb(30, 58, 138), 
+    rgb(17, 24, 39) 
   );
+  background-attachment: fixed;
+}
+.main-content {
+  margin-left: 3vw;
+  flex: 1;
+  width: 100%;
+  overflow-x: hidden;
+}
+@media(max-width:1035px) {
+  .main-content{
+    margin-left: 5vw;
+  }
+
+}
+@media(max-width:760px) {
+  .main-content{
+    margin-left: 7vw;
+  }
+}
+@media(max-width:670px) {
+  .main-content{
+    margin-left: 7vw;
+  }
+  .icon-status{
+    font-size: 6px;
+  }
+}
+@media(max-width:642px) {
+  .main-content{
+    margin-left: 7vw;
+  }
+  .icon-status{
+    font-size: 0px;
+    width: 1px;
+  }
+}
+@media(max-width:567px) {
+  .main-content{
+    margin-left: 11vw;
+  }
+}
+@media(max-width:382px) {
+  .main-content{
+    margin-left: 13vw;
+  }
 }
 
 @media (prefers-color-scheme: light) {

@@ -14,8 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-enum userRole{  
+enum userRole {
   SUPERADMIN
   SEKRETARIAT
   BUKUWISUDA
@@ -23,44 +22,43 @@ enum userRole{
 }
 
 model user {
-  id_user   Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
-  password  String
-  role      userRole  @default(SUPERADMIN)
+  id_user  Int      @id @default(autoincrement())
+  username String   @unique
+  email    String   @unique
+  password String
+  role     userRole @default(SUPERADMIN)
+
+  files     file[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  files     file[]
 }
 
-
-
 model mahasiswa {
-  nim               Int               @id
+  nim               Int     @id
   nama              String
-  prodi             String?
   kelas             String
+  prodi             String?
   no_telp           String?
-  penempatan        String?
   nama_orang_tua    String?
   judul_skripsi     String?
   dosen_pembimbing  String?
   daerah_asal       String?
   daerah_penempatan String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  presensis         presensi[]
-  emailSendStatuses emailSendStatus[]
-  files             file[]
+
+  peserta   peserta[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model tamu {
-  id_tamu           Int               @id @default(autoincrement())
-  nama              String
-  email             String
-  asal_instansi     String
-  presensis         presensi[]
-  emailSendStatuses emailSendStatus[]
+  id_tamu       Int    @id @default(autoincrement())
+  nama          String
+  email         String
+  asal_instansi String
+
+  peserta   peserta[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model presensi {
@@ -68,33 +66,49 @@ model presensi {
   waktu_presensi DateTime @default(now())
   status         Int      @default(0)
 
-  mahasiswa mahasiswa? @relation(fields: [nim], references: [nim])
-  nim       Int?
-
-  tamu    tamu? @relation(fields: [id_tamu], references: [id_tamu])
-  id_tamu Int?
+  peserta    peserta  @relation(fields: [id_peserta], references: [id_peserta])
+  id_peserta Int      @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model emailSendStatus {
-  id_sendStatus Int        @id @default(autoincrement())
-  waktu_dikirim DateTime   @default(now())
-  status        Int        @default(0)
+  id_sendStatus Int      @id @default(autoincrement())
+  waktu_dikirim DateTime @default(now())
+  status        Int      @default(0)
   email         String
-  mahasiswa     mahasiswa? @relation(fields: [nim], references: [nim])
-  nim           Int?
-  tamu          tamu?      @relation(fields: [id_tamu], references: [id_tamu])
-  id_tamu       Int?
+
+  peserta           peserta? @relation(fields: [pesertaId_peserta], references: [id_peserta])
+  pesertaId_peserta Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model file {
-  id_file   Int        @id @default(autoincrement())
+  id_file   Int    @id @default(autoincrement())
   file_name String
   path      String
   type      String
-  mahasiswa mahasiswa? @relation(fields: [nim], references: [nim])
-  nim       Int?
-  user      user?      @relation(fields: [id_user], references: [id_user])
-  id_user   Int?
+
+  user              user?    @relation(fields: [userId_user], references: [id_user])
+  userId_user       Int
+  peserta           peserta? @relation(fields: [pesertaId_peserta], references: [id_peserta])
+  pesertaId_peserta Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
+model peserta {
+  id_peserta Int    @id @default(autoincrement())
+  jenis      String
+  nim        Int?
+  id_tamu    Int?
 
+  mahasiswa       mahasiswa?        @relation(fields: [nim], references: [nim])
+  tamu            tamu?             @relation(fields: [id_tamu], references: [id_tamu])
+  files           file[]
+  emailsendstatus emailSendStatus[]
+  presensis       presensi[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}

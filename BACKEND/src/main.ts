@@ -7,7 +7,7 @@ async function bootstrap() {
 
   // 🛡️ Aktifkan CORS untuk frontend (Vite/Vue)
   app.enableCors({
-    origin: 'http://localhost:5173', // asal frontend kamu
+    origin: ['http://localhost:5173', 'http://localhost:5174'], // asal frontend kamu
     credentials: true,               // jika pakai cookie/session
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   });
