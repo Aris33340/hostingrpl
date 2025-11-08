@@ -1,15 +1,16 @@
 <template>
   <div class="min-h-screen p-8 text-white">
     <div class="max-w-7xl mx-auto">
-    
-        <header class="mb-8 text-center">
-    <h2 class="text-3xl font-extrabold tracking-tight text-white">
-        📚 Manajemen Mahasiswa
-    </h2>
-    <p class="text-blue-200/70 mt-1 text-sm">Dashboard Admin • Kelola data mahasiswa</p>
-    </header>
-    
-        <!-- Upload -->
+
+      <!-- Header -->
+      <header class="mb-8 text-center">
+        <h2 class="text-3xl font-extrabold tracking-tight text-white">
+          📚 Manajemen Mahasiswa
+        </h2>
+        <p class="text-blue-200/70 mt-1 text-sm">Dashboard Admin • Kelola data mahasiswa</p>
+      </header>
+
+      <!-- Upload Section -->
       <section class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
         <InputData @refresh="fetchMahasiswa" @loading="isUploading = $event" />
         <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
@@ -18,7 +19,7 @@
         </div>
       </section>
 
-      <!-- CRUD & Table -->
+      <!-- CRUD & Table Section -->
       <section class="bg-white/6 backdrop-blur-sm rounded-2xl border border-blue-500/20 p-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <h3 class="text-xl font-semibold text-white">Daftar Mahasiswa</h3>
@@ -31,7 +32,6 @@
               placeholder="Cari mahasiswa..."
               class="w-full md:w-72 px-3 py-2 rounded-lg bg-white/10 border border-transparent placeholder-blue-200 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-
             <button
               @click="tambahMahasiswa"
               class="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold shadow-sm transition"
@@ -48,43 +48,38 @@
             @hapus="hapusMahasiswa"
           />
 
-          <!-- small loading overlay (doesn't block whole screen) -->
+          <!-- Loading overlay -->
           <div v-if="isLoading" class="absolute left-1/2 -translate-x-1/2 bottom-2 flex items-center gap-2 bg-black/60 px-4 py-2 rounded-full">
             <span class="w-5 h-5 border-4 border-gray-400 border-t-blue-500 rounded-full animate-spin"></span>
             <span class="text-xs text-blue-100">Memuat data...</span>
           </div>
         </div>
 
-        <!-- Paging -->
+        <!-- Pagination -->
         <div class="flex items-center justify-between mt-4">
           <div class="text-sm text-blue-200/80">
             Menampilkan <span class="font-medium text-white">{{ mahasiswa.length }}</span> baris
           </div>
           <div class="flex items-center gap-2">
             <button
-            @click="prevPage"
-            :disabled="page === 1"
-            class="px-3 py-1 rounded-lg text-gray-100 bg-white/10
-                    border border-white/20 hover:bg-white/20
-                    transition duration-200 disabled:text-gray-400 disabled:bg-white/5"
+              @click="prevPage"
+              :disabled="page === 1"
+              class="px-3 py-1 rounded-lg text-gray-100 bg-white/10 border border-white/20 hover:bg-white/20 transition duration-200 disabled:text-gray-400 disabled:bg-white/5"
             >
-            ‹ Prev
+              ‹ Prev
             </button>
-
             <span class="text-sm">Halaman <span class="font-medium">{{ page }}</span></span>
-
             <button
               @click="nextPage"
               :disabled="mahasiswa.length < limit"
-              class="px-3 py-1 rounded-lg text-gray-100 bg-white/10
-                    border border-white/20 hover:bg-white/20
-                    transition duration-200 disabled:text-gray-400 disabled:bg-white/5"
+              class="px-3 py-1 rounded-lg text-gray-100 bg-white/10 border border-white/20 hover:bg-white/20 transition duration-200 disabled:text-gray-400 disabled:bg-white/5"
             >
               Next ›
             </button>
           </div>
         </div>
 
+        <!-- Modal -->
         <ModalMahasiswa
           :show="showModal"
           :mahasiswa="selectedMahasiswa"
@@ -115,21 +110,23 @@ const page = ref(1)
 const limit = 25
 let searchTimeout = null
 
+// Fetch mahasiswa with optional search & pagination
 async function fetchMahasiswa() {
   try {
     isLoading.value = true
     const { data } = await api.get('/api/mahasiswa', {
-      params: { search: search.value, page: page.value, limit },
+      params: { search: search.value, page: page.value, limit }
     })
     mahasiswa.value = data.data || []
-  } catch (error) {
-    console.error('Gagal memuat data mahasiswa:', error)
+  } catch (err) {
+    console.error('Gagal memuat data mahasiswa:', err)
     mahasiswa.value = []
   } finally {
     isLoading.value = false
   }
 }
 
+// CRUD Functions
 function tambahMahasiswa() {
   selectedMahasiswa.value = null
   isEdit.value = false
@@ -147,15 +144,17 @@ async function hapusMahasiswa(nim) {
   try {
     await api.delete(`/api/mahasiswa/${nim}`)
     fetchMahasiswa()
-  } catch (error) {
-    console.error('Gagal menghapus data mahasiswa:', error)
+  } catch (err) {
+    console.error('Gagal menghapus data mahasiswa:', err)
   }
 }
 
+// Pagination
 function nextPage() {
   page.value++
   fetchMahasiswa()
 }
+
 function prevPage() {
   if (page.value > 1) {
     page.value--
@@ -163,8 +162,8 @@ function prevPage() {
   }
 }
 
+// Debounce search
 function onSearch() {
-  // debounce search 400ms
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
     page.value = 1
@@ -172,5 +171,6 @@ function onSearch() {
   }, 400)
 }
 
+// Initial load
 onMounted(fetchMahasiswa)
 </script>

@@ -41,7 +41,7 @@
 defineProps({
   mahasiswa: {
     type: Array,
-    default: () => [],
-  },
+    default: () => []
+  }
 })
 </script>

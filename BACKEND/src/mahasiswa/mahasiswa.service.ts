@@ -31,7 +31,6 @@ async getMahasiswaWithPagination(search?: string, page = 1, limit = 10) {
           { prodi: { contains: search } },
           { kelas: { contains: search } },
           { no_telp: { contains: search } },
-          { penempatan: { contains: search } },
           { nama_orang_tua: { contains: search } },
           { judul_skripsi: { contains: search } },
           { dosen_pembimbing: { contains: search } },
@@ -56,6 +55,7 @@ async getMahasiswaWithPagination(search?: string, page = 1, limit = 10) {
 
   return { data, page, limit, total };
 }
+
 
   // 🟩 4️⃣ Tambah satu mahasiswa
   async createMahasiswa(

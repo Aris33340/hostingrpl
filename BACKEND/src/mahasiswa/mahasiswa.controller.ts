@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Post, Body } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Put, Param, Delete, ParseIntPipe, BadRequestException } from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
 import { Prisma } from 'generated/prisma';
 import { CryptoService } from 'src/scan/CryptoService';
@@ -11,14 +11,12 @@ export class MahasiswaController {
   ) {}
 
   // 🟩 1️⃣ GET /api/mahasiswa/all
-  // Ambil semua data mahasiswa tanpa pagination (versi lama)
   @Get('all')
   async mahasiswas() {
     return this.mhsService.mahasiswas();
   }
 
   // 🟩 2️⃣ GET /api/mahasiswa?search=&page=&limit=
-  // Versi baru dengan fitur pencarian & pagination
   @Get()
   async getMahasiswa(
     @Query('search') search?: string,
@@ -29,17 +27,77 @@ export class MahasiswaController {
   }
 
   // 🟩 3️⃣ POST /api/mahasiswa/bulk
-  // Import banyak data mahasiswa dari Excel
   @Post('bulk')
   async createMany(@Body() data: Prisma.mahasiswaCreateManyInput[]) {
     return this.mhsService.createManyMahasiswa(data);
   }
 
   // 🟩 4️⃣ POST /api/mahasiswa/encrypt
-  // Contoh endpoint enkripsi text (pakai CryptoService)
   @Post('encrypt')
   encryptData(@Body('text') text: string) {
     const encrypted = this.crypto.encrypt(text);
     return { encrypted };
+  }
+
+  // 🟩 5️⃣ POST /api/mahasiswa
+  @Post()
+  async createMahasiswa(@Body() body: any) {
+    try {
+      const data: Prisma.mahasiswaCreateInput = {
+        nim: parseInt(body.nim),
+        nama: body.nama,
+        kelas: body.kelas || '',
+        prodi: body.prodi || null,
+        no_telp: body.no_telp || null,
+        nama_orang_tua: body.nama_orang_tua || null,
+        judul_skripsi: body.judul_skripsi || null,
+        dosen_pembimbing: body.dosen_pembimbing || null,
+        daerah_asal: body.daerah_asal || null,
+        daerah_penempatan: body.daerah_penempatan || null,
+      };
+
+      if (isNaN(data.nim)) {
+        throw new BadRequestException('NIM harus berupa angka');
+      }
+
+      return this.mhsService.createMahasiswa(data);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Gagal menambah mahasiswa');
+    }
+  }
+
+  // 🟩 6️⃣ PUT /api/mahasiswa/:nim
+  @Put(':nim')
+  async updateMahasiswa(
+    @Param('nim', ParseIntPipe) nim: number,
+    @Body() body: any,
+  ) {
+    try {
+      const data: Prisma.mahasiswaUpdateInput = {
+        nama: body.nama,
+        kelas: body.kelas,
+        prodi: body.prodi || null,
+        no_telp: body.no_telp || null,
+        nama_orang_tua: body.nama_orang_tua || null,
+        judul_skripsi: body.judul_skripsi || null,
+        dosen_pembimbing: body.dosen_pembimbing || null,
+        daerah_asal: body.daerah_asal || null,
+        daerah_penempatan: body.daerah_penempatan || null,
+      };
+
+      return this.mhsService.updateMahasiswa({ where: { nim }, data });
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Gagal mengupdate mahasiswa');
+    }
+  }
+
+  // 🟩 7️⃣ DELETE /api/mahasiswa/:nim
+  @Delete(':nim')
+  async deleteMahasiswa(@Param('nim', ParseIntPipe) nim: number) {
+    try {
+      return this.mhsService.deleteMahasiswa({ nim });
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Gagal menghapus mahasiswa');
+    }
   }
 }
