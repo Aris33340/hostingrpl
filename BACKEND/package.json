@@ -27,6 +27,8 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/platform-express": "^11.0.1",
+    "@prisma/client": "^6.19.0",
     "@nestjs/platform-express": "^11.1.8",
     "@prisma/client": "^6.17.1",
     "bcryptjs": "^3.0.2",
