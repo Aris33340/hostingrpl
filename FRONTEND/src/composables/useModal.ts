@@ -9,8 +9,10 @@ let resolvePromise: ((value: boolean) => void) | null = null
 type Options = {
   title?: string
   message?: string
-  type?: 'alert' | 'question' | 'success'
+  type?: notifType
 }
+
+type notifType = 'alert' | 'question' | 'success';
 
 export function useModal() {
   function open(options?: Options): Promise<boolean> {

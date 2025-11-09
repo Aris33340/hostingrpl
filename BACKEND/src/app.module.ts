@@ -30,7 +30,7 @@ import { PresensiModule } from './presensi/presensi/presensi.module';
     ConfigModule.forRoot({ isGlobal: true }),
     FileModule,
     CryptoModule,
-    PresensiModule
+    PresensiModule,
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],

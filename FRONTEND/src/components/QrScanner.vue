@@ -28,18 +28,14 @@ onMounted(() => {
 
     function onScanSuccess(decodedText, decodedResult) {
         if (decodedText !== lastResult) {
-            lastResult = decodedText
-            processing = true
-        }
+            lastResult = decodedText;
+            myqr.classList.remove('hidden');
+            myqr.innerHTML = `<strong>Hasil Scan Terakhir:</strong> ${decodedText}`;
+            emit('scanned', decodedText);
 
-        if (processing) {
-            processing = false
-            html5QrcodeScanner.pause()
-
-            myqr.classList.remove('hidden')
-            myqr.innerHTML = `<strong>Hasil Scan Terakhir:</strong> ${decodedText}`
-
-            emit('scanned', decodedText)
+            setTimeout(() => {
+                lastResult = null;
+            }, 2000);
         }
     }
 
@@ -56,12 +52,12 @@ onMounted(() => {
 })
 
 defineExpose({
-  pauseScanner() {
-    html5QrcodeScanner?.pause()
-  },
-  resumeScanner() {
-    html5QrcodeScanner?.resume()
-  }
+    pauseScanner() {
+        html5QrcodeScanner?.pause()
+    },
+    resumeScanner() {
+        html5QrcodeScanner?.resume()
+    }
 })
 </script>
 <style>
@@ -72,7 +68,8 @@ defineExpose({
     justify-content: center;
     background-color: none;
 }
-#reader__scan_region > video{
+
+#reader__scan_region>video {
     border-radius: 20px;
 }
 

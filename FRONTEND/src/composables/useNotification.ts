@@ -2,16 +2,28 @@ import { reactive } from "vue";
 
 export const notification = reactive({
   show: false,
-  type: "success",
+  type: "success" as "success" | "error",
   message: "",
 });
 
-export function showNotification(type:string, message:string) {
-  notification.show = true;
-  notification.type = type;
-  notification.message = message;
+type notifType = "success" | "error";
 
-  setTimeout(() => {
+let timeoutId: number | null = null;
+
+export function showNotification(type: notifType, message: string) {
+  if (notification.show) {
     notification.show = false;
-  }, 4000);
+    setTimeout(() => {
+      notification.show = true;
+      notification.type = type;
+      notification.message = message;
+    }, 200); 
+  } else {
+    notification.show = true;
+    notification.type = type;
+    notification.message = message;
+  }
+
+  if (timeoutId) clearTimeout(timeoutId);
+  timeoutId = window.setTimeout(() => (notification.show = false), 4000);
 }

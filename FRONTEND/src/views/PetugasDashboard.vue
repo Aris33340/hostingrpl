@@ -6,9 +6,11 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <InfoContainer :value="totalUndangan" message="Total Undangan" icon="users" color="blue" />
-            <InfoContainer :value="totalHadir" message="Hadir" icon="check" color="green" />
-            <InfoContainer :value="totalBelumHadir" message="Belum Hadir" icon="clock" color="orange" />
+            <InfoContainer :loading="isLoading" :value="totalUndangan" message="Total Undangan" icon="users"
+                color="blue" />
+            <InfoContainer :loading="isLoading" :value="totalHadir" message="Hadir" icon="check" color="green" />
+            <InfoContainer :loading="isLoading" :value="totalBelumHadir" message="Belum Hadir" icon="clock"
+                color="orange" />
         </div>
 
         <div class="grid h-full grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -202,62 +204,88 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import InfoContainer from '../components/InfoContainer.vue';
-import Scanner from '../components/Scanner.vue';
-import api from '@/api'
+import Scanner from '../components/QrScanner.vue';
+import { mainApi } from '@/api'
 import { useModal } from '../composables/useModal';
-import { showNotification } from '../composables/useNotification'
+import { notification, showNotification } from '../composables/useNotification'
 
 const modal = useModal();
-const BASE_URL = 'api/'
 const scannerRef = ref(null)
+const manualNim = ref('');
 const scanResult = ref("");
+const totalUndangan = ref(0);
+const totalHadir = ref(0);
+const totalBelumHadir = ref(0);
+const isLoading = ref(true);
+
+async function getData() {
+    try {
+        const res = await mainApi.get(`presensi/count-status-presensi`);
+        const dataUndangan = res.data;
+        totalUndangan.value = dataUndangan.totalUndangan;
+        totalHadir.value = dataUndangan.totalUndanganHadir;
+        totalBelumHadir.value = dataUndangan.totalUndanganTidakHadir;
+    } catch (e) {
+        showNotification('error', e);
+    } finally {
+        isLoading.value = false;
+    }
+}
+onMounted(async () => {
+    await getData();
+});
 
 const handleScan = async (value) => {
-    scanResult.value = value;
     try {
-        const res = await api.post(`${BASE_URL}scan`, { qr: String(scanResult.value) });
-        const data = res.data.data;
-        let nama;
-        if (data.jenis == "mahasiswa") {
-            nama = data.mahasiswa.nama;
-            const result = await modal.open({
-                title: 'Konfirmasi Kehadiran',
-                message: `Tandai ${nama} sebagai hadir?`,
-                type: 'question'
-            })
-
-            if (!result) {
-                modal.close(true);
-            }
-
-        } else {
-            nama = data.tamu.nama;
-            const result = await modal.open({
-                title: 'Konfirmasi Kehadiran',
-                message: `Tandai Bapak/Ibu ${nama} sebagai hadir?`,
-                type: 'question'
-            })
-            if (!result) {
-                modal.close(true);
-            }
-
-        }
-        const response = await api.patch(`${BASE_URL}scan/${data.presensis[0].id_presensi}`, { status: 1 })
-
-        setTimeout(() => {
-            modal.open({
-                title: 'Berhasil!',
-                message: `Hadirin atas nama ${nama} ditandai hadir`,
-                type: 'success'
-            })
-        }, 3000)
+        const resScan = await mainApi.post('scan', { data: value });
+        scanResult.value = resScan.data.hasilDecrypt;
+        handlePresensi(scanResult.value);
     } catch (error) {
-        showNotification('error', ': ' + (error.response?.data?.message || error.message))
+        showNotification('error', error.message);
     }
-    modal.close(true)
+    finally {
+        setTimeout(() => resumeScan(), 2000);
+    }
+}
 
+const handleManualInput = async () => {
+    try {
+        const res = await mainApi.get(`presensi/find-nim/${manualNim.value}`)
+        handlePresensi(res.data.id_presensi);
+    } catch (error) {
+        console.log(error.message);
+        
+    }
+};
+
+const handlePresensi = async (idPresensi) => {
+    try {
+        const resPesertaData = await mainApi.get(`presensi/find-peserta/${idPresensi}`);
+        const pesertaData = resPesertaData.data;
+        if (!pesertaData.peserta) {
+            showNotification('error', 'Data tidak ditemukan');
+        } else {
+            const modalres = await modal.open({
+                title: "Konfirmasi Kehadiran?",
+                message: `Konfirmasi Kehadiran ${pesertaData.peserta.mahasiswa ? pesertaData.peserta.mahasiswa.nama : pesertaData.peserta.tamu.nama}`,
+                type: 'question'
+            })
+
+            if (modalres) {
+                const res = await mainApi.patch(`presensi/mark-status/${Number(idPresensi)}`)
+                console.log(res.data);
+                showNotification(res.data.STATUS_CODES === 200 ? 'success' : 'error', res.data.message)
+
+            } else {
+                showNotification('success', "Presensi dibatalkan")
+            }
+        }
+
+    } catch (error) {
+        showNotification('error', error.message);
+    } 
 }
 
 function pauseScan() {
@@ -267,6 +295,4 @@ function pauseScan() {
 function resumeScan() {
     scannerRef.value?.resumeScanner()
 }
-
-
 </script>

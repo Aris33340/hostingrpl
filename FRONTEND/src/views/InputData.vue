@@ -33,7 +33,7 @@
 import * as XLSX from 'xlsx'
 import axios from 'axios'
 import { ref } from 'vue'
-import api from '@/api'
+import {mainApi} from '@/api'
 
 const preview = ref([])
 const message = ref('')

@@ -140,7 +140,7 @@
 <script setup>
     import { ref, onMounted } from 'vue'
     import { useRouter } from 'vue-router'
-    import api from '@/api'
+    import {mainApi} from '@/api'
     import { showNotification } from "../composables/useNotification";
 
     const router = useRouter()

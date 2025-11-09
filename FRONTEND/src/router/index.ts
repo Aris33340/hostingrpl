@@ -13,7 +13,7 @@ const routes = [
     path: "/",
     name: "Login",
     component: Login,
-    meta: { title: "Login", showInNavbar: false },
+    meta: { title: "Login", icon: HomeIcon, showInNavbar: true  },
   },
   {
     path: "/input-excel",

@@ -6,9 +6,9 @@ export class ScanController {
   constructor(private scanService: ScanService) {}
   
   @Post()
-  async scanQr(@Body('qr') qr: string) {
-    const data = await this.scanService.getScanData(qr);
-    return { success: true, data };
+  async scanQr(@Body('data') data: string) {
+    const hasilDecrypt = await this.scanService.ScanData(data);
+    return { success: true, hasilDecrypt };
   }
   @Patch(':id')
   async updateStatusPresensi(@Param('id') id :Number,@Body('status') status:Number){
