@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
-import InputData from "../views/InputData.vue";
+import ManajemenMahasiswa from "../views/ManajemenMahasiswa.vue";
 import Login from "../views/Login.vue";
 import QrGenerator from "../components/QrGenerator.vue";
 import FileManager from "../views/FileManager.vue";
+import PetugasDashboard from "../views/PetugasDashboard.vue";
 
 // 🧩 Impor ikon (bisa SVG component, lucide-react, Heroicons, dll)
-import { HomeIcon, FileTextIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
-import PetugasDashboard from "../views/PetugasDashboard.vue";
+import { HomeIcon, UserIcon, FileTextIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
 
 const routes = [
   {
@@ -16,10 +16,10 @@ const routes = [
     meta: { title: "Login", icon: HomeIcon, showInNavbar: true  },
   },
   {
-    path: "/input-excel",
-    name: "InputExcel",
-    component: InputData,
-    meta: { title: "Input Excel", icon: FileTextIcon, showInNavbar: true },
+    path: "/manajemen-mahasiswa",
+    name: "ManajemenMahasiswa",
+    component: ManajemenMahasiswa,
+    meta: { title: "Manajemen Mahasiswa", icon: UserIcon, showInNavbar: true },
   },
   {
     path: "/input-file",
