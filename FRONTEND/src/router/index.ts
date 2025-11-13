@@ -5,21 +5,21 @@ import QrGenerator from "../components/QrGenerator.vue";
 import FileManager from "../views/FileManager.vue";
 import PetugasDashboard from "../views/PetugasDashboard.vue";
 
-// 🧩 Impor ikon (bisa SVG component, lucide-react, Heroicons, dll)
-import { HomeIcon, UserIcon, FileTextIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
+import { HomeIcon, UserIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
+import Test from "../views/Test.vue";
 
 const routes = [
   {
     path: "/",
     name: "Login",
     component: Login,
-    meta: { title: "Login", icon: HomeIcon, showInNavbar: true  },
+    meta: { title: "Login", icon: HomeIcon, showInNavbar: true, showNavbar:false },
   },
   {
     path: "/manajemen-mahasiswa",
     name: "ManajemenMahasiswa",
     component: ManajemenMahasiswa,
-    meta: { title: "Manajemen Mahasiswa", icon: UserIcon, showInNavbar: true },
+    meta: { title: "Manajemen Mahasiswa", icon: UserIcon, showInNavbar: true},
   },
   {
     path: "/input-file",
@@ -37,6 +37,12 @@ const routes = [
     path: "/petugas",
     name: "DashboardPetugas",
     component: PetugasDashboard,
+    meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true },
+  },
+  {
+    path: "/test",
+    name: "testing",
+    component: Test,
     meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true },
   },
 ];

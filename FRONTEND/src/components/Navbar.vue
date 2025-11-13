@@ -1,5 +1,5 @@
 <template>
-  <aside
+  <aside v-if="isNavbarVisible"
     class="fixed left-0 top-0 h-full shadow-lg flex flex-col items-center py-6 w-16 z-50 transition-all duration-300"
   >
     <div class="w-full mb-6 text-center px-2">
@@ -35,11 +35,15 @@
 
 <script setup>
 import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { LogOut } from "lucide-vue-next";
 import SidebarLink from "../components/Button.vue";
 
 const router = useRouter();
+const route = useRoute();
+
+const isNavbarVisible = computed(() => route.meta.showNavbar !== false);
+console.log(isNavbarVisible.value)
 
 const menuRoutes = computed(() =>
   router.getRoutes().filter((r) => r.meta.showInNavbar)
