@@ -1,5 +1,4 @@
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { STATUS_CODES } from 'http';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

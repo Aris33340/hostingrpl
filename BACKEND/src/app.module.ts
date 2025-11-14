@@ -17,6 +17,7 @@ import { CryptoService } from './crypto/crypto/CryptoService';
 import { FileModule } from './file/file.module';
 import { CryptoModule } from './crypto/crypto/crypto.module';
 import { PresensiModule } from './presensi/presensi/presensi.module';
+import { EditorModule } from './editor/editor.module';
 
 
 @Module({
@@ -31,6 +32,7 @@ import { PresensiModule } from './presensi/presensi/presensi.module';
     FileModule,
     CryptoModule,
     PresensiModule,
+    EditorModule
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],

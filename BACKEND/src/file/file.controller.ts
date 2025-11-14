@@ -27,11 +27,16 @@ import { createReadStream, existsSync, unlinkSync } from 'node:fs';
 export class FileController {
     constructor(private readonly fileService: FileService) { }
 
-    @Post('upload')
+    @Get()
+    async getAllFiles() {
+        return this.fileService.getAllFiles();
+    }
+
+    @Post()
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
-                destination: './uploads',
+                destination: './public/uploads',
                 filename: (req, file, cb) => {
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                     const ext = extname(file.originalname);
@@ -43,24 +48,27 @@ export class FileController {
     async uploadFile(
         @UploadedFile(
             new ParseFilePipeBuilder()
-            .addMaxSizeValidator({
-                maxSize: 20 * 1024 * 1024
-            }).build({
-                errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,   
-            })
+                .addFileTypeValidator({
+                    fileType: /(pdf)$/,
+                    skipMagicNumbersValidation:true
+                })
+                .addMaxSizeValidator({
+                    maxSize: 20 * 1024 * 1024, // 3 MB
+                })
+                .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+                }),
         )
-        
         file: Express.Multer.File,
     ) {
         if (!file) {
             throw new BadRequestException('No file uploaded');
         }
-
         const savedFile = await this.fileService.saveFile(file);
         return savedFile;
     }
 
-    @Get(':id/file')
+    @Get(':id')
     async getFile(@Param('id') id: string): Promise<StreamableFile> {
         const fileRecord = await this.fileService.getFileById(Number(id));
         if (!fileRecord) throw new NotFoundException('File not found in database');
@@ -79,6 +87,11 @@ export class FileController {
         });
     }
 
+    @Delete(':id')
+    async deleteFile(@Param('id') id: string) {
+        return this.fileService.deleteFileById(Number(id));
+    }
+
     private getMimeType(type: string): string {
         const map: Record<string, string> = {
             pdf: 'application/pdf',
@@ -90,16 +103,4 @@ export class FileController {
         };
         return map[type.toLowerCase()] || 'application/octet-stream';
     }
-
-
-    @Get('all')
-    async getAllFiles() {
-        return this.fileService.getAllFiles();
-    }
-
-    @Delete(':id')
-    async deleteFile(@Param('id') id: string) {
-        return this.fileService.deleteFileById(Number(id));
-    }
-
 }

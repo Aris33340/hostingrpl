@@ -23,13 +23,22 @@ export class MahasiswaController {
   ) {}
 
   // 🟩 1️⃣ GET /api/mahasiswa/all
-  @Get('all')
+  @Get()
   async mahasiswas() {
     return this.mhsService.mahasiswas();
   }
 
+  @Get('by-nim/:nim')
+  async getMahasiswaByNim(@Param('nim') nim: string) {
+    const nimNumber = Number(nim);
+    if (isNaN(nimNumber)) {
+      throw new BadRequestException('NIM harus berupa angka');
+    }
+    return this.mhsService.mahasiswa({ nim: nimNumber });
+  }
+
   // 🟩 2️⃣ GET /api/mahasiswa?search=&page=&limit=
-  @Get()
+  @Get('pagination')
   async getMahasiswa(
     @Query('search') search?: string,
     @Query('page') page: string = '1',
@@ -42,13 +51,6 @@ export class MahasiswaController {
   @Post('bulk')
   async createMany(@Body() data: Prisma.mahasiswaCreateManyInput[]) {
     return this.mhsService.createManyMahasiswa(data);
-  }
-
-  // 🟩 4️⃣ POST /api/mahasiswa/encrypt
-  @Post('encrypt')
-  encryptData(@Body('text') text: string) {
-    const encrypted = this.crypto.encrypt(text);
-    return { encrypted };
   }
 
   // 🟩 5️⃣ POST /api/mahasiswa
