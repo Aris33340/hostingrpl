@@ -431,7 +431,8 @@ const handlePresensi = async (idPresensi) => {
 
             if (modalres) {
                 const res = await mainApi.patch(`presensi/mark-status/${Number(idPresensi)}`)
-                console.log(res.data);
+                await mountStatistikData();
+                await mountTableData();
                 showNotification(res.data.STATUS_CODES === 200 ? 'success' : 'error', res.data.message)
 
             } else {

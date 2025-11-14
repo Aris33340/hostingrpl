@@ -83,7 +83,7 @@ export class PresensiService {
 
     async getPresensiByNim(nim: number) {
         try {
-            const presMahasiswa = await this.prisma.presensi.findFirst({
+            const presMahasiswa = await this.prisma.presensi.findMany({
                 select: {
                     id_presensi: true,
                     waktu_presensi: true,

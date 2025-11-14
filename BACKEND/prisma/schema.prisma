@@ -66,7 +66,7 @@ model presensi {
   waktu_presensi DateTime @default(now())
   status         Int      @default(0)
 
-  peserta    peserta  @relation(fields: [id_peserta], references: [id_peserta])
+  peserta    peserta  @relation(fields: [id_peserta], references: [id_peserta]) 
   id_peserta Int      @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -101,8 +101,8 @@ model file {
 model peserta {
   id_peserta Int    @id @default(autoincrement())
   jenis      String
-  nim        Int?
-  id_tamu    Int?
+  nim        Int?   @unique
+  id_tamu    Int?   @unique
 
   mahasiswa       mahasiswa?        @relation(fields: [nim], references: [nim])
   tamu            tamu?             @relation(fields: [id_tamu], references: [id_tamu])
