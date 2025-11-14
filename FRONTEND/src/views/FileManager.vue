@@ -152,7 +152,7 @@
     const uploadProgress = ref(0)
 
 
-    const API_BASE = '/api/files'
+    const API_BASE = '/files'
     const getFileType = (fileName) => {
         const ext = fileName.split('.').pop().toLowerCase()
         if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) return 'image'
@@ -180,7 +180,7 @@
         }, 200)
 
         try {
-            const res = await api.post(`${API_BASE}/upload`, formData, {
+            const res = await mainApi.post(`${API_BASE}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             })
 
@@ -205,7 +205,7 @@
 
     const viewFile = async (file) => {
         try {
-            const res = await api.get(`${API_BASE}/${file.id_file}/file`, {
+            const res = await mainApi.get(`${API_BASE}/${file.id_file}`, {
                 responseType: 'blob',
             });
 
@@ -239,7 +239,7 @@
         if (!confirm(`Hapus file "${file.file_name}"?`)) return
 
         try {
-            await api.delete(`${API_BASE}/${file.id_file}`)
+            await mainApi.delete(`${API_BASE}/${file.id_file}`)
             files.value = files.value.filter(f => f.id_file !== file.id_file)
 
             if (previewUrl.value) {
@@ -256,7 +256,7 @@
 
     const loadFiles = async () => {
         try {
-            const res = await api.get(`${API_BASE}/all`)
+            const res = await mainApi.get(`${API_BASE}`)
             files.value = res.data
         } catch {
             files.value = []

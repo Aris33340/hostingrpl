@@ -78,23 +78,21 @@
             </button>
           </div>
         </div>
-
-        <!-- Modal -->
-        <ModalMahasiswa
+      </section>
+      <ModalMahasiswa
           :show="showModal"
           :mahasiswa="selectedMahasiswa"
           :isEdit="isEdit"
           @close="showModal = false"
           @refresh="fetchMahasiswa"
         />
-      </section>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import api from '@/api'
+import {mainApi} from '@/api'
 import InputData from '@/components/InputData.vue'
 import TableMahasiswa from '@/components/TableMahasiswa.vue'
 import ModalMahasiswa from '@/components/ModalMahasiswa.vue'
@@ -114,7 +112,7 @@ let searchTimeout = null
 async function fetchMahasiswa() {
   try {
     isLoading.value = true
-    const { data } = await api.get('/api/mahasiswa', {
+    const { data } = await mainApi.get('mahasiswa', {
       params: { search: search.value, page: page.value, limit }
     })
     mahasiswa.value = data.data || []
@@ -142,7 +140,7 @@ function editMahasiswa(m) {
 async function hapusMahasiswa(nim) {
   if (!confirm('Yakin ingin menghapus data ini?')) return
   try {
-    await api.delete(`/api/mahasiswa/${nim}`)
+    await mainApi.delete(`mahasiswa/${nim}`)
     fetchMahasiswa()
   } catch (err) {
     console.error('Gagal menghapus data mahasiswa:', err)

@@ -45,6 +45,12 @@ const routes = [
     component: Test,
     meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true },
   },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: Login,
+    meta: { title: "Not Found", icon: HomeIcon, showInNavbar: false, showNavbar:false },
+  }
 ];
 
 const router = createRouter({

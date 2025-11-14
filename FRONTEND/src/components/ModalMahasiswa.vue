@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div v-if="show" class="fixed inset-0 top-0 z-50  flex items-center justify-center">
       <!-- Background overlay -->
       <div class="absolute inset-0 bg-black/50" @click="$emit('close')"></div>
 
@@ -126,7 +126,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import api from '@/api'
+import {mainApi} from '@/api'
 
 const props = defineProps({
   show: Boolean,
@@ -199,10 +199,10 @@ async function simpan() {
 
     if (props.isEdit) {
       // Update mahasiswa
-      await api.put(`/api/mahasiswa/${form.value.nim}`, form.value)
+      await mainApi.put(`mahasiswa/${form.value.nim}`, form.value)
     } else {
       // Tambah mahasiswa baru
-      await api.post('/api/mahasiswa', form.value)
+      await mainApi.post('mahasiswa', form.value)
     }
 
     emit('refresh')
