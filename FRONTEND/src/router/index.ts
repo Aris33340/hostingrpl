@@ -9,41 +9,45 @@ import { HomeIcon, FileTextIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next"
 import PetugasDashboard from "../views/PetugasDashboard.vue";
 
 const routes = [
-  {
-    path: "/",
-    name: "Login",
-    component: Login,
-    meta: { title: "Login", showInNavbar: false },
-  },
-  {
-    path: "/input-excel",
-    name: "InputExcel",
-    component: InputData,
-    meta: { title: "Input Excel", icon: FileTextIcon, showInNavbar: true },
-  },
-  {
-    path: "/input-file",
-    name: "InputFile",
-    component: FileManager,
-    meta: { title: "Input File", icon: UploadIcon, showInNavbar: true },
-  },
-  {
-    path: "/generate-qr",
-    name: "QrGenerator",
-    component: QrGenerator,
-    meta: { title: "Generate QR", icon: QrCodeIcon, showInNavbar: true },
-  },
-  {
-    path: "/petugas",
-    name: "DashboardPetugas",
-    component: PetugasDashboard,
-    meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true },
-  },
+  {
+    path: "/",
+    name: "Login",
+    component: Login,
+    meta: { 
+      title: "Login", 
+      showInNavbar: false, 
+      hideSidebar: true  // <-- INI DIA PERUBAHANNYA
+    },
+  },
+  {
+    path: "/input-excel",
+    name: "InputExcel",
+    component: InputData,
+    meta: { title: "Input Excel", icon: FileTextIcon, showInNavbar: true },
+  },
+  {
+    path: "/input-file",
+    name: "InputFile",
+    component: FileManager,
+    meta: { title: "Input File", icon: UploadIcon, showInNavbar: true },
+  },
+  {
+    path: "/generate-qr",
+    name: "QrGenerator",
+    component: QrGenerator,
+    meta: { title: "Generate QR", icon: QrCodeIcon, showInNavbar: true },
+  },
+  {
+    path: "/petugas",
+    name: "DashboardPetugas",
+    component: PetugasDashboard,
+    meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true },
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+  history: createWebHistory(),
+  routes,
 });
 
 export default router;
