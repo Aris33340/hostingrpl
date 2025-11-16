@@ -64,8 +64,16 @@
 </template>
 
 <script>
-import axios from 'axios';
+// --- MODIFIKASI UNTUK PINIA & INTERCEPTOR ---
 
+// 1. Impor 'mapActions' dari Pinia dan store kita
+import { mapActions } from 'pinia';
+import { useAuthStore } from '../stores/authStore';
+
+// 2. Impor 'apiClient' baru kita, BUKAN 'axios' biasa
+import apiClient from '../plugins/axios';
+
+// Menggunakan VUE 2 (Options API)
 export default {
   data() {
     return {
@@ -78,18 +86,35 @@ export default {
     };
   },
   methods: {
+    // 3. Petakan 'action' dari store kita ke komponen ini
+    ...mapActions(useAuthStore, ['setAuthData']),
+
     async handleLogin() {
       this.error = ''; 
+      
       try {
-        const response = await axios.post('http://localhost:3000/auth/login', {
-          username: this.form.username,
+        // 4. Gunakan 'apiClient' baru kita
+        const response = await apiClient.post('/auth/login', {
+          // Di backend, kita login pakai 'email', tapi form pakai 'username'
+          // Kita kirim 'username' dari form sebagai 'email' ke backend
+          email: this.form.username, 
           password: this.form.password
         });
         
-        localStorage.setItem('token', response.data.token);
+        // 5. Backend HANYA mengirim 'access_token' dan 'role'
+        const accessToken = response.data.access_token;
+        const userRole = response.data.role;
+
+        // 6. Panggil action Pinia untuk menyimpan data di memori
+        // BUKAN localStorage
+        this.setAuthData(accessToken, userRole);
+        
+        // 7. Arahkan ke halaman utama setelah login
         this.$router.push('/input-excel'); 
 
       } catch (err) {
+        // Interceptor akan menangani error 401 (token refresh)
+        // Ini hanya akan menangani error login (misal: password salah)
         if (err.response && err.response.data && err.response.data.message) {
           this.error = err.response.data.message;
         } else {
