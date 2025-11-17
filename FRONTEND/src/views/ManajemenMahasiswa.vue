@@ -78,16 +78,15 @@
             </button>
           </div>
         </div>
-
-        <!-- Modal -->
+      </section>
+              <!-- Modal -->
         <ModalMahasiswa
           :show="showModal"
-          :mahasiswa="selectedMahasiswa"
+          :mahasiswa="selectedMahasiswa"  
           :isEdit="isEdit"
           @close="showModal = false"
           @refresh="fetchMahasiswa"
-        />
-      </section>
+        />F
     </div>
   </div>
 </template>
