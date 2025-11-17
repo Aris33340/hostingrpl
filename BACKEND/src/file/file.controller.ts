@@ -13,7 +13,8 @@ import {
     ParseFilePipe,
     ParseFilePipeBuilder,
     FileTypeValidator,
-    HttpStatus
+    HttpStatus,
+    Body
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -32,7 +33,7 @@ export class FileController {
         return this.fileService.getAllFiles();
     }
 
-    @Post()
+    @Post(':userId')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
@@ -43,9 +44,9 @@ export class FileController {
                     cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
                 },
             }),
-        }),
+        })
     )
-    async uploadFile(
+    async uploadFile(@Param('userId') userId:string,
         @UploadedFile(
             new ParseFilePipeBuilder()
                 .addFileTypeValidator({
@@ -53,7 +54,7 @@ export class FileController {
                     skipMagicNumbersValidation:true
                 })
                 .addMaxSizeValidator({
-                    maxSize: 20 * 1024 * 1024, // 3 MB
+                    maxSize: 20 * 1024 * 1024, // 20 MB
                 })
                 .build({
                     errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
@@ -64,7 +65,7 @@ export class FileController {
         if (!file) {
             throw new BadRequestException('No file uploaded');
         }
-        const savedFile = await this.fileService.saveFile(file);
+        const savedFile = await this.fileService.saveFile(file,Number(userId));
         return savedFile;
     }
 

@@ -1,15 +1,15 @@
 import { Body, Controller, Post, Res, Req, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 // PERBAIKAN: 'import' diubah menjadi 'import type'
-import type { Response, Request } from 'express'; 
+import type { Response, Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
-  
+  constructor(private authService: AuthService) { }
+
   // Endpoint 'register' tidak berubah, sudah benar.
   @Post('register')
-  async register(@Body() body: { username:string; email: string; password: string }) {
+  async register(@Body() body: { username: string; email: string; password: string }) {
     return this.authService.register(body.username, body.email, body.password);
   }
 
@@ -17,33 +17,37 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() body: { email: string; password: string },
-    @Res({ passthrough: true }) res: Response 
+    @Res({ passthrough: true }) res: Response
   ) {
     const loginData = await this.authService.login(body.email, body.password);
 
     res.cookie('refresh_token', loginData.refresh_token, {
-      httpOnly: true, 
-      secure: false, 
-      path: '/', 
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      httpOnly: true,
+      secure: false,
+      sameSite:"lax",
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+
 
     return {
       access_token: loginData.access_token,
       role: loginData.role,
+      id : loginData.id
     };
   }
 
   // --- ENDPOINT BARU 'refresh' ---
   @Post('refresh')
   async refreshTokens(
-    @Req() req: Request, 
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
     const oldRefreshToken = req.cookies['refresh_token'];
     if (!oldRefreshToken) {
       throw new UnauthorizedException('No refresh token found');
     }
+    
 
     let payload: any;
     try {
@@ -54,7 +58,7 @@ export class AuthController {
     }
 
     const tokens = await this.authService.getTokens(
-      payload.sub, 
+      payload.sub,
       payload.email,
       payload.role
     );
@@ -63,7 +67,8 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      sameSite:"lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return {
@@ -79,7 +84,7 @@ export class AuthController {
       secure: false,
       path: '/',
     });
-    
+
     return { message: 'Logged out successfully' };
   }
 }

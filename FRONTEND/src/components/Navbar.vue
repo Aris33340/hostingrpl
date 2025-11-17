@@ -27,20 +27,21 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { LogOut } from "lucide-vue-next";
 import SidebarLink from "../components/Button.vue";
+import { useAuthStore } from "../stores/authStore";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const isNavbarVisible = computed(() => route.meta.showNavbar !== false);
-console.log(isNavbarVisible.value)
-
 const menuRoutes = computed(() =>
   router.getRoutes().filter((r) => r.meta.showInNavbar)
 );
 
 const handleLogout = () => {
   if (confirm("Apakah Anda yakin ingin logout?")) {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
+    authStore.clearAuthData();
     router.push("/login");
   }
 };

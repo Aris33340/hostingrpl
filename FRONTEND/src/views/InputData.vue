@@ -50,7 +50,6 @@ function handleFileUpload(event) {
 
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
     const jsonData = XLSX.utils.sheet_to_json(firstSheet)
-    console.log(jsonData)
     preview.value = jsonData
   }
   reader.readAsArrayBuffer(file)
@@ -64,7 +63,7 @@ async function uploadData() {
 
   loading.value = true
   try {
-    const response = await api.post('/api/mahasiswa/bulk', preview.value)
+    const response = await mainApi.post('/mahasiswa/bulk', preview.value)
     message.value = ` Berhasil menambahkan ${response.data.count} mahasiswa!`;
   } catch (error) {
     console.error(error)

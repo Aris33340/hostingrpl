@@ -4,14 +4,15 @@ import Login from "../views/Login.vue";
 import QrGenerator from "../components/QrGenerator.vue";
 import FileManager from "../views/FileManager.vue";
 import PetugasDashboard from "../views/PetugasDashboard.vue";
+import Editor from "../views/Editor.vue";
 
 import { UserIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
-import Test from "../views/Test.vue";
-import Editor from "../views/Editor.vue";
+import { useAuthStore } from "../stores/authStore";
+import NotFound from "../views/NotFound.vue";
 
 const routes = [
   {
-    path: "/",
+    path: "/login",
     name: "Login",
     component: Login,
     meta: { title: "Login", showNavbar: false },
@@ -54,42 +55,36 @@ const routes = [
     }
   },
   {
-    path: "/test",
-    name: "testing",
-    component: Test,
-    meta: { title: "Test Page", requiresAuth: true },
-  },
-  {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
-    component: Login,
+    component:NotFound,
     meta: { title: "Not Found", showNavbar: false },
   }
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+  history: createWebHistory(),
+  routes,
 });
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
+  const authStore = useAuthStore();
+  const token = authStore.access_token ?? localStorage.getItem("access_token");
+  console.log( localStorage.getItem("access_token"));
+  console.log(authStore.access_token );
 
+  if (to.path == '/'){
+    return next("/login")
+  }
   if (to.meta.requiresAuth && !token) {
-    next({ name: "Login" });
-    return;
+    return next("/login");
   }
 
-  if (to.name === "Login" && token) {
-    next({ name: "ManajemenMahasiswa" }); 
-    return;
+  if (to.path === "/login" && token) {
+    return next("/manajemen-mahasiswa");
   }
-  if(to.path === '/login' && token){
-    next({ name: "ManajemenMahasiswa" }); 
-    return;
-  }
-
-  next();
+  
+  return next();
 });
 
 export default router;

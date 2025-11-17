@@ -38,11 +38,11 @@ export class AuthService {
       };
       
       const accessToken = jwt.sign(payload, this.accessSecret, {
-        expiresIn: '15m', // 15 menit
+        expiresIn: '1m', // 15 menit
       });
       
       const refreshToken = jwt.sign(payload, this.refreshSecret, {
-        expiresIn: '7d', // 7 hari
+        expiresIn: '7s', // 7 hari
       });
       
       return {
@@ -77,7 +77,7 @@ export class AuthService {
 
     // --- FUNGSI 'login' DIMODIFIKASI ---
     // Sekarang me-return DUA token + role
-    async login(email: string, password: string): Promise<{ access_token: string, refresh_token: string, role: string}> {
+    async login(email: string, password: string): Promise<{ access_token: string, refresh_token: string, role: string, id:number}> {
         const user = await this.prisma.user.findUnique({ where: { email } });
         if (!user || !(await bcrypt.compare(password, user.password))) {
             throw new UnauthorizedException('Invalid credentials');
@@ -89,7 +89,8 @@ export class AuthService {
         // Return semua yang dibutuhkan controller
         return { 
           ...tokens, 
-          role: user.role 
+          role: user.role,
+          id: user.id_user
         };
     }
 

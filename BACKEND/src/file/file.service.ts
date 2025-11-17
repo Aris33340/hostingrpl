@@ -7,13 +7,13 @@ import { unlinkSync, existsSync } from 'fs';
 export class FileService {
   constructor(private prisma: PrismaService) { }
 
-  async saveFile(file: Express.Multer.File, userId?: number, nim?: number) {
+  async saveFile(file: Express.Multer.File, userId?: number) {
     return this.prisma.file.create({
       data: {
         file_name: file.originalname,
         path: file.path,
         type: file.mimetype,
-        userId_user: 2
+        userId_user: userId
       },
     });
   }
