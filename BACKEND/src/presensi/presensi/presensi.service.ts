@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class PresensiService {
@@ -83,7 +83,7 @@ export class PresensiService {
 
     async getPresensiByNim(nim: number) {
         try {
-            const presMahasiswa = await this.prisma.presensi.findMany({
+            const presMahasiswa = await this.prisma.presensi.findFirst({
                 select: {
                     id_presensi: true,
                     waktu_presensi: true,
@@ -103,7 +103,10 @@ export class PresensiService {
                 },
                 where: {
                     peserta: {
-                        nim: nim
+                        
+                        mahasiswa:{
+                            nim: nim
+                        }
                     }
                 }
             });

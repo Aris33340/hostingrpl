@@ -18,6 +18,7 @@ import { FileModule } from './file/file.module';
 import { CryptoModule } from './crypto/crypto/crypto.module';
 import { PresensiModule } from './presensi/presensi/presensi.module';
 import { EditorModule } from './editor/editor.module';
+import { QrCodeService } from './scan/qr/qr.service';
 
 
 @Module({

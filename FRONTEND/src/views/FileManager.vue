@@ -7,7 +7,8 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
 
-            <div class="lg:col-span-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 overflow-hidden flex flex-col">
+            <div
+                class="lg:col-span-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-blue-500/20">
                     <div class="flex items-center gap-3">
                         <label class="flex-1 cursor-pointer">
@@ -138,197 +139,197 @@
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue'
-    import { useRouter } from 'vue-router'
-    import {mainApi} from '@/api'
-    import { showNotification } from "../composables/useNotification";
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { mainApi } from '@/api'
+import { showNotification } from "../composables/useNotification";
 
-    const router = useRouter()
-    const selectedFile = ref(null)
-    const files = ref([])
-    const previewUrl = ref(null)
-    const previewType = ref(null)
-    const uploading = ref(false)
-    const uploadProgress = ref(0)
+const router = useRouter()
+const selectedFile = ref(null)
+const files = ref([])
+const previewUrl = ref(null)
+const previewType = ref(null)
+const uploading = ref(false)
+const uploadProgress = ref(0)
 
 
-    const API_BASE = '/files'
-    const getFileType = (fileName) => {
-        const ext = fileName.split('.').pop().toLowerCase()
-        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) return 'image'
-        if (ext === 'pdf') return 'pdf'
-        return 'other'
-    }
+const API_BASE = '/files'
+const getFileType = (fileName) => {
+    const ext = fileName.split('.').pop().toLowerCase()
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) return 'image'
+    if (ext === 'pdf') return 'pdf'
+    return 'other'
+}
 
-    const onFileChange = (event) => {
-        selectedFile.value = event.target.files[0]
-    }
+const onFileChange = (event) => {
+    selectedFile.value = event.target.files[0]
+}
 
-    const uploadFile = async () => {
-        if (!selectedFile.value) return
+const uploadFile = async () => {
+    if (!selectedFile.value) return
 
-        uploading.value = true
-        uploadProgress.value = 0
+    uploading.value = true
+    uploadProgress.value = 0
 
-        const formData = new FormData()
-        formData.append('file', selectedFile.value)
+    const formData = new FormData()
+    formData.append('file', selectedFile.value)
 
-        const progressInterval = setInterval(() => {
-            if (uploadProgress.value < 90) {
-                uploadProgress.value += 10
-            }
-        }, 200)
+    const progressInterval = setInterval(() => {
+        if (uploadProgress.value < 90) {
+            uploadProgress.value += 10
+        }
+    }, 200)
 
-        try {
-            const res = await mainApi.post(`${API_BASE}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
+    try {
+        const res = await mainApi.post(`${API_BASE}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        })
 
-            clearInterval(progressInterval)
-            uploadProgress.value = 100
+        clearInterval(progressInterval)
+        uploadProgress.value = 100
 
-            setTimeout(() => {
-                showNotification('success', 'File berhasil diupload!')
-                files.value.push(res.data)
-                selectedFile.value = null
-                uploading.value = false
-                uploadProgress.value = 0
-            }, 500)
-        } catch (err) {
-            clearInterval(progressInterval)
+        setTimeout(() => {
+            showNotification('success', 'File berhasil diupload!')
+            files.value.push(res.data)
+            selectedFile.value = null
             uploading.value = false
             uploadProgress.value = 0
-            showNotification('error', 'Gagal upload: ' + (err.response?.data?.message || err.message))
-            console.log(err.response?.data?.message)
-        }
+        }, 500)
+    } catch (err) {
+        clearInterval(progressInterval)
+        uploading.value = false
+        uploadProgress.value = 0
+        showNotification('error', 'Gagal upload: ' + (err.response?.data?.message || err.message))
+        console.log(err.response?.data?.message)
     }
+}
 
-    const viewFile = async (file) => {
-        try {
-            const res = await mainApi.get(`${API_BASE}/${file.id_file}`, {
-                responseType: 'blob',
-            });
+const viewFile = async (file) => {
+    try {
+        const res = await mainApi.get(`${API_BASE}/${file.id_file}`, {
+            responseType: 'blob',
+        });
 
-            let mimeType = res.headers['content-type'];
-            if (!mimeType || mimeType === 'application/octet-stream') {
-                const ext = file.file_name.split('.').pop().toLowerCase();
-                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) mimeType = `image/${ext}`;
-                else if (ext === 'pdf') mimeType = 'application/pdf';
-            }
-
-            const blob = new Blob([res.data], { type: mimeType });
-            const url = URL.createObjectURL(blob);
-
-            if (previewUrl.value) {
-                URL.revokeObjectURL(previewUrl.value);
-            }
-
-            previewUrl.value = url;
-            previewType.value = mimeType.startsWith('image/')
-                ? 'image'
-                : mimeType === 'application/pdf'
-                    ? 'pdf'
-                    : 'other';
-        } catch (err) {
-            showNotification('error', 'Gagal menampilkan file.');
-            console.error('View error:', err);
+        let mimeType = res.headers['content-type'];
+        if (!mimeType || mimeType === 'application/octet-stream') {
+            const ext = file.file_name.split('.').pop().toLowerCase();
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) mimeType = `image/${ext}`;
+            else if (ext === 'pdf') mimeType = 'application/pdf';
         }
-    };
 
-    const deleteFile = async (file) => {
-        if (!confirm(`Hapus file "${file.file_name}"?`)) return
+        const blob = new Blob([res.data], { type: mimeType });
+        const url = URL.createObjectURL(blob);
 
-        try {
-            await mainApi.delete(`${API_BASE}/${file.id_file}`)
-            files.value = files.value.filter(f => f.id_file !== file.id_file)
-
-            if (previewUrl.value) {
-                URL.revokeObjectURL(previewUrl.value)
-                previewUrl.value = null
-                previewType.value = null
-            }
-
-            showNotification('success', 'File berhasil dihapus!')
-        } catch (err) {
-            showNotification('error', 'Gagal menghapus file: ' + (err.response?.data?.message || err.message))
+        if (previewUrl.value) {
+            URL.revokeObjectURL(previewUrl.value);
         }
+
+        previewUrl.value = url;
+        previewType.value = mimeType.startsWith('image/')
+            ? 'image'
+            : mimeType === 'application/pdf'
+                ? 'pdf'
+                : 'other';
+    } catch (err) {
+        showNotification('error', 'Gagal menampilkan file.');
+        console.error('View error:', err);
     }
+};
 
-    const loadFiles = async () => {
-        try {
-            const res = await mainApi.get(`${API_BASE}`)
-            files.value = res.data
-        } catch {
-            files.value = []
+const deleteFile = async (file) => {
+    if (!confirm(`Hapus file "${file.file_name}"?`)) return
+
+    try {
+        await mainApi.delete(`${API_BASE}/${file.id_file}`)
+        files.value = files.value.filter(f => f.id_file !== file.id_file)
+
+        if (previewUrl.value) {
+            URL.revokeObjectURL(previewUrl.value)
+            previewUrl.value = null
+            previewType.value = null
         }
-    }
 
-    onMounted(loadFiles)
+        showNotification('success', 'File berhasil dihapus!')
+    } catch (err) {
+        showNotification('error', 'Gagal menghapus file: ' + (err.response?.data?.message || err.message))
+    }
+}
+
+const loadFiles = async () => {
+    try {
+        const res = await mainApi.get(`${API_BASE}`)
+        files.value = res.data
+    } catch {
+        files.value = []
+    }
+}
+
+onMounted(loadFiles)
 </script>
 
 <style scoped>
-    .rgb-custom {
-        background-color: rgb(18, 75, 150);
+.rgb-custom {
+    background-color: rgb(18, 75, 150);
+}
+
+.from-rgb-custom {
+    --tw-gradient-from: rgb(18, 75, 150);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(18, 75, 150, 0));
+}
+
+.to-rgb-custom {
+    --tw-gradient-to: rgb(18, 75, 150);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.5);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.7);
+}
+
+@keyframes progress-animation {
+    0% {
+        background-position: 0% 50%;
     }
 
-    .from-rgb-custom {
-        --tw-gradient-from: rgb(18, 75, 150);
-        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(18, 75, 150, 0));
+    100% {
+        background-position: 100% 50%;
     }
+}
 
-    .to-rgb-custom {
-        --tw-gradient-to: rgb(18, 75, 150);
-    }
+.progress-bar-animated {
+    background-size: 200% 100%;
+    animation: progress-animation 1.5s ease-in-out infinite;
+}
 
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+}
 
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-    }
+.slide-fade-leave-active {
+    transition: all 0.2s ease-in;
+}
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(59, 130, 246, 0.5);
-        border-radius: 10px;
-    }
+.slide-fade-enter-from {
+    transform: translateX(20px);
+    opacity: 0;
+}
 
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(59, 130, 246, 0.7);
-    }
-
-    @keyframes progress-animation {
-        0% {
-            background-position: 0% 50%;
-        }
-
-        100% {
-            background-position: 100% 50%;
-        }
-    }
-
-    .progress-bar-animated {
-        background-size: 200% 100%;
-        animation: progress-animation 1.5s ease-in-out infinite;
-    }
-
-    .slide-fade-enter-active {
-        transition: all 0.3s ease-out;
-    }
-
-    .slide-fade-leave-active {
-        transition: all 0.2s ease-in;
-    }
-
-    .slide-fade-enter-from {
-        transform: translateX(20px);
-        opacity: 0;
-    }
-
-    .slide-fade-leave-to {
-        transform: translateX(20px);
-        opacity: 0;
-    }
+.slide-fade-leave-to {
+    transform: translateX(20px);
+    opacity: 0;
+}
 </style>

@@ -5,10 +5,10 @@
       <span class="font-bold text-xs text-white truncate">Stis Grad</span>
     </div>
 
-    <nav class="flex-1 flex bg-white rounded-full flex-col items-center space-y-4 w-12 sm:w-12 md:w-12 lg:w-12 px-2">
+    <nav class="relative flex-1 flex bg-white rounded-full flex-col items-center space-y-4 w-12 sm:w-12 md:w-12 lg:w-12 px-2 transition-all duration-300 hover:scale-105">
       <SidebarLink v-for="route in menuRoutes" :key="route.path" :route="route" class="w-full mt-3" />
 
-      <button @click="handleLogout" class="mt-auto absolute group flex justify-center bottom-3">
+      <button @click="handleLogout" class="mt-auto absolute group flex justify-center bottom-0">
         <div
           class="w-12 h-12 flex rounded-full items-center justify-center transition-all duration-300 hover:bg-red-50 hover:shadow-md text-gray-600 hover:text-red-500">
           <LogOut class="w-5 h-5" />

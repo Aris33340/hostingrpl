@@ -91,7 +91,12 @@ export class MahasiswaService {
   async createManyMahasiswa(
     data: Prisma.mahasiswaCreateManyInput[],
   ): Promise<{ count: number }> {
-    const validData = data.filter((d) => d.nim && d.nama); // validasi dasar
+    
+    const validData = data.filter((d) => d.nim && d.nama); 
+    console.log(typeof(this.prisma.mahasiswa.createMany({
+      data: validData,
+      skipDuplicates: true,
+    })));
     return this.prisma.mahasiswa.createMany({
       data: validData,
       skipDuplicates: true,

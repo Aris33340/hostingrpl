@@ -7,6 +7,7 @@ import PetugasDashboard from "../views/PetugasDashboard.vue";
 
 import { UserIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
 import Test from "../views/Test.vue";
+import Editor from "../views/Editor.vue";
 
 const routes = [
   {
@@ -23,7 +24,7 @@ const routes = [
   },
   {
     path: "/input-file",
-    name: "InputFile",
+    name: "FileManager",
     component: FileManager,
     meta: { title: "Input File", icon: UploadIcon, showInNavbar: true, requiresAuth: true },
   },
@@ -38,6 +39,19 @@ const routes = [
     name: "DashboardPetugas",
     component: PetugasDashboard,
     meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true, requiresAuth: true },
+  },
+  {
+    path: "/editor",
+    name: "Editor STIS GRAD",
+    component: Editor,
+    meta: { title: "Editor STIS GRAD", icon: UserIcon, showInNavbar: true, requiresAuth: true, showNavbar:false },
+    beforeEnter: (to:any, from:any, next:any) => {
+      if(!to.query.fileId){
+        next({ name: "FileManager" });
+      }else{
+        next();
+      }
+    }
   },
   {
     path: "/test",

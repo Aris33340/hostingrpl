@@ -1,10 +1,18 @@
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { ScanService } from './scan.service';
+import type QRDTO from './qr/dto/qroptions.dto';
+import { QrCodeService } from './qr/qr.service';
 
 @Controller('api/scan')
 export class ScanController {
-  constructor(private scanService: ScanService) {}
-  
+  constructor(private scanService: ScanService, private qrCodeService: QrCodeService ) {}
+  @Post('create-qr')
+  async qreateQr(@Body()qrDto:QRDTO) {
+    this.qrCodeService.createQR(qrDto,'test','qr-sample');
+    return {success:'success'}
+  }
+
+
   @Post()
   async scanQr(@Body('data') data: string) {
     const hasilDecrypt = await this.scanService.ScanData(data);

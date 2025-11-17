@@ -368,6 +368,15 @@ async function mountStatistikData() {
     }
 }
 
+const visiblePages = computed(() => {
+    const pages = [];
+    const start = Math.max(1, currentPage.value - 2);
+    const end = Math.min(totalPages.value, currentPage.value + 2);
+    for (let i = start; i <= end; i++) {
+        pages.push(i);
+    }
+    return pages;
+});
 
 const filteredData = computed(() => {
     return tableData.value.filter(item => {
@@ -386,6 +395,10 @@ const paginatedData = computed(() => filteredData.value);
 watch([searchQuery, currentPage, itemsPerPage], async () => {
     await mountTableData();
 });
+
+watch([manualNim], () => {
+    console.log(manualNim.value);
+})
 
 onMounted(async () => {
     await mountTableData();
@@ -406,19 +419,20 @@ const handleScan = async (value) => {
     }
 }
 
+
 const handleManualInput = async () => {
     try {
-        const res = await mainApi.get(`presensi/find-nim/${manualNim.value}`)
-        handlePresensi(res.data.id_presensi);
+        const res = await mainApi.get(`presensi/find-nim/${manualNim.value}`);
+        console.log(manualNim.value);
+        await handlePresensi(res.data.id_presensi);
     } catch (error) {
-        console.log(error.message);
-
+        showNotification('error', error.response.data.message);
     }
 };
 
 const handlePresensi = async (idPresensi) => {
     try {
-        const resPesertaData = await mainApi.get(`presensi/find-peserta/${idPresensi}`);
+        const resPesertaData = await mainApi.get(`presensi/find-peserta/${Number(idPresensi)}`);
         const pesertaData = resPesertaData.data;
         if (!pesertaData.peserta) {
             showNotification('error', 'Data tidak ditemukan');
