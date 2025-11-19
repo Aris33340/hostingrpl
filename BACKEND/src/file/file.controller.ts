@@ -13,7 +13,9 @@ import {
     ParseFilePipe,
     ParseFilePipeBuilder,
     FileTypeValidator,
-    HttpStatus
+    HttpStatus,
+    Body,
+    Req
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -21,15 +23,17 @@ import { extname } from 'path';
 import { FileService } from './file.service';
 import { join, basename } from 'node:path';
 import { createReadStream, existsSync, unlinkSync } from 'node:fs';
+import { AuthService } from 'src/auth/auth.service';
 
 
 @Controller('api/files')
 export class FileController {
-    constructor(private readonly fileService: FileService) { }
+    constructor(private readonly fileService: FileService, private readonly authService:AuthService) { }
 
     @Get()
-    async getAllFiles() {
-        return this.fileService.getAllFiles();
+    async getAllFiles(@Req() req:any) {
+        const userId = req.user.sub;
+        return this.fileService.getAllFiles(Number(userId));
     }
 
     @Post()
@@ -43,9 +47,9 @@ export class FileController {
                     cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
                 },
             }),
-        }),
+        })
     )
-    async uploadFile(
+    async uploadFile(@Req() req:any,
         @UploadedFile(
             new ParseFilePipeBuilder()
                 .addFileTypeValidator({
@@ -53,7 +57,7 @@ export class FileController {
                     skipMagicNumbersValidation:true
                 })
                 .addMaxSizeValidator({
-                    maxSize: 20 * 1024 * 1024, // 3 MB
+                    maxSize: 20 * 1024 * 1024, // 20 MB
                 })
                 .build({
                     errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
@@ -61,10 +65,11 @@ export class FileController {
         )
         file: Express.Multer.File,
     ) {
+        const userId = req.user.sub;
         if (!file) {
             throw new BadRequestException('No file uploaded');
         }
-        const savedFile = await this.fileService.saveFile(file);
+        const savedFile = await this.fileService.saveFile(file,userId);
         return savedFile;
     }
 

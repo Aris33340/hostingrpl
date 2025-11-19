@@ -343,7 +343,6 @@ const mountTableData = async () => {
                 limit: itemsPerPage.value
             }
         });
-
         tableData.value = res.data.data || [];
         totalData.value = res.data.total || tableData.value.length;
     } catch (e) {
@@ -368,6 +367,15 @@ async function mountStatistikData() {
     }
 }
 
+const visiblePages = computed(() => {
+    const pages = [];
+    const start = Math.max(1, currentPage.value - 2);
+    const end = Math.min(totalPages.value, currentPage.value + 2);
+    for (let i = start; i <= end; i++) {
+        pages.push(i);
+    }
+    return pages;
+});
 
 const filteredData = computed(() => {
     return tableData.value.filter(item => {
@@ -406,19 +414,19 @@ const handleScan = async (value) => {
     }
 }
 
+
 const handleManualInput = async () => {
     try {
-        const res = await mainApi.get(`presensi/find-nim/${manualNim.value}`)
-        handlePresensi(res.data.id_presensi);
+        const res = await mainApi.get(`presensi/find-nim/${manualNim.value}`);
+        await handlePresensi(res.data[0].id_presensi);
     } catch (error) {
-        console.log(error.message);
-
+        showNotification('error', 'NIM tidak ditemukan');
     }
 };
 
 const handlePresensi = async (idPresensi) => {
     try {
-        const resPesertaData = await mainApi.get(`presensi/find-peserta/${idPresensi}`);
+        const resPesertaData = await mainApi.get(`presensi/find-peserta/${Number(idPresensi)}`);
         const pesertaData = resPesertaData.data;
         if (!pesertaData.peserta) {
             showNotification('error', 'Data tidak ditemukan');
@@ -433,7 +441,7 @@ const handlePresensi = async (idPresensi) => {
                 const res = await mainApi.patch(`presensi/mark-status/${Number(idPresensi)}`)
                 await mountStatistikData();
                 await mountTableData();
-                showNotification(res.data.STATUS_CODES === 200 ? 'success' : 'error', res.data.message)
+                showNotification('success', res.data.message)
 
             } else {
                 showNotification('success', "Presensi dibatalkan")

@@ -4,17 +4,26 @@ import Login from "../views/Login.vue";
 import QrGenerator from "../components/QrGenerator.vue";
 import FileManager from "../views/FileManager.vue";
 import PetugasDashboard from "../views/PetugasDashboard.vue";
+import Editor from "../views/Editor.vue";
 
 import { UserIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
+import { useAuthStore } from "../stores/authStore";
+import NotFound from "../views/NotFound.vue";
 import Test from "../views/Test.vue";
 
 const routes = [
   {
-    path: "/",
+    path: "/login",
     name: "Login",
     component: Login,
-    meta: { title: "Login", showNavbar: false },
+    meta: { title: "Login", showNavbar: false, requiresAuth:false},
   },
+  // {
+  //   path: "/test",
+  //   name: "Test",
+  //   component: Test,
+  //   meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true, requiresAuth: true },
+  // },
   {
     path: "/manajemen-mahasiswa",
     name: "ManajemenMahasiswa",
@@ -23,7 +32,7 @@ const routes = [
   },
   {
     path: "/input-file",
-    name: "InputFile",
+    name: "FileManager",
     component: FileManager,
     meta: { title: "Input File", icon: UploadIcon, showInNavbar: true, requiresAuth: true },
   },
@@ -40,15 +49,22 @@ const routes = [
     meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true, requiresAuth: true },
   },
   {
-    path: "/test",
-    name: "testing",
-    component: Test,
-    meta: { title: "Test Page", requiresAuth: true },
+    path: "/editor",
+    name: "Editor STIS GRAD",
+    component: Editor,
+    meta: { title: "Editor STIS GRAD", icon: UserIcon, showInNavbar: true, requiresAuth: true, showNavbar:false },
+    beforeEnter: (to:any, from:any, next:any) => {
+      if(!to.query.fileId){
+        next({ name: "FileManager" });
+      }else{
+        next();
+      }
+    }
   },
   {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
-    component: Login,
+    component:NotFound,
     meta: { title: "Not Found", showNavbar: false },
   }
 ];
@@ -58,24 +74,22 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
-
-  if (to.meta.requiresAuth && !token) {
-    next({ name: "Login" });
-    return;
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore();
+  const isAuth = authStore.isAuthenticated;
+  // Jika route membutuhkan autentikasi tapi user tidak login
+  if (to.meta.requiresAuth && !isAuth) {
+    return next("/login");
   }
 
-  if (to.name === "Login" && token) {
-    next({ name: "ManajemenMahasiswa" }); 
-    return;
-  }
-  if(to.path === '/login' && token){
-    next({ name: "ManajemenMahasiswa" }); 
-    return;
+  // Jika user sudah login tapi membuka halaman login
+  if (to.path === "/login" && isAuth) {
+    return next("/manajemen-mahasiswa");
   }
 
-  next();
+  // Route normal
+  return next();
 });
+
 
 export default router;

@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class PresensiService {
@@ -83,36 +83,45 @@ export class PresensiService {
 
     async getPresensiByNim(nim: number) {
         try {
-            const presMahasiswa = await this.prisma.presensi.findMany({
-                select: {
-                    id_presensi: true,
-                    waktu_presensi: true,
-                    status: true,
-                    peserta: {
-                        select: {
-                            mahasiswa: {
-                                select: {
-                                    nim: true,
-                                    nama: true,
-                                    kelas: true,
-                                    prodi: true,
-                                },
-                            },
-                        },
-                    },
-                },
-                where: {
-                    peserta: {
-                        nim: nim
+            // const presMahasiswa = await this.prisma.presensi.findFirst({
+            //     select: {
+            //         id_presensi: true,
+            //         waktu_presensi: true,
+            //         status: true,
+            //         peserta: {
+            //             select: {
+            //                 mahasiswa: {
+            //                     select: {
+            //                         nim: true,
+            //                         nama: true,
+            //                         kelas: true,
+            //                         prodi: true,
+            //                     },
+            //                 },
+            //             },
+            //         },
+            //     },
+            //     where: {
+            //         peserta: {
+            //             mahasiswa:{
+            //                 nim: nim
+            //             }
+            //         }
+            //     }
+            // });
+
+            // if (!presMahasiswa) {
+            //     throw new HttpException('Data dengan nim tersebut tidak ditemukan', HttpStatus.BAD_REQUEST)
+            // }
+
+            // return presMahasiswa;
+            return this.prisma.presensi.findMany({where:{
+                peserta:{
+                    mahasiswa:{
+                        nim:nim
                     }
                 }
-            });
-
-            if (!presMahasiswa) {
-                throw new HttpException('Data dengan nim tersebut tidak ditemukan', HttpStatus.BAD_REQUEST)
-            }
-
-            return presMahasiswa;
+            }})
         } catch (e) {
             throw new BadRequestException('Terjadi kesalahan saat mengambil data');
         }
