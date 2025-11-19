@@ -75,6 +75,7 @@ import { mainApi } from '@/api'
 import InputData from '@/components/InputData.vue'
 import TableMahasiswa from '@/components/TableMahasiswa.vue'
 import ModalMahasiswa from '@/components/ModalMahasiswa.vue'
+import { showNotification } from '../composables/useNotification'
 
 const mahasiswa = ref([])
 const search = ref('')
@@ -101,7 +102,7 @@ async function fetchMahasiswa() {
 
     mahasiswa.value = data.data || []
   } catch (err) {
-    console.error('Gagal memuat data mahasiswa:', err)
+    showNotification('error', err.message || 'Gagal memuat tabel');
     mahasiswa.value = []
   } finally {
     isLoading.value = false
@@ -127,7 +128,7 @@ async function hapusMahasiswa(nim) {
     await mainApi.delete(`mahasiswa/${nim}`)
     fetchMahasiswa()
   } catch (err) {
-    console.error('Gagal menghapus data mahasiswa:', err)
+    showNotification('error', err.message || 'Gagal memuat tabel');
   }
 }
 

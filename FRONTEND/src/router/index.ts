@@ -9,14 +9,21 @@ import Editor from "../views/Editor.vue";
 import { UserIcon, QrCodeIcon, UploadIcon } from "lucide-vue-next";
 import { useAuthStore } from "../stores/authStore";
 import NotFound from "../views/NotFound.vue";
+import Test from "../views/Test.vue";
 
 const routes = [
   {
     path: "/login",
     name: "Login",
     component: Login,
-    meta: { title: "Login", showNavbar: false },
+    meta: { title: "Login", showNavbar: false, requiresAuth:false},
   },
+  // {
+  //   path: "/test",
+  //   name: "Test",
+  //   component: Test,
+  //   meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true, requiresAuth: true },
+  // },
   {
     path: "/manajemen-mahasiswa",
     name: "ManajemenMahasiswa",
@@ -67,24 +74,22 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  const token = authStore.access_token ?? localStorage.getItem("access_token");
-  console.log( localStorage.getItem("access_token"));
-  console.log(authStore.access_token );
-
-  if (to.path == '/'){
-    return next("/login")
-  }
-  if (to.meta.requiresAuth && !token) {
+  const isAuth = authStore.isAuthenticated;
+  // Jika route membutuhkan autentikasi tapi user tidak login
+  if (to.meta.requiresAuth && !isAuth) {
     return next("/login");
   }
 
-  if (to.path === "/login" && token) {
+  // Jika user sudah login tapi membuka halaman login
+  if (to.path === "/login" && isAuth) {
     return next("/manajemen-mahasiswa");
   }
-  
+
+  // Route normal
   return next();
 });
+
 
 export default router;

@@ -19,22 +19,24 @@ export class AuthController {
     @Body() body: { email: string; password: string },
     @Res({ passthrough: true }) res: Response
   ) {
-    const loginData = await this.authService.login(body.email, body.password);
+    try {
+      const loginData = await this.authService.login(body.email, body.password);
+      res.cookie('refresh_token', loginData.refresh_token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
-    res.cookie('refresh_token', loginData.refresh_token, {
-      httpOnly: true,
-      secure: false,
-      sameSite:"lax",
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+      return {
+        access_token: loginData.access_token
+      };
+    } catch (e) {
+      console.log(body)
+      throw new UnauthorizedException('email or password invalid');
+    }
 
-
-    return {
-      access_token: loginData.access_token,
-      role: loginData.role,
-      id : loginData.id
-    };
   }
 
   // --- ENDPOINT BARU 'refresh' ---
@@ -47,33 +49,28 @@ export class AuthController {
     if (!oldRefreshToken) {
       throw new UnauthorizedException('No refresh token found');
     }
-    
-
-    let payload: any;
     try {
-      payload = await this.authService.validateRefreshToken(oldRefreshToken);
+      const payload = await this.authService.validateRefreshToken(oldRefreshToken);
+      const tokens = await this.authService.getTokens(
+        payload.sub,
+        payload.email,
+        payload.role
+      );
+      res.cookie('refresh_token', tokens.refresh_token, {
+        httpOnly: true,
+        secure: false,
+        path: '/',
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      console.log("refresh",tokens.refresh_token);
+      return {
+        access_token: tokens.access_token,
+      };
     } catch (e) {
       res.clearCookie('refresh_token', { httpOnly: true, path: '/' });
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
-
-    const tokens = await this.authService.getTokens(
-      payload.sub,
-      payload.email,
-      payload.role
-    );
-
-    res.cookie('refresh_token', tokens.refresh_token, {
-      httpOnly: true,
-      secure: false,
-      path: '/',
-      sameSite:"lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    return {
-      access_token: tokens.access_token,
-    };
   }
 
   // --- Endpoint 'logout' DIPERBAIKI ---

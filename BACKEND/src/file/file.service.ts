@@ -24,8 +24,14 @@ export class FileService {
     });
   }
 
-  async getAllFiles() {
-    return this.prisma.file.findMany();
+  async getAllFiles(userId:number) {
+    return this.prisma.file.findMany({
+      where:{
+        user:{
+          id_user:userId
+        }
+      }
+    });
   }
 
   async deleteFileById(id: number) {

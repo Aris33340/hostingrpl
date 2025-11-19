@@ -34,6 +34,7 @@ import * as XLSX from 'xlsx'
 import axios from 'axios'
 import { ref } from 'vue'
 import {mainApi} from '@/api'
+import { showNotification } from '../composables/useNotification'
 
 const preview = ref([])
 const message = ref('')
@@ -58,6 +59,7 @@ function handleFileUpload(event) {
 async function uploadData() {
   if (preview.value.length === 0) {
     message.value = 'Tidak ada data untuk dikirim.'
+    showNotification('error',message.value);
     return
   }
 
@@ -65,9 +67,9 @@ async function uploadData() {
   try {
     const response = await mainApi.post('/mahasiswa/bulk', preview.value)
     message.value = ` Berhasil menambahkan ${response.data.count} mahasiswa!`;
+    showNotification('success',message.value);
   } catch (error) {
-    console.error(error)
-    message.value = error;
+    showNotification('error',error.message);
   } finally {
     loading.value = false
   }

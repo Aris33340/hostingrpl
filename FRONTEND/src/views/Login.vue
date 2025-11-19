@@ -15,8 +15,8 @@
         <form @submit.prevent="handleLogin">
 
           <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" v-model="form.username" placeholder="Masukkan username Anda" required />
+            <label for="email">Email</label>
+            <input type="email" id="email" v-model="form.email" placeholder="Masukkan email Anda" required />
           </div>
 
           <div class="form-group">
@@ -54,8 +54,7 @@
 // 1. Impor 'mapActions' dari Pinia dan store kita
 import { mapActions } from 'pinia';
 import { useAuthStore } from '../stores/authStore';
-
-// 2. Impor 'apiClient' baru kita, BUKAN 'axios' biasa
+import { showNotification } from '../composables/useNotification'
 import { authApi } from '@/api'
 
 // Menggunakan VUE 2 (Options API)
@@ -63,7 +62,7 @@ export default {
   data() {
     return {
       form: {
-        username: '',
+        email: '',
         password: '',
         remember: false
       },
@@ -72,40 +71,21 @@ export default {
   },
   methods: {
     // 3. Petakan 'action' dari store kita ke komponen ini
-    ...mapActions(useAuthStore, ['setAuthData']),
+    ...mapActions(useAuthStore, ['login']),
 
     async handleLogin() {
-      this.error = '';
+      this.error = "";
+      const auth = useAuthStore();
 
       try {
-        // 4. Gunakan 'apiClient' baru kita
-        const response = await authApi.post('/login', {
-          // Di backend, kita login pakai 'email', tapi form pakai 'username'
-          // Kita kirim 'username' dari form sebagai 'email' ke backend
-          email: this.form.username,
-          password: this.form.password
-        });
-
-        // 5. Backend HANYA mengirim 'access_token' dan 'role'
-        const accessToken = response.data.access_token;
-        const userRole = response.data.role;
-        const userId = response.data.id;
-        // 6. Panggil action Pinia untuk menyimpan data di memori
-        // BUKAN localStorage
-        this.setAuthData(accessToken, userRole, userId, this.form.remember);
-
-        // 7. Arahkan ke halaman utama setelah login
-        this.$router.push('/manajemen-mahasiswa');
-
+        await auth.login(
+          this.form.email,
+          this.form.password,
+          this.form.remember
+        );
+        this.$router.push("/manajemen-mahasiswa");
       } catch (err) {
-        // Interceptor akan menangani error 401 (token refresh)
-        // Ini hanya akan menangani error login (misal: password salah)
-        if (err.response && err.response.data && err.response.data.message) {
-          this.error = err.response.data.message;
-        } else {
-          this.error = 'Login gagal. Periksa kembali username dan password Anda.';
-        }
-        console.error('Login error:', err);
+        showNotification('error', err.message || 'Gagal Login, periksa email atau password anda');
       }
     }
   }
@@ -207,7 +187,7 @@ h1 {
   margin-bottom: 0.5rem;
 }
 
-.form-group input[type="text"],
+.form-group input[type="email"],
 .form-group input[type="password"] {
   width: 100%;
   padding: 0.875rem 1rem;
@@ -219,7 +199,7 @@ h1 {
   font-size: 0.9rem;
 }
 
-.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
 .form-group input[type="password"]:focus {
   outline: none;
   border-color: #06B6D4;

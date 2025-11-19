@@ -343,7 +343,6 @@ const mountTableData = async () => {
                 limit: itemsPerPage.value
             }
         });
-
         tableData.value = res.data.data || [];
         totalData.value = res.data.total || tableData.value.length;
     } catch (e) {
@@ -396,10 +395,6 @@ watch([searchQuery, currentPage, itemsPerPage], async () => {
     await mountTableData();
 });
 
-watch([manualNim], () => {
-    console.log(manualNim.value);
-})
-
 onMounted(async () => {
     await mountTableData();
     await mountStatistikData();
@@ -423,10 +418,9 @@ const handleScan = async (value) => {
 const handleManualInput = async () => {
     try {
         const res = await mainApi.get(`presensi/find-nim/${manualNim.value}`);
-        console.log(manualNim.value);
-        await handlePresensi(res.data.id_presensi);
+        await handlePresensi(res.data[0].id_presensi);
     } catch (error) {
-        showNotification('error', error.response.data.message);
+        showNotification('error', 'NIM tidak ditemukan');
     }
 };
 
@@ -447,7 +441,7 @@ const handlePresensi = async (idPresensi) => {
                 const res = await mainApi.patch(`presensi/mark-status/${Number(idPresensi)}`)
                 await mountStatistikData();
                 await mountTableData();
-                showNotification(res.data.STATUS_CODES === 200 ? 'success' : 'error', res.data.message)
+                showNotification('success', res.data.message)
 
             } else {
                 showNotification('success', "Presensi dibatalkan")

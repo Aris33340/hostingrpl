@@ -38,11 +38,11 @@ export class AuthService {
       };
       
       const accessToken = jwt.sign(payload, this.accessSecret, {
-        expiresIn: '1m', // 15 menit
+        expiresIn: '15s', // 15 menit
       });
       
       const refreshToken = jwt.sign(payload, this.refreshSecret, {
-        expiresIn: '7s', // 7 hari
+        expiresIn: '1W', // 7 hari
       });
       
       return {
@@ -85,7 +85,6 @@ export class AuthService {
         
         // Panggil fungsi baru kita
         const tokens = await this.getTokens(user.id_user, user.email, user.role);
-
         // Return semua yang dibutuhkan controller
         return { 
           ...tokens, 
