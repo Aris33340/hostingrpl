@@ -44,8 +44,8 @@
 // })
 
 
-import { PrismaClient } from "../generated/prisma";
-import { $Enums as Enum } from "../generated/prisma";
+import { PrismaClient } from "@prisma/client";
+import { $Enums as Enum } from "@prisma/client";
 
 const prisma = new PrismaClient();
 

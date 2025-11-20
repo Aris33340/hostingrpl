@@ -12,7 +12,7 @@ import {
   BadRequestException 
 } from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
-import { Prisma } from 'generated/prisma';
+import { Prisma } from '@prisma/client'
 import { CryptoService } from 'src/crypto/crypto/CryptoService';
 
 @Controller('api/mahasiswa')
