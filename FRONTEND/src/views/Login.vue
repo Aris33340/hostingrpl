@@ -83,7 +83,12 @@ export default {
           this.form.password,
           this.form.remember
         );
-        this.$router.push("/manajemen-mahasiswa");
+        
+        // PERUBAHAN DISINI:
+        // Arahkan ke '/' (Halaman Pilih Aktor Super Admin)
+        // Bukan ke '/manajemen-mahasiswa'
+        this.$router.push("/"); 
+        
       } catch (err) {
         showNotification('error', err.message || 'Gagal Login, periksa email atau password anda');
       }
@@ -99,8 +104,8 @@ export default {
 /* Struktur Utama */
 .login-page {
   /* PERBAIKAN: Menggunakan 'position: fixed' 
-    Ini akan membuat halaman login "keluar" dari container 
-    di App.vue dan menutupi seluruh layar.
+     Ini akan membuat halaman login "keluar" dari container 
+     di App.vue dan menutupi seluruh layar.
   */
   position: fixed;
   top: 0;
