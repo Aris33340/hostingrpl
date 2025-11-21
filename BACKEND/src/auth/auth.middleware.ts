@@ -24,5 +24,5 @@ export class AuthMiddleware implements NestMiddleware {
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
     }
-  }
+  } 
 }

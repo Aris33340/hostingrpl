@@ -9,7 +9,7 @@
       <h2 class="mb-2 font-bold">Generated QR Codes:</h2>
       <div class="grid grid-cols-4 gap-4">
         <div v-for="(code, index) in encrypted" :key="index" class="flex flex-col items-center">
-          <qrcode-canvas :value="code" :size="1080" level="H" />
+          <qrcode-canvas :value="code" :size="300" level="M" includeMargin="true" foreground="#000000" background="#FFFFFF" />
           <span class="mt-1 text-sm">{{ index + 1 }}</span>
         </div>
       </div>
@@ -20,7 +20,7 @@
 <script setup>
 import { ref } from 'vue';
 import { QrcodeCanvas } from 'qrcode.vue';
-import api from "@/api";
+import {mainApi} from "@/api";
 import { showNotification } from '../composables/useNotification';
 
 const encrypted = ref([]);
@@ -30,7 +30,7 @@ const generate = async () => {
   try {
     encrypted.value = [];
 
-    const responsePresensi = await api.get(`${BASE_URL}presensi`);
+    const responsePresensi = await mainApi.get(`presensi`);
     const presensiArray = responsePresensi.data;
     if (!Array.isArray(presensiArray) || presensiArray.length === 0) {
       console.warn("Data presensi kosong!");
@@ -39,7 +39,7 @@ const generate = async () => {
 
     const encryptedResults = await Promise.all(
       presensiArray.map(async (element) => {
-        const responseEncrypt = await api.post(`${BASE_URL}crypto/encrypt`, { data: String(element.id_presensi) });
+        const responseEncrypt = await mainApi.post(`crypto/encrypt`, { data: String(element.id_presensi) });
         encrypted.value.push(responseEncrypt.data)
         return responseEncrypt.data.data; 
       })
@@ -55,4 +55,10 @@ const generate = async () => {
 button {
   transition: background-color 0.2s;
 }
+.flex-col.items-center {
+  background-color: white;
+  padding: 12px;
+  border-radius: 8px;
+}
+
 </style>

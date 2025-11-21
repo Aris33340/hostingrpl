@@ -1,6 +1,6 @@
 import {CryptoService} from './crypto/crypto/CryptoService'
 import { ConfigService } from '@nestjs/config';
-import { PrismaClient } from '../generated/prisma';
+import { PrismaClient } from '@prisma/client'
 
 let crypto = new CryptoService();
 let nim = 1;

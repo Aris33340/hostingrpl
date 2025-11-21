@@ -6,48 +6,12 @@ import { CryptoService } from '../crypto/crypto/CryptoService';
 export class ScanService {
   constructor(private prisma: PrismaService, private crypto: CryptoService) { }
 
-  async getScanData(x: string): Promise<any> {
-    let ID: any;
-
+  async ScanData(x: string): Promise<any> {
     try {
-      ID = this.crypto.decrypt(x);
-      if (!ID) {
-        throw new BadRequestException('QR Tidak Valid');
-      }
-
-      const presensiStatus = await this.prisma.presensi.findUnique({
-        where: { id_peserta: Number(ID) },
-      });
-
-      if (!presensiStatus) {
-        throw new NotFoundException('ID Presensi Tidak Ditemukan');
-      }
-
-      if (presensiStatus.status !== 0) {
-        throw new ConflictException('Peserta sudah hadir');
-      }
-
-      const data = await this.prisma.peserta.findUnique({
-        where: { id_peserta: Number(ID) },
-        select: { jenis: true, mahasiswa: true, tamu: true, presensis: true },
-      });
-
-      if (!data) {
-        throw new NotFoundException('Peserta tidak ditemukan');
-      }
-
-      return data;
-
+      const encryptedData = this.crypto.decrypt(x); 
+      return encryptedData;
     } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof ConflictException ||
-        error instanceof BadRequestException
-      ) {
-        throw error;
-      }
-
-      throw new BadRequestException('QR Tidak Valid / Terjadi Kesalahan');
+      throw error;
     }
   }
 

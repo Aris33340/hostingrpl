@@ -3,7 +3,6 @@
       <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-96">
         <div class="flex items-start gap-4">
           <div class="flex-shrink-0">
-            <!-- Gunakan component Lucide Icon -->
             <component :is="iconComponent" class="w-10 h-10 text-white" />
           </div>
           <div>

@@ -5,8 +5,8 @@ import { Controller, Get, Param,
   Delete, } from '@nestjs/common';
 import { AppService } from './app.service';
 import { TamuService } from './tamu/tamu.service';
-import { tamu as TamuModel } from 'generated/prisma';
-import { user as UserModel } from 'generated/prisma';
+import { tamu as TamuModel } from '@prisma/client';
+import { user as UserModel } from '@prisma/client';
 
 
 @Controller('api')

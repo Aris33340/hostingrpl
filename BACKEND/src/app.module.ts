@@ -17,6 +17,8 @@ import { CryptoService } from './crypto/crypto/CryptoService';
 import { FileModule } from './file/file.module';
 import { CryptoModule } from './crypto/crypto/crypto.module';
 import { PresensiModule } from './presensi/presensi/presensi.module';
+import { EditorModule } from './editor/editor.module';
+import { QrCodeService } from './scan/qr/qr.service';
 
 
 @Module({
@@ -30,7 +32,8 @@ import { PresensiModule } from './presensi/presensi/presensi.module';
     ConfigModule.forRoot({ isGlobal: true }),
     FileModule,
     CryptoModule,
-    PresensiModule
+    PresensiModule,
+    EditorModule
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],
@@ -46,6 +49,7 @@ export class AppModule {
       .exclude(
         { path: 'auth/register', method: RequestMethod.POST },
         { path: 'auth/login', method: RequestMethod.POST },
+        { path: 'auth/refresh', method: RequestMethod.POST },
       )
       .forRoutes('*');
   }

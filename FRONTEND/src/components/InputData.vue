@@ -59,7 +59,7 @@
 <script setup>
 import * as XLSX from 'xlsx'
 import { ref, computed } from 'vue'
-import api from '@/api'
+import {mainApi} from '@/api'
 
 const preview = ref([])
 const message = ref('')
@@ -96,7 +96,7 @@ async function uploadData() {
   loading.value = true
   emit('loading', true)
   try {
-    const res = await api.post('/api/mahasiswa/bulk', preview.value)
+    const res = await mainApi.post('/mahasiswa/bulk', preview.value)
     message.value = `Berhasil menambahkan ${res.data.count || preview.value.length} mahasiswa.`
     messageType.value = 'ok'
     preview.value = []

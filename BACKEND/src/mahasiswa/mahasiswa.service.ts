@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { mahasiswa, Prisma } from 'generated/prisma';
+import { mahasiswa, Prisma } from '@prisma/client'
 
 @Injectable()
 export class MahasiswaService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // 🟩 1️⃣ Ambil satu mahasiswa berdasarkan unique key (id/nim)
   async mahasiswa(
@@ -21,11 +21,11 @@ export class MahasiswaService {
   }
 
   // 🟩 3️⃣ Ambil mahasiswa dengan fitur search & pagination
-async getMahasiswaWithPagination(search?: string, page = 1, limit = 10) {
-  const skip = (page - 1) * limit;
+  async getMahasiswaWithPagination(search?: string, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
 
-  const where: Prisma.mahasiswaWhereInput = search
-    ? {
+    const where: Prisma.mahasiswaWhereInput = search
+      ? {
         OR: [
           { nama: { contains: search } },
           { prodi: { contains: search } },
@@ -41,38 +41,88 @@ async getMahasiswaWithPagination(search?: string, page = 1, limit = 10) {
             : undefined,
         ].filter(Boolean) as any,
       }
-    : {};
+      : {};
 
-  const [data, total] = await Promise.all([
-    this.prisma.mahasiswa.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-    }),
-    this.prisma.mahasiswa.count({ where }),
-  ]);
+    const [data, total] = await Promise.all([
+      this.prisma.mahasiswa.findMany({
+        where,
+        skip,
+        include: {
+          peserta: {
+            select: {
+              presensis: {
+                select: {
+                  status: true,
+                  waktu_presensi: true
+                }
+              }
+            }
+          }
+        },
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.mahasiswa.count({ where }),
+    ]);
 
-  return { data, page, limit, total };
-}
+    const finalResult = data.map((mhs) => {
+      const presensiTerbaru = mhs.peserta.flatMap((p) => p.presensis)[0] || null;
+
+      return {
+        id: mhs.nim,
+        nama: mhs.nama,
+        statusPresensi: presensiTerbaru,
+      };
+    });
+
+
+    return { data: data, page, limit, total };
+  }
 
 
   // 🟩 4️⃣ Tambah satu mahasiswa
   async createMahasiswa(
     data: Prisma.mahasiswaCreateInput,
   ): Promise<mahasiswa> {
-    return this.prisma.mahasiswa.create({ data });
-  }
+    const mahasiswa = await this.prisma.mahasiswa.create({ data });
+    const peserta = await this.prisma.peserta.create({
+      data: {
+        nim: Number(mahasiswa.nim),
+        jenis: 'mahasiswa'
+      }
+    })
 
+    await this.prisma.presensi.create({
+      data: {
+        id_peserta: Number(peserta.id_peserta)
+      }
+    })
+    return mahasiswa;
+  }
   // 🟩 5️⃣ Tambah banyak mahasiswa (import Excel)
   async createManyMahasiswa(
     data: Prisma.mahasiswaCreateManyInput[],
   ): Promise<{ count: number }> {
-    const validData = data.filter((d) => d.nim && d.nama); // validasi dasar
-    return this.prisma.mahasiswa.createMany({
+    
+    const validData = data.filter((d) => d.nim && d.nama);
+    
+    const mahasiswas = await this.prisma.mahasiswa.createMany({
       data: validData,
       skipDuplicates: true,
     });
+    await this.prisma.peserta.createMany({
+      data: validData.map((e) => ({
+        nim: Number(e.nim),
+        jenis: 'mahasiswa'
+      })), skipDuplicates: true
+    });
+    const pesertas = await this.prisma.peserta.findMany();
+    await this.prisma.presensi.createMany({
+      data: pesertas.map((e) => ({
+        id_peserta: Number(e.id_peserta)
+      })), skipDuplicates: true
+    })
+    return mahasiswas;
   }
 
   // 🟩 6️⃣ Update mahasiswa
