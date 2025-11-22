@@ -1,6 +1,6 @@
 <template>
   <aside v-if="isNavbarVisible"
-    class="fixed left-0 top-0 h-full shadow-lg flex flex-col items-center py-6 w-16 z-50 transition-all duration-300">
+    class="left-0 top-0 h-full shadow-lg flex flex-col items-center py-6 w-16 z-50 transition-all duration-300">
     <div class="w-full mb-6 text-center px-2">
       <span class="font-bold text-xs text-white truncate">Stis Grad</span>
     </div>

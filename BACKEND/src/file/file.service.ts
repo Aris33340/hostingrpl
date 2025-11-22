@@ -18,17 +18,20 @@ export class FileService {
     });
   }
 
-  async getFileById(id: number) {
-    return this.prisma.file.findUnique({
-      where: { id_file: id },
-    });
-  }
+    async getFileById(id: number) {
+      return this.prisma.file.findUnique({
+        where: { id_file: id },
+      });
+    }
 
-  async getAllFiles(userId:number) {
+  async getAllFiles(userId:number,query?:string) {
     return this.prisma.file.findMany({
       where:{
         user:{
           id_user:userId
+        },
+        type:{
+          contains:query
         }
       }
     });

@@ -15,7 +15,8 @@ import {
     FileTypeValidator,
     HttpStatus,
     Body,
-    Req
+    Req,
+    Query
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -26,14 +27,19 @@ import { createReadStream, existsSync, unlinkSync } from 'node:fs';
 import { AuthService } from 'src/auth/auth.service';
 
 
+
 @Controller('api/files')
 export class FileController {
-    constructor(private readonly fileService: FileService, private readonly authService:AuthService) { }
+    constructor(private readonly fileService: FileService, private readonly authService: AuthService) { }
 
     @Get()
-    async getAllFiles(@Req() req:any) {
+    async getAllFiles(@Req() req: any,@Query('type') type:string) {
         const userId = req.user.sub;
-        return this.fileService.getAllFiles(Number(userId));
+        const files = await this.fileService.getAllFiles(Number(userId),type.toLowerCase());
+        console.log('userId:', userId)
+        console.log('type:', type)
+        console.log('files:', files)
+        return files;
     }
 
     @Post()
@@ -49,12 +55,12 @@ export class FileController {
             }),
         })
     )
-    async uploadFile(@Req() req:any,
+    async uploadFile(@Req() req: any,
         @UploadedFile(
             new ParseFilePipeBuilder()
                 .addFileTypeValidator({
-                    fileType: /(pdf)$/,
-                    skipMagicNumbersValidation:true
+                    fileType: /(pdf|jpg|jpeg|png|gif)$/i,
+                    skipMagicNumbersValidation: true
                 })
                 .addMaxSizeValidator({
                     maxSize: 20 * 1024 * 1024, // 20 MB
@@ -66,11 +72,17 @@ export class FileController {
         file: Express.Multer.File,
     ) {
         const userId = req.user.sub;
-        if (!file) {
-            throw new BadRequestException('No file uploaded');
+        try {
+            if (!file) {
+                throw new BadRequestException('No file uploaded');
+            }
+            console.log('userId:',userId)
+            const fileUploaded = await this.fileService.saveFile(file, userId);
+            return fileUploaded;
+        } catch (err) {
+            unlinkSync(file.path);
+            throw err;
         }
-        const savedFile = await this.fileService.saveFile(file,userId);
-        return savedFile;
     }
 
     @Get(':id')

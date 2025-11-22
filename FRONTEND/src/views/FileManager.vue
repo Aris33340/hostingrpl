@@ -163,7 +163,7 @@ const getFileType = (fileName) => {
 
 const onFileChange = (event) => {
     selectedFile.value = event.target.files[0]
-}
+}   
 
 const uploadFile = async () => {
     if (!selectedFile.value) return
@@ -257,7 +257,7 @@ const deleteFile = async (file) => {
 
 const loadFiles = async () => {
     try {
-        const res = await mainApi.get(`${API_BASE}`)
+        const res = await mainApi.get(`${API_BASE}?type=pdf`)
         files.value = res.data
     } catch {
         files.value = []

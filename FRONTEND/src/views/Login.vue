@@ -48,48 +48,34 @@
   </div>
 </template>
 
-<script>
-// --- MODIFIKASI UNTUK PINIA & INTERCEPTOR ---
-
-// 1. Impor 'mapActions' dari Pinia dan store kita
-import { mapActions } from 'pinia';
-import { useAuthStore } from '../stores/authStore';
+<script setup>
+import { reactive, ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
+import { useRouter } from 'vue-router'
 import { showNotification } from '../composables/useNotification'
-import { authApi } from '@/api'
 
-// Menggunakan VUE 2 (Options API)
-export default {
-  data() {
-    return {
-      form: {
-        email: '',
-        password: '',
-        remember: false
-      },
-      error: '',
-    };
-  },
-  methods: {
-    // 3. Petakan 'action' dari store kita ke komponen ini
-    ...mapActions(useAuthStore, ['login']),
+// Router
+const router = useRouter()
 
-    async handleLogin() {
-      this.error = "";
-      const auth = useAuthStore();
+// Pinia
+const auth = useAuthStore()
 
-      try {
-        await auth.login(
-          this.form.email,
-          this.form.password,
-          this.form.remember
-        );
-        this.$router.push("/manajemen-mahasiswa");
-      } catch (err) {
-        showNotification('error', err.message || 'Gagal Login, periksa email atau password anda');
-      }
-    }
+// Form state
+const form = reactive({
+  email: '',
+  password: '',
+  remember: false
+})
+const error = ref();
+// Handle login
+async function handleLogin() {
+  try {
+    await auth.login(form.email, form.password, form.remember)
+    router.push('/manajemen-mahasiswa')
+  } catch (err) {
+    showNotification('error','Email atau Password anda salah')
   }
-};
+}
 </script>
 
 <style scoped>
@@ -102,7 +88,6 @@ export default {
     Ini akan membuat halaman login "keluar" dari container 
     di App.vue dan menutupi seluruh layar.
   */
-  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;

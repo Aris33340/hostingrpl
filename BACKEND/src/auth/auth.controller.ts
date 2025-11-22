@@ -2,6 +2,7 @@ import { Body, Controller, Post, Res, Req, UnauthorizedException } from '@nestjs
 import { AuthService } from './auth.service';
 // PERBAIKAN: 'import' diubah menjadi 'import type'
 import type { Response, Request } from 'express';
+import { userRole } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -9,8 +10,8 @@ export class AuthController {
 
   // Endpoint 'register' tidak berubah, sudah benar.
   @Post('register')
-  async register(@Body() body: { username: string; email: string; password: string }) {
-    return this.authService.register(body.username, body.email, body.password);
+  async register(@Body() body: { username: string; email: string; password: string ,token:string, role?:userRole, }) {
+    return this.authService.register(body.username, body.email, body.password, body.token, body.role);
   }
 
   // --- Endpoint 'login' DIMODIFIKASI ---
