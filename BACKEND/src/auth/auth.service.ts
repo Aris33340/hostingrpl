@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs'; // Menggunakan import standar
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-import { $Enums as Role } from 'generated/prisma/client';
 import { userRole } from '@prisma/client';
 
 @Injectable()
