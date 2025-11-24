@@ -4,6 +4,8 @@ import { defineStore } from 'pinia';
 import { authApi } from '../api';
 import { jwtDecode } from 'jwt-decode';
 import type { JwtPayload } from 'jwt-decode';
+// import type { PdfEditRequestDto, EditablePage, EditorElement } from '@/types/editorDto';
+
 
 
 interface MyJwtPayload extends JwtPayload {

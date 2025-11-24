@@ -1,9 +1,16 @@
 // dto/editor.dto.ts
 
+import { userRole } from "@prisma/client";
+
 export interface RGBColor {
   r: number;
   g: number;
   b: number;
+}
+
+export interface userDetail{
+  id :number;
+  role: userRole;
 }
 
 export interface TextStyle {
@@ -50,9 +57,12 @@ export interface RenderOption {
 }
 
 export default interface PdfEditRequestDto {
-  pdfId: string;
-  pdfFileName: string;
-  editOption: 'renderonlyeditablepages' | 'renderinsidepage';
+  userDetail: userDetail;
+  configuration:{
+      pdfId:number,
+      pdfFileName: string;
+      renderOption: RenderOption;
+      editOption: 'renderonlyeditablepages' | 'renderinsidepage';
+  } 
   editablePages: EditablePage[];
-  renderOption: RenderOption;
 }

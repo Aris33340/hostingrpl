@@ -1,34 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { writeFileSync, existsSync } from 'fs';
 import * as fs from 'fs/promises';
 import PdfEditRequestDto from './dto/editor.dto';
 import { MahasiswaService } from 'src/mahasiswa/mahasiswa.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class EditorService {
-    constructor(private readonly mhsService: MahasiswaService) { }
-    async renderPdf(dto: PdfEditRequestDto): Promise<String> {
-
-        // const pdfBytes = await fs.readFile(`./public/uploads/${dto.pdfFileName}`);
+    constructor(private readonly mhsService: MahasiswaService, private prisma: PrismaService) { }
+    async renderPdf(dto: PdfEditRequestDto, userId: number): Promise<any> {
 
 
+        const file = await this.prisma.file.findUnique({ where: { id_file: Number(dto.configuration.pdfId) } })
+
+        const pdfBytes = await fs.readFile(`${file?.path}`);
         const mahasiswaList = await this.mhsService.mahasiswas();
 
         const editablePages = dto.editablePages.map(p => p.pageNumber - 1);
-        console.log('Halaman yang dapat diedit:', editablePages);
 
+        const outputPath = `./public/output/hasilujicoba.pdf`;
         for (const mhs of mahasiswaList) {
-            const pdfDoc = await PDFDocument.create();
+            const pdfDoc = await PDFDocument.load(pdfBytes);
             pdfDoc.addPage([500, 700]);
+
             const copiedPages = await pdfDoc.copyPages(pdfDoc, editablePages);
             for (const [i, pageConfig] of dto.editablePages.entries()) {
                 const page = copiedPages[i];
                 for (const element of pageConfig.elements) {
-                    // 🔹 Tulis field teks
                     if (element.type === 'field' || element.type === 'text') {
-                        const fieldKey = element.fieldName ?? element.content;
-                        const text = (mhs as Record<string, any>)[fieldKey ?? ''] ?? '';
+                        const fieldKey = element.fieldName ?? '';
+                        const text = (mhs as Record<string, any>)[fieldKey ?? ''] ?? element.content;
                         page.drawText(String(text), {
                             x: element.position.x,
                             y: element.position.y,
@@ -49,8 +51,8 @@ export class EditorService {
                     // 🔹 Tampilkan gambar (misal logo)
                     else if (element.type === 'image' && element.fileId) {
                         const imageBytes = await this.loadImage(element.fileId);
-                        let img;
-                        if (imageBytes.type === 'jpg') {
+                        let img: any;
+                        if (imageBytes.type === 'image/jpeg') {
                             img = await pdfDoc.embedJpg(imageBytes.data);
                         } else {
                             img = await pdfDoc.embedPng(imageBytes.data);
@@ -64,6 +66,7 @@ export class EditorService {
                             opacity: element.opacity ?? 1,
                         });
                     }
+
                 }
                 pdfDoc.insertPage(editablePages[i], page);
                 pdfDoc.removePage(editablePages[i] + 1);
@@ -72,7 +75,6 @@ export class EditorService {
             pdfDoc.removePage(1);
 
             const pdfBytesOut = await pdfDoc.save();
-            const outputPath = `./public/output/${mhs.nim}.pdf`;
             writeFileSync(outputPath, pdfBytesOut);
         }
 
@@ -99,36 +101,47 @@ export class EditorService {
         //     writeFileSync(outputPath, pdfBytesOut);
         //     console.log(`✅ PDF berhasil disimpan ke: ${outputPath}`);
         // }
-
-        return 'success';
+        return this.prisma.file.create({
+            data: {
+                file_name: 'dto.configuration.pdfFileName',
+                path: outputPath,
+                type: 'application/pdf',
+                id_user: userId,
+            }
+        });
     }
 
     private async loadImage(
         fileId: string,
-    ): Promise<{ data: Uint8Array; type: 'png' | 'jpg' }> {
-        const pngPath = `./public/uploads/${fileId}.png`;
-        const jpgPath = `./public/uploads/${fileId}.jpg`;
-        const jpegPath = `./public/uploads/${fileId}.jpeg`;
+    ): Promise<{ data: Uint8Array; type: string }> {
+        const path = await this.prisma.file.findUnique({ where: { id_file: Number(fileId) } })
+        // const pngPath = `./public/uploads/${fileId}.png`;
+        // const jpgPath = `./public/uploads/${fileId}.jpg`;
+        // const jpegPath = `./public/uploads/${fileId}.jpeg`;
 
-        let filePath = '';
-        let fileType: 'png' | 'jpg' | null = null;
+        // let filePath = '';
+        // let fileType: 'png' | 'jpg' | null = null;
 
-        if (existsSync(pngPath)) {
-            filePath = pngPath;
-            fileType = 'png';
-        } else if (existsSync(jpgPath)) {
-            filePath = jpgPath;
-            fileType = 'jpg';
-        } else if (existsSync(jpegPath)) {
-            filePath = jpegPath;
-            fileType = 'jpg';
-        }
+        // if (existsSync(pngPath)) {
+        //     filePath = pngPath;
+        //     fileType = 'png';
+        // } else if (existsSync(jpgPath)) {
+        //     filePath = jpgPath;
+        //     fileType = 'jpg';
+        // } else if (existsSync(jpegPath)) {
+        //     filePath = jpegPath;
+        //     fileType = 'jpg';
+        // }
 
-        if (!filePath || !fileType) {
-            throw new Error(`File gambar tidak ditemukan untuk fileId: ${fileId}`);
+        // if (!filePath || !fileType) {
+        //     throw new Error(`File gambar tidak ditemukan untuk fileId: ${fileId}`);
+        // }
+        const filePath = path?.path;
+        if (!filePath) {
+            throw new NotFoundException;
         }
 
         const imageBuffer = await fs.readFile(filePath);
-        return { data: imageBuffer, type: fileType };
+        return { data: imageBuffer, type: path.type };
     }
 }

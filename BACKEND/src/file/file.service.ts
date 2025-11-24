@@ -13,25 +13,25 @@ export class FileService {
         file_name: file.originalname,
         path: file.path,
         type: file.mimetype,
-        userId_user: userId
+        id_user: userId
       },
     });
   }
 
-    async getFileById(id: number) {
-      return this.prisma.file.findUnique({
-        where: { id_file: id },
-      });
-    }
+  async getFileById(id: number) {
+    return this.prisma.file.findUnique({
+      where: { id_file: id },
+    });
+  }
 
-  async getAllFiles(userId:number,query?:string) {
+  async getAllFiles(userId: number, query?: string) {
     return this.prisma.file.findMany({
-      where:{
-        user:{
-          id_user:userId
+      where: {
+        user: {
+          id_user: userId
         },
-        type:{
-          contains:query
+        type: {
+          contains: query
         }
       }
     });

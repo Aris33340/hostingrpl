@@ -1,5 +1,5 @@
 // editor.controller.ts
-import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Req } from '@nestjs/common';
 import { EditorService } from './editor.service';
 import type PdfEditRequestDto  from './dto/editor.dto';
 import type { Response } from 'express';
@@ -9,9 +9,10 @@ export class EditorController {
     constructor(private readonly editorService: EditorService) {}
 
   @Post('render')
-  async renderPdf(@Body() dto: PdfEditRequestDto, @Res() res: Response) {
+  async renderPdf(@Body() dto: PdfEditRequestDto, @Res() res: Response, @Req() req:any) {
     try {
-      const pdfBytes = await this.editorService.renderPdf(dto);
+      const userId = req.user.sub;
+      const pdfBytes = await this.editorService.renderPdf(dto,Number(userId));
       // res.set({
       //   'Content-Type': 'application/pdf',
       //   'Content-Disposition': `attachment; filename=${dto.pdfFileName.replace('.pdf', '-rendered.pdf')}`,

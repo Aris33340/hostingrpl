@@ -5,7 +5,15 @@ import svgLoader from 'vite-svg-loader'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(),svgLoader()],
+  plugins: [vue({
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => {
+          return tag.startsWith('el-')
+        }
+      }
+    }
+  }),svgLoader()],
   optimizeDeps: {
     exclude: ['pdfjs-dist']
   },

@@ -449,7 +449,7 @@ const handlePresensi = async (idPresensi) => {
         }
 
     } catch (error) {
-        showNotification('error', error.message);
+        showNotification('error', error.response.data.message);
     }
 }
 

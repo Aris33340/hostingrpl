@@ -9,12 +9,8 @@ import {
     Delete,
     BadRequestException,
     NotFoundException,
-    MaxFileSizeValidator,
-    ParseFilePipe,
     ParseFilePipeBuilder,
-    FileTypeValidator,
     HttpStatus,
-    Body,
     Req,
     Query
 } from '@nestjs/common';

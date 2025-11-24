@@ -3,12 +3,18 @@
         <!-- SidePreview -->
         <div
             class="flex flex-col relative h-full w-28 group transition-all duration-300 ease-in-out hover:w-60 bg-white shadow-xl z-20">
-            <div class="h-16 flex items-center justify-center p-2 border-b">
-                <span
-                    class="text-lg font-semibold text-blue-600 transition-opacity duration-300 opacity-0 group-hover:opacity-100 group-hover:delay-150">
-                    Pages
-                </span>
-            </div>
+            <router-link to="/manajemen-mahasiswa" @mouseenter="onHover = false" @mouseleave="onHover = true">
+                <div class="h-16 flex items-center justify-center p-2 border-b">
+                    <span v-if="!onHover"
+                        class="text-lg font-semibold text-blue-600 transition-opacity duration-300 opacity-0 group-hover:opacity-100 group-hover:delay-150">
+                        <HomeIcon class="w-6 h-6 text-black" />
+                    </span>
+                    <span v-if="onHover"
+                        class="text-lg font-semibold text-blue-600 transition-opacity duration-300 opacity-100 group-hover:opacity-0 group-hover:delay-150">
+                        <LeftArrow class="w-6 h-6  text-white" />
+                    </span>
+                </div>
+            </router-link>
 
             <div
                 class="w-full h-full flex flex-col items-center gap-4 py-4 hover:overflow-y-scroll scrollbar-thumb-rounded scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-100">
@@ -32,30 +38,22 @@
             </div>
 
             <div class="absolute bottom-0 w-full p-2 bg-white border-t shadow-inner">
-                <button @click="activateFab" :disabled="fab.enabled"
-                    class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors"
-                    :class="fab.enabled ? 'bg-green-100 text-green-700 cursor-default' : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500'">
-                    {{ fab.enabled ? 'Template Set' : 'Set as Template' }}
+                <button @click="setTemplate" class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors"
+                    :class="pageTemplate.includes(activePage, 0) ? 'bg-red-100 text-red-700 cursor-pointer' : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500'">
+                    {{ pageTemplate.includes(activePage, 0) ? 'Remove Template' : 'Set as Template' }}
                 </button>
             </div>
         </div>
-        <!-- SidePreview -->
 
 
         <!-- WorkSpace -->
-        <div class="flex-1 flex flex-col items-center relative overflow-auto">
-            <div
-                class="bg-white w-[90%] h-14 rounded-3xl mt-4 shadow-lg flex items-center justify-center text-gray-600 z-10">
-                <div class="flex space-x-4">
-                    <span v-for="i in 5" :key="i" class="px-4 py-1 hover:bg-gray-100 rounded-full cursor-pointer">Tool
-                        {{ i }}</span>
-                </div>
-            </div>
+        <div class="flex-1 flex flex-col items-center relative overflow-auto bg-transparent">
 
-            <div class="relative mt-5 w-full h-full flex items-center justify-center p-8 overflow-auto">
+            <ControlPanel @textType="handleSelect" @property="handlePropery" />
+            <div class="relative w-full h-full flex  items-center justify-center p-8 overflow-auto">
                 <!-- DotPlacement -->
 
-                <div ref="workspaceDiv" class="shadow-2xl border bg-white relative"
+                <div ref="workspaceDiv" class="shadow-2xl mt-64 border bg-white relative"
                     :style="{ width: `${workSpaceViewport.width}`, height: `${workSpaceViewport.height}`, }">
                     <!-- DotPlacement -->
                     <div v-if="placement.mode && placement.mode !== 'asset_select'" class="absolute inset-0 z-40"
@@ -92,14 +90,24 @@
                         height: `${object.height}px`,
                         transform: `rotate(${object.rotation}deg)`,
                         position: 'absolute',
-                    }" @mousedown.stop="startDrag($event, object.id)" :class="[
+                    }" @mousedown.prevent="startDrag($event, object.id)" :class="[
                         'cursor-move border border-dashed transition-all duration-100',
                         selectedObjectId === object.id ? 'border-blue-500' : 'border-transparent hover:border-gray-300'
                     ]">
                         <div class="w-full h-full flex items-center justify-center text-xs">
                             <!-- Jika type 'text', tampilkan teks -->
-                            <span v-if="object.type === 'text'" :style="{ fontSize: `${object.props.fontSize}px` }">
-                                {{ object.props.content }}
+                            <span v-if="object.type === 'text'">
+                                <!-- Mode view -->
+                                <span v-if="editingObjectId !== object.id"
+                                    :style="{ fontSize: `${object.props.fontSize}px` }"
+                                    @dblclick.stop="handleInputText(object)">
+                                    {{ object.props.content }}
+                                </span>
+
+                                <!-- Mode edit -->
+                                <input v-else :id="`input-${object.id}`" type="text" v-model="object.props.content"
+                                    class="w-full h-full text-center outline-none bg-transparent border-none"
+                                    @blur="finishEdit(object)" @keydown="handleEnter($event, object)" />
                             </span>
                             <!-- Jika type 'image', tampilkan gambar -->
                             <img v-else-if="object.type === 'image'" :src="getAssetUrl(object.props.assetId)"
@@ -142,6 +150,20 @@
                             'w-full h-full flex flex-col justify-evenly items-center transition-opacity duration-300 delay-150',
                             fab.enabled ? 'group-hover:opacity-100' : 'opacity-0'
                         ]">
+                            <li class="relative">
+                                <button @click="startPlacement('qr')" aria-label="Add QR"
+                                    class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
+                                    <svg class="w-6 h-6 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v.01m0 4v.01m0 4v.01m0 4v.01m-4-8h.01M8 8h.01m8 4h.01m-4 8h.01">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <span role="tooltip"
+                                    class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
+                                    Add Field
+                                </span>
+                            </li>
                             <li class="relative">
                                 <button @click="startPlacement('qr')" aria-label="Add QR"
                                     class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
@@ -198,22 +220,34 @@
             <div v-if="selectedObjectId"
                 class="w-80 h-full bg-white shadow-xl z-20 transition-all duration-300 overflow-y-auto p-4 border-l">
                 <h3 class="text-lg font-bold mb-4">Properties</h3>
-                <div v-if="selectedObject.type === 'text'">
-                    <label class="block text-sm font-medium text-gray-700">Font Size</label>
-                    <input type="number" :value="selectedObject.props.fontSize"
-                        @input="updateProperty(selectedObjectId, 'fontSize', $event.target.value)"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Orientation</label>
+                    <input type="number" :value="Math.floor(selectedObject.rotation)" @input="updateObjectTransform(selectedObjectId, {
+                        rotation: Math.min(360, Math.max(0, Number($event.target.value)))
+                    })" class=" mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
                 </div>
                 <div class="mt-4">
-                    <label class="block text-sm font-medium text-gray-700">X Position (px)</label>
+                    <label class="block text-sm font-medium text-gray-700">X Coordinate</label>
                     <input type="number" :value="Math.floor(selectedObject.x)"
                         @input="updateObjectTransform(selectedObjectId, { x: $event.target.value })"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
                 </div>
                 <div class="mt-4">
-                    <label class="block text-sm font-medium text-gray-700">Y Position (px)</label>
+                    <label class="block text-sm font-medium text-gray-700">Y Coordinate</label>
                     <input type="number" :value="Math.floor(selectedObject.y)"
                         @input="updateObjectTransform(selectedObjectId, { y: $event.target.value })"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Height</label>
+                    <input type="number" :value="Math.floor(selectedObject.height)"
+                        @input="updateObjectTransform(selectedObjectId, { height: $event.target.value })"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Width</label>
+                    <input type="number" :value="Math.floor(selectedObject.width)"
+                        @input="updateObjectTransform(selectedObjectId, { width: $event.target.value })"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
                 </div>
                 <div class="mt-4">
@@ -238,9 +272,7 @@
                 </button>
 
 
-                <!-- Title -->
                 <h3 class="text-2xl font-semibold mb-5 text-gray-800">Select Image Asset</h3>
-                <!-- Asset Grid -->
                 <div class="grid grid-cols-4 gap-4 max-h-96 overflow-y-auto pr-2">
                     <div v-for="asset in assetLibrary" :key="asset.id" @click="selectAsset(asset.id)" :class="[
                         'w-full h-24 border rounded-xl cursor-pointer overflow-hidden shadow-sm transition-all',
@@ -255,8 +287,7 @@
 
                 <!-- Footer Actions -->
                 <div class="mt-6 space-y-4">
-                    <!-- Add Button -->
-                    <div class="flex gap-5">
+                    = <div class="flex gap-5">
                         <button @click="deleteImg" :disabled="!placement.selectedAssetId" :class="[
                             'w-full py-2.5 rounded-xl font-medium text-white transition',
                             placement.selectedAssetId
@@ -298,30 +329,35 @@
 </template>
 
 <script setup>
+import ControlPanel from '../components/EditorComponents/ControlPanel.vue';
 import * as pdfjsLib from 'pdfjs-dist/webpack.mjs'
 import "pdfjs-dist/web/pdf_viewer.css";
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed, watch, nextTick, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 // Assuming your PlusIcon is correctly imported, but using a placeholder SVG for simplicity above.
 import PlusIcon from '@/assets/icons/plus-large-svgrepo-com.svg'
+import LeftArrow from '@/assets/icons/left-arrow-svgrepo-com.svg'
+import Home from '@/assets/icons/home-smile-svgrepo-com.svg'
 import RotateIcon from '@/assets/icons/bended-arrow-svgrepo-com.svg'
 import { mainApi } from '@/api'
 import { showNotification } from '../composables/useNotification';
-import PdfEditRequestDto from '../stores/editorDto'
+import { usePdfEditRequestStore } from '../stores/requestEditorStore';
+import { HomeIcon } from 'lucide-vue-next';
 pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.mjs';
 
-
-
 // --- STATE MANAGEMENT (Simplified) ---
+const onHover = ref(false)
+const DtoEditorStore = usePdfEditRequestStore();
 const route = useRoute();
 const pageCount = ref();
 const pdfFile = ref();
 const activePage = ref(1);
+const canvasHeight = ref(0);
 let pdfDoc;
 const pages = ref([]);
 const fileImg = ref(null)
 const uploadProgress = ref(0);
-let workSpaceViewport = { width: 1080, height: 720 };
+const workSpaceViewport = ref({ width: 1080, height: 720 });
 const isDragging = ref(false);
 const dragObjectId = ref(null);
 const dragOffset = ref({ x: 0, y: 0 });
@@ -333,11 +369,181 @@ const isResizing = ref(false);
 const resizeObjectId = ref(null);
 const initialSize = ref({ width: 0, height: 0 });
 const initialMouse = ref({ x: 0, y: 0 });
+const pageTemplate = ref([]);
+const objects = ref([
+    { id: 1001, type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, pageNumber: 1, props: { content: 'testtt', fontSize: 16 } },
+    { id: 1002, type: 'image', x: 400, y: 500, width: 100, height: 100, rotation: 15, pageNumber: 1, props: { assetId: 101, opacity: 100 } },
+]);
+const assetLibrary = ref([]);
+const editingObjectId = ref(null);
 
+
+const mouseDrag = ref({ x: 0, y: 0 });
+const placement = ref({
+    mode: 'asset_select' | 'text' | 'image' | 'field' | 'qr' | null,
+    selectedAssetId: null,
+    dotPosition: { x: 0, y: 0 },
+});
+
+const activePageData = computed(() => pages.value.find(p => p.pageNumber === activePage.value));
+const selectedObject = computed(() => objects.value.find(obj => obj.id === selectedObjectId.value));
+const dotPosition = computed(() => placement.value.dotPosition);
+const select = ref()
+
+const handleSelect = (event) => {
+    select.value = event
+    console.log(event)
+}
+
+const handlePropery = (event) => {
+    console.log(event)
+}
+
+onMounted(() => {
+    DtoEditorStore.init();
+    loadPDF().then(async () => {
+        pages.value.forEach(page => {
+            const container = document.querySelector(`[aria-label="Page ${page.pageNumber}"] div`);
+            container.appendChild(page.canvas);
+        });
+        await setWorkSpace(activePage.value);
+    });
+    canvasHeight.value = workspaceDiv.value.getBoundingClientRect();
+});
+
+watch(activePage, async () => {
+    await setWorkSpace(activePage.value)
+})
+
+const selected = ref("")
+
+const menuItems = [
+    "Edit",
+    "Duplicate",
+    "Archive",
+    "Move",
+    "Share",
+    "Add to favorites",
+    "Delete"
+]
+const onEmits = async (event) => {
+    selected.value = event
+}
+
+const translateToScreen = (y, height) => {
+    return canvasHeight.value.height - y + 590;
+};
+
+
+const handleInputText = (object) => {
+    if (object.type !== 'text') return;
+    editingObjectId.value = object.id;
+
+    nextTick(() => {
+        const el = document.getElementById(`input-${object.id}`);
+        el?.focus();
+        el?.select();
+    });
+};
+
+const finishEdit = () => {
+    editingObjectId.value = null;
+};
+
+const handleEnter = (e, object) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        finishEdit(object);
+    }
+};
+
+const render = async () => {
+    const json = DtoEditorStore.showDto();
+    console.log(json)
+    const res = await mainApi.post('editor/render', json);
+    console.log(res.data);
+}
+
+
+const loadPDF = async () => {
+    const id = route.query.fileId;
+    DtoEditorStore.setPdfId(id);
+    const res = await mainApi.get(`/files/${id}`, { responseType: 'arraybuffer' });
+    pdfDoc = await pdfjsLib.getDocument({ data: res.data }).promise;
+    const numPages = pdfDoc.numPages;
+    for (let i = 1; i <= numPages; i++) {
+        const page = await pdfDoc.getPage(i);
+
+        const scale = 1;
+        const viewport = page.getViewport({ scale });
+        const outputScale = window.devicePixelRatio || 1;
+        console.log(viewport)
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        canvas.width = Math.floor(viewport.width * outputScale);
+        canvas.height = Math.floor(viewport.height * outputScale);
+        canvas.style.width = Math.floor(viewport.width) + "px";
+        canvas.style.height = Math.floor(viewport.height) + "px";
+
+        const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+
+        await page.render({ canvasContext: context, viewport, transform }).promise;
+
+        pages.value.push({
+            id: i,
+            pageNumber: i,
+            canvas
+        });
+    }
+
+    activePage.value = 1;
+};
+
+
+const uploadImg = async () => {
+    if (!fileImg.value) return;
+
+    let interval = null;
+
+    try {
+        const formData = new FormData();
+        formData.append('file', fileImg.value);
+        uploadProgress.value = 1;
+
+        interval = setInterval(() => {
+            if (uploadProgress.value < 90) {
+                uploadProgress.value++;
+            }
+        }, 80);
+
+        const res = await mainApi.post(`files`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        uploadProgress.value = 100;
+
+        setTimeout(() => {
+            uploadProgress.value = 0;
+        }, 500);
+        await loadLibrary();
+    } catch (e) {
+        showNotification('error', 'Gagal upload gambar');
+        uploadProgress.value = 0;
+
+    } finally {
+        if (interval) clearInterval(interval);
+        fileImg.value = null;
+    }
+}
+
+
+const onFileChange = (event) => {
+    fileImg.value = event.target.files[0];
+}
 
 const getAssetUrl = (assetId) => {
     const asset = assetLibrary.value.find(a => a.id === assetId);
-    return asset ? asset.url : ''; // Kembalikan URL jika ditemukan, kosong jika tidak
+    return asset ? asset.url : '';
 };
 
 
@@ -433,70 +639,32 @@ const startDrag = (e, objectId) => {
 
 const onDrag = (e) => {
     if (!isDragging.value || !workspaceDiv.value) return;
+    const height = window.visualViewport.height;
+    mouseDrag.value.y = height - e.clientY;
+    const mouseY = height - e.clientY;
     const rect = workspaceDiv.value.getBoundingClientRect();
     const rawX = e.clientX - rect.left - dragOffset.value.x;
     const rawY = e.clientY - rect.top - dragOffset.value.y;
-    // Batasi agar tidak keluar dari workspaceDiv
-    const clampedX = Math.max(0, Math.min(rawX, rect.width - 100)); // Asumsi width objek 100px
-    const clampedY = Math.max(0, Math.min(rawY, rect.height - 100)); // Asumsi height objek 100px
+    const clampedX = Math.max(0, Math.min(rawX, rect.width - 100));
+    const clampedY = Math.max(0, Math.min(rawY, rect.height - 100));
+    mouseDrag.value.x = rawY;
     updateObjectTransform(dragObjectId.value, { x: clampedX, y: clampedY });
 };
-
 const stopDrag = () => {
-    isDragging.value = false;
-    dragObjectId.value = null;
+    isDragging.value = false; dragObjectId.value = null;
     window.removeEventListener('mousemove', onDrag);
     window.removeEventListener('mouseup', stopDrag);
 };
+
 
 const updateDotPosition = (e) => {
     if (!workspaceDiv.value) return;
     const rect = workspaceDiv.value.getBoundingClientRect();
     const rawX = e.clientX - rect.left;
     const rawY = e.clientY - rect.top;
-
     placement.value.dotPosition.x = Math.max(0, Math.min(rawX, rect.width));
     placement.value.dotPosition.y = Math.max(0, Math.min(rawY, rect.height));
 };
-
-const confirmPlacement = () => {
-    const newObject = {
-        id: Date.now(),
-        type: placement.value.mode,
-        x: placement.value.dotPosition.x, // Sekarang relatif terhadap workspace
-        y: placement.value.dotPosition.y, // Sekarang relatif terhadap workspace
-        width: 100,
-        height: 100,
-        rotation: 0,
-        pageNumber: activePage.value,
-        props: {}
-    };
-    if (newObject.type === 'text') {
-        newObject.props = { content: 'New Text Block', fontSize: 14 };
-    } else if (newObject.type === 'image') {
-        newObject.props = { assetId: placement.value.selectedAssetId, opacity: 100 };
-    }
-    objects.value.push(newObject);
-    selectObject(newObject.id); // Select the new object immediately
-    cancelPlacement(); // Exit placement mode
-    console.log(`Object placed: ${newObject.type}`);
-};
-
-
-
-// const pages = ref([{
-//     id: null,
-//     pageNumber: null,
-//     data: null
-// }
-//     // Dummy data for structure
-//     // { id: 1, thumbnailUrl: 'url1', pageNumber: 1, url: '' },
-//     // { id: 2, thumbnailUrl: 'url2', pageNumber: 2, url: '' },
-//     // { id: 3, thumbnailUrl: 'url3', pageNumber: 3, url: '' },
-//     // { id: 4, thumbnailUrl: 'url4', pageNumber: 4, url: '' },
-//     // { id: 5, thumbnailUrl: 'url5', pageNumber: 5, url: '' },
-//     // ... more pages
-// ]);
 
 const deleteImg = async () => {
     const id = placement.value.selectedAssetId
@@ -507,54 +675,6 @@ const deleteImg = async () => {
         placement.value.selectedAssetId = null;
     }
 }
-const uploadImg = async () => {
-    if (!fileImg.value) return;
-
-    let interval = null; // <-- pindahkan ke sini
-
-    try {
-        const formData = new FormData();
-        formData.append('file', fileImg.value);
-
-        uploadProgress.value = 1;
-
-        // Progress animation dummy (karena axios tidak ada onUploadProgress di fetch)
-        interval = setInterval(() => {
-            if (uploadProgress.value < 90) {
-                uploadProgress.value++;
-            }
-        }, 80);
-
-        const res = await mainApi.post(`files`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
-
-        // Jika sukses → langsung 100%
-        uploadProgress.value = 100;
-
-        setTimeout(() => {
-            uploadProgress.value = 0;
-        }, 500);
-        await loadLibrary();
-    } catch (e) {
-        showNotification('error', 'Gagal upload gambar');
-        uploadProgress.value = 0;
-
-    } finally {
-        if (interval) clearInterval(interval);
-        fileImg.value = null;
-    }
-}
-
-
-const onFileChange = (event) => {
-    fileImg.value = event.target.files[0];
-}
-
-
-watch(activePage, async () => {
-    await setWorkSpace(activePage.value)
-})
 
 const setWorkSpace = async (pageNum) => {
     const page = await pdfDoc.getPage(pageNum);
@@ -568,58 +688,12 @@ const setWorkSpace = async (pageNum) => {
 
     canvas.style.width = `${Math.floor(pageViewport.width)}px`;
     canvas.style.height = `${Math.floor(pageViewport.height)}px`;
-    workSpaceViewport.width = canvas.style.width;
-    workSpaceViewport.height = canvas.style.height;
+    workSpaceViewport.value.width = canvas.style.width;
+    workSpaceViewport.value.height = canvas.style.height;
 
     const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
     await page.render({ canvasContext: context, viewport: pageViewport, transform }).promise;
 }
-const loadPDF = async () => {
-    const id = route.query.fileId;
-    const res = await mainApi.get(`/files/${id}`, { responseType: 'arraybuffer' });
-    pdfDoc = await pdfjsLib.getDocument({ data: res.data }).promise;
-    const numPages = pdfDoc.numPages;
-
-
-    for (let i = 1; i <= numPages; i++) {
-        const page = await pdfDoc.getPage(i);
-
-        const scale = 0.3;
-        const viewport = page.getViewport({ scale });
-        const outputScale = window.devicePixelRatio || 1;
-
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-
-        canvas.width = Math.floor(viewport.width * outputScale);
-        canvas.height = Math.floor(viewport.height * outputScale);
-        canvas.style.width = Math.floor(viewport.width) + "px";
-        canvas.style.height = Math.floor(viewport.height) + "px";
-
-        const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
-        await page.render({ canvasContext: context, viewport, transform }).promise;
-
-        pages.value.push({
-            id: i,
-            pageNumber: i,
-            canvas
-        });
-    }
-
-    activePage.value = 1;
-};
-
-onMounted(() => {
-    loadPDF().then(async () => {
-        pages.value.forEach(page => {
-            const container = document.querySelector(`[aria-label="Page ${page.pageNumber}"] div`);
-            container.appendChild(page.canvas);
-        });
-        await setWorkSpace(activePage.value);
-    });
-
-});
 
 
 const fab = ref({ enabled: false });
@@ -639,42 +713,31 @@ const loadLibrary = async () => {
     })
 }
 
-const assetLibrary = ref([
-]);
 
-const placement = ref({
-    mode: null, // 'asset_select' | 'image' | 'text' | 'qr' | null
-    selectedAssetId: null,
-    dotPosition: { x: 0, y: 0 },
-});
-
-const objects = ref([
-    { id: 1001, type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, pageNumber: 1, props: { content: 'Editable Text', fontSize: 16 } },
-    { id: 1002, type: 'image', x: 400, y: 300, width: 100, height: 100, rotation: 15, pageNumber: 1, props: { assetId: 101, opacity: 100 } },
-]);
-
-// Computed Properties
-const activePageData = computed(() => pages.value.find(p => p.pageNumber === activePage.value));
-const selectedObject = computed(() => objects.value.find(obj => obj.id === selectedObjectId.value));
-const dotPosition = computed(() => placement.value.dotPosition);
-
-
-// --- METHODS ---
-
-/** 1. Pages Panel Actions */
 const selectPage = (pageNumber) => {
+    fab.value.enabled = pageTemplate.value.includes(pageNumber, 0)
     activePage.value = pageNumber;
-    selectedObjectId.value = null; // Deselect object on page change
+    selectedObjectId.value = null;
     console.log(`Page ${pageNumber} selected.`);
 };
 
-/** 2. FAB Actions */
-const activateFab = () => {
-    fab.value.enabled = true;
-    console.log('FAB Activated.');
+const setTemplate = () => {
+    if (!pageTemplate.value.includes(activePage.value)) {
+        pageTemplate.value.push(activePage.value)
+        DtoEditorStore.addPage({ pageNumber: activePage.value, elements: [] })
+        console.log('template :', DtoEditorStore.showDto());
+        fab.value.enabled = true;
+        return
+    }
+    const confirmation = confirm('yakin hapus template?')
+    if (confirmation) {
+        const index = pageTemplate.value.findIndex((e) => e === activePage.value)
+        pageTemplate.value.splice(index, 1);
+        fab.value.enabled = false;
+    }
+    console.log('FAB Activated.', pageTemplate.value);
 };
 
-/** 3. Asset Selector / Placement Flow Actions */
 const openAssetSelector = async () => {
     if (fab.value.enabled) {
         placement.value.mode = 'asset_select';
@@ -693,26 +756,47 @@ const startPlacement = (mode, assetId = null) => {
     if (!fab.value.enabled) return;
 
     if (mode === 'image' && !assetId) {
-        // This happens after selecting an image in the asset selector
         placement.value.mode = 'image';
         placement.value.selectedAssetId = placement.value.selectedAssetId;
-        // Close modal if open
-        // placement.value.mode = mode; // Asset selector modal will close itself implicitly
     } else if (mode === 'image') {
-        // Called from modal CTA
         placement.value.mode = mode;
         placement.value.selectedAssetId = assetId;
     } else {
-        // For QR or Text, immediately enter placement mode
         placement.value.mode = mode;
         placement.value.selectedAssetId = null; // Not asset-based
     }
 
-    // Close the asset selector if it was open
     if (placement.value.mode !== 'asset_select') {
-        // A better way to handle the modal would be a separate v-model state.
         console.log(`Entering placement mode: ${placement.value.mode}`);
     }
+};
+
+const confirmPlacement = () => {
+    const newObject = {
+        id: Date.now(),
+        type: placement.value.mode,
+        x: placement.value.dotPosition.x,
+        y: placement.value.dotPosition.y,
+        width: 100,
+        height: 100,
+        rotation: 0,
+        pageNumber: activePage.value,
+        props: {}
+    }
+    console.log(placement.value.selectedAssetId)
+    console.log(placement.value.mode)
+    const element = DtoEditorStore.createElement(newObject.id, { x: newObject.x, y: newObject.y }, { height: newObject.height, width: newObject.width }, newObject.type, newObject.rotation);
+    if (newObject.type === 'text') {
+        newObject.props = { content: 'New Text Block', fontSize: 14 };
+    } else if (newObject.type === 'image') {
+        newObject.props = { assetId: placement.value.selectedAssetId, opacity: 100 };
+        element.fileId = placement.value.selectedAssetId
+    }
+    DtoEditorStore.addOneElement(newObject.pageNumber, element);
+    objects.value.push(newObject);
+    selectObject(newObject.id);
+    cancelPlacement();
+    console.log(`Object placed: ${newObject.type}`);
 };
 
 
@@ -751,14 +835,6 @@ const updateProperty = (objectId, property, value) => {
 };
 
 
-// onMounted(async() => {
-//     await loadPdf();
-// })
-
-// onMounted(() => {
-//   // Your existing PDF loading logic goes here
-//   // For now, using dummy data.
-// });
 </script>
 
 <style scoped>
