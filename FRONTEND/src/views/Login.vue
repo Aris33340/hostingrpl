@@ -85,8 +85,8 @@ async function handleLogin() {
 /* Struktur Utama */
 .login-page {
   /* PERBAIKAN: Menggunakan 'position: fixed' 
-    Ini akan membuat halaman login "keluar" dari container 
-    di App.vue dan menutupi seluruh layar.
+     Ini akan membuat halaman login "keluar" dari container 
+     di App.vue dan menutupi seluruh layar.
   */
   top: 0;
   left: 0;
