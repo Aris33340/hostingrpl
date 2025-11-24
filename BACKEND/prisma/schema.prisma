@@ -1,0 +1,159 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma" 
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// --- ENUMS ---
+enum userRole {
+  SUPERADMIN
+  SEKRETARIAT
+  BUKUWISUDA
+  PETUGAS
+}
+
+// --- CORE MODELS ---
+
+model user {
+  id_user   Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      userRole @default(SUPERADMIN)
+
+  files     file[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model mahasiswa {
+  nim               Int      @id
+  nama              String
+  kelas             String
+  prodi             String?
+  no_telp           String?
+  nama_orang_tua    String?
+  judul_skripsi     String?
+  dosen_pembimbing  String?
+  daerah_asal       String?
+  daerah_penempatan String?
+
+  peserta           peserta[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model tamu {
+  id_tamu       Int    @id @default(autoincrement())
+  nama          String
+  email         String
+  asal_instansi String
+
+  peserta       peserta[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model peserta {
+  id_peserta      Int    @id @default(autoincrement())
+  jenis           String // Mahasiswa atau Tamu
+  nim             Int?   @unique
+  id_tamu         Int?   @unique
+
+  mahasiswa       mahasiswa? @relation(fields: [nim], references: [nim], onDelete: Cascade)
+  tamu            tamu?      @relation(fields: [id_tamu], references: [id_tamu], onDelete: Cascade)
+  files           file[]
+  emailsendstatus emailSendStatus[]
+  presensis       presensi[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// --- SYSTEM LOGS & CONFIGURATION MODELS ---
+
+model presensi {
+  id_presensi    Int      @id @default(autoincrement())
+  waktu_presensi DateTime @default(now())
+  status         Int      @default(0) // 0: Absen, 1: Hadir
+
+  peserta        peserta  @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
+  id_peserta     Int      @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model file {
+  id_file           Int      @id @default(autoincrement())
+  file_name         String
+  path              String
+  type              String
+
+  user              user?    @relation(fields: [userId_user], references: [id_user], onDelete: Cascade)
+  userId_user       Int
+  peserta           peserta? @relation(fields: [pesertaId_peserta], references: [id_peserta], onDelete: Cascade)
+  pesertaId_peserta Int?
+  
+  // PERBAIKAN: Field Balikan untuk relasi EmailAttachment
+  emailSendStatuses emailSendStatus[] @relation(name: "EmailAttachment")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SenderAccount {
+  id_sender   Int      @id @default(autoincrement())
+  email       String   @unique // ex: panitia@stis.ac.id
+  host        String   // ex: smtp.gmail.com
+  port        Int      // ex: 587
+  password    String   // App Password
+  isActive    Boolean  @default(false) // Hanya 1 yang aktif
+  createdAt   DateTime @default(now())
+}
+
+model SystemConfig {
+  id_config   Int    @id @default(autoincrement())
+  key_name    String @unique // "QR_SECRET_KEY"
+  value       String
+}
+
+// Model emailSendStatus yang sudah digabungkan dan diperbaiki sintaksnya
+model emailSendStatus {
+  id_sendStatus     Int      @id @default(autoincrement())
+  waktu_dikirim     DateTime @default(now())
+  status            Int      @default(0) // 0: Gagal, 1: Berhasil
+  
+  // LOG & TARGET BARU
+  subject           String?
+  recipient_email   String
+  error_message     String?  @db.Text
+  
+  // RELATIONS
+  peserta           peserta? @relation(fields: [pesertaId_peserta], references: [id_peserta], onDelete: Cascade)
+  pesertaId_peserta Int?
+  
+  // PERBAIKAN SINTAKS: Memperbaiki tanda kurung dan menambahkan nama relasi
+  file              file?    @relation(fields: [fileId], references: [id_file], name: "EmailAttachment") 
+  fileId            Int?     
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model EmailAccount {
+  id        Int     @id @default(autoincrement())
+  name      String  // misal: "No Reply Wisuda"
+  host      String
+  port      Int
+  secure    Boolean
+  username  String  // user SMTP
+  password  String  // password / app password
+  isActive  Boolean @default(false)
+  createdAt DateTime @default(now())
+}
