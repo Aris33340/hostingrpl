@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 * {
   margin: 0;
   padding: 0;
@@ -80,42 +81,10 @@ h1 {
   width: 100%;
   overflow-x: hidden;
 }
-@media(max-width:1035px) {
-  .main-content{
-    margin-left: 5vw;
-  }
-
-}
-@media(max-width:760px) {
-  .main-content{
-    margin-left: 7vw;
-  }
-}
-@media(max-width:670px) {
-  .main-content{
-    margin-left: 7vw;
-  }
-  .icon-status{
-    font-size: 6px;
-  }
-}
 @media(max-width:642px) {
-  .main-content{
-    margin-left: 7vw;
-  }
   .icon-status{
     font-size: 0px;
     width: 1px;
-  }
-}
-@media(max-width:567px) {
-  .main-content{
-    margin-left: 11vw;
-  }
-}
-@media(max-width:382px) {
-  .main-content{
-    margin-left: 13vw;
   }
 }
 

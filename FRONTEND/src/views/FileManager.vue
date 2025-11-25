@@ -250,6 +250,7 @@ const deleteFile = async (file) => {
         showNotification('success', 'File berhasil dihapus!')
     } catch (err) {
         showNotification('error', 'Gagal menghapus file: ' + (err.response?.data?.message || err.message))
+        files.value = files.value.filter(f => f.id_file !== file.id_file)
     }
 }
 

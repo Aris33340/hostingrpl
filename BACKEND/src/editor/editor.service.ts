@@ -103,7 +103,7 @@ export class EditorService {
         // }
         return this.prisma.file.create({
             data: {
-                file_name: 'dto.configuration.pdfFileName',
+                file_name: `rendered-${userId}.pdf`,
                 path: outputPath,
                 type: 'application/pdf',
                 id_user: userId,

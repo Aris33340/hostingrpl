@@ -87,7 +87,7 @@ model emailSendStatus {
 model file {
   id_file   Int    @id @default(autoincrement())
   file_name String
-  path      String
+  path      String @unique
   type      String
 
   user       user?    @relation(fields: [id_user], references: [id_user], onDelete: Cascade)

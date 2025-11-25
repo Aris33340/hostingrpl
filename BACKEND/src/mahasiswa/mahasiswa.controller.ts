@@ -9,7 +9,10 @@ import {
   Param, 
   Delete, 
   ParseIntPipe, 
-  BadRequestException 
+  BadRequestException, 
+  HttpException,
+  HttpStatus,
+  NotFoundException
 } from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
 import { Prisma } from '@prisma/client'

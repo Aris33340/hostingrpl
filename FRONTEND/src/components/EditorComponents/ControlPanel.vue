@@ -50,10 +50,21 @@
             <div class=" flex-1"></div>
 
             <!-- Render button -->
-            <button @click="render"
+            <button @click="render" :disabled="prop.isLoading"
                 class="h-10 px-5 bg-blue-800 text-white hover:bg-blue-500 active:bg-blue-900 rounded-full cursor-pointer">
-                RENDER
+                <span v-if="!prop.isLoading" class="font-bold" @click.prevent="render">RENDER</span>
+                <span v-else class="flex items-center">
+                    <svg class="animate-spin h-5 w-5 mr-3 text-gray-50" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    <span>Merender...</span>
+                </span>
+
             </button>
+
 
         </div>
     </div>
@@ -68,12 +79,17 @@ const selected = ref("")
 const isBold = ref(false);
 const isItalic = ref(false);
 const isUnderline = ref(false);
-
+const prop = defineProps({
+    isLoading: Boolean
+})
 
 
 if (fontSize.value < 0) {
     fontSize.value = 0
 } else if (fontSize.value > 210) fontSize.value = 210
+const render = () => {
+    emits('property', { key: 'isRender', value: true })
+}
 
 const handleBold = () => {
     isBold.value = !isBold.value

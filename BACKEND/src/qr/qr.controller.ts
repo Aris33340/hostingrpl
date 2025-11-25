@@ -10,7 +10,7 @@ export class QRcontroller {
     @Post('generate-qr')
     async qreateQr(@Body('data') data: string, @Body('config') qrDto?: QRDTO) {
         try {
-            const pdfBuffer = await this.qrCodeService.createQR(data);
+            const pdfBuffer = await this.qrCodeService.createQR(data,qrDto);
             if (!fs.existsSync(`./public/qr-generate/`)) {
                 fs.mkdirSync(`./public/qr-generate/`, { recursive: true });
             }

@@ -71,9 +71,18 @@ const error = ref();
 async function handleLogin() {
   try {
     await auth.login(form.email, form.password, form.remember)
-    router.push('/manajemen-mahasiswa')
+    switch (auth.getPayload().role) {
+      case 'BUKUWISUDA':
+        return router.push({ name: 'DashboardBuku' })
+      case 'SUPERADMIN':
+        return router.push({ name: 'SuperAdminDashboard' })
+      case 'SEKRETARIAT':
+        return router.push({ name: 'DashboardSekre' })
+      default:
+        break;
+    }
   } catch (err) {
-    showNotification('error','Email atau Password anda salah')
+    showNotification('error', 'Email atau Password anda salah')
   }
 }
 </script>

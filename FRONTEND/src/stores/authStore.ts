@@ -52,7 +52,6 @@ export const useAuthStore = defineStore('auth', {
 
       } catch (error: any) {
         const message = "Email atau password salah";
-      
         throw new Error(message);
       }
     },

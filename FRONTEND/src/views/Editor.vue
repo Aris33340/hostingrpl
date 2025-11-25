@@ -3,7 +3,7 @@
         <!-- SidePreview -->
         <div
             class="flex flex-col relative h-full w-28 group transition-all duration-300 ease-in-out hover:w-60 bg-white shadow-xl z-20">
-            <router-link to="/manajemen-mahasiswa" @mouseenter="onHover = false" @mouseleave="onHover = true">
+            <router-link to="/input-file" @mouseenter="onHover = false" @mouseleave="onHover = true">
                 <div class="h-16 flex items-center justify-center p-2 border-b">
                     <span v-if="!onHover"
                         class="text-lg font-semibold text-blue-600 transition-opacity duration-300 opacity-0 group-hover:opacity-100 group-hover:delay-150">
@@ -48,8 +48,7 @@
 
         <!-- WorkSpace -->
         <div class="flex-1 flex flex-col items-center relative overflow-auto bg-transparent">
-
-            <ControlPanel @textType="handleSelect" @property="handlePropery" />
+            <ControlPanel @property="handleProperty" :isLoading="isLoading"/>
             <div class="relative w-full h-full flex  items-center justify-center p-8 overflow-auto">
                 <!-- DotPlacement -->
 
@@ -109,13 +108,10 @@
                                     class="w-full h-full text-center outline-none bg-transparent border-none"
                                     @blur="finishEdit(object)" @keydown="handleEnter($event, object)" />
                             </span>
-                            <!-- Jika type 'image', tampilkan gambar -->
                             <img v-else-if="object.type === 'image'" :src="getAssetUrl(object.props.assetId)"
                                 :alt="`Asset ${object.props.assetId}`" class="w-full h-full object-cover" />
-                            <!-- Jika type lain (e.g., 'qr'), tampilkan placeholder atau implementasi khusus -->
                             <span v-else>{{ object.type }} Object #{{ object.id }}</span>
                         </div>
-                        <!-- Handle rotasi, hanya tampil jika objek dipilih -->
                         <div v-if="selectedObjectId === object.id"
                             class="absolute w-4 h-4 bg-blue-700 rounded-full cursor-nesw-resize -top-2 -right-2"
                             @mousedown.stop="startRotate($event, object.id)" style="transform: rotate(45deg);">
@@ -346,7 +342,7 @@ import { HomeIcon } from 'lucide-vue-next';
 pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.mjs';
 
 // --- STATE MANAGEMENT (Simplified) ---
-const onHover = ref(false)
+const onHover = ref(true)
 const DtoEditorStore = usePdfEditRequestStore();
 const route = useRoute();
 const pageCount = ref();
@@ -376,7 +372,7 @@ const objects = ref([
 ]);
 const assetLibrary = ref([]);
 const editingObjectId = ref(null);
-
+const isLoading = ref(false);
 
 const mouseDrag = ref({ x: 0, y: 0 });
 const placement = ref({
@@ -388,15 +384,10 @@ const placement = ref({
 const activePageData = computed(() => pages.value.find(p => p.pageNumber === activePage.value));
 const selectedObject = computed(() => objects.value.find(obj => obj.id === selectedObjectId.value));
 const dotPosition = computed(() => placement.value.dotPosition);
-const select = ref()
 
-const handleSelect = (event) => {
-    select.value = event
-    console.log(event)
-}
-
-const handlePropery = (event) => {
-    console.log(event)
+const handleProperty =async (event) => {
+    if(event.key=='isRender')
+    await render()
 }
 
 onMounted(() => {
@@ -426,9 +417,6 @@ const menuItems = [
     "Add to favorites",
     "Delete"
 ]
-const onEmits = async (event) => {
-    selected.value = event
-}
 
 const translateToScreen = (y, height) => {
     return canvasHeight.value.height - y + 590;
@@ -458,10 +446,18 @@ const handleEnter = (e, object) => {
 };
 
 const render = async () => {
-    const json = DtoEditorStore.showDto();
-    console.log(json)
-    const res = await mainApi.post('editor/render', json);
-    console.log(res.data);
+    isLoading.value = true
+    try {
+        const json = DtoEditorStore.showDto();
+        console.log(json)
+        const res = await mainApi.post('editor/render', json);
+        console.log(res.data);
+        showNotification('success',`Render Berhasil, cek pada file manager`)
+    } catch (error) {
+        showNotification('error',`Terjadi kesalahan render: ${error.message}`)
+    }finally{
+        isLoading.value = false
+    }
 }
 
 
@@ -477,7 +473,6 @@ const loadPDF = async () => {
         const scale = 1;
         const viewport = page.getViewport({ scale });
         const outputScale = window.devicePixelRatio || 1;
-        console.log(viewport)
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 

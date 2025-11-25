@@ -29,9 +29,9 @@ export class FileController {
     constructor(private readonly fileService: FileService, private readonly authService: AuthService) { }
 
     @Get()
-    async getAllFiles(@Req() req: any,@Query('type') type:string) {
+    async getAllFiles(@Req() req: any, @Query('type') type: string) {
         const userId = req.user.sub;
-        const files = await this.fileService.getAllFiles(Number(userId),type.toLowerCase());
+        const files = await this.fileService.getAllFiles(Number(userId), type.toLowerCase());
         console.log('userId:', userId)
         console.log('type:', type)
         console.log('files:', files)
@@ -72,7 +72,6 @@ export class FileController {
             if (!file) {
                 throw new BadRequestException('No file uploaded');
             }
-            console.log('userId:',userId)
             const fileUploaded = await this.fileService.saveFile(file, userId);
             return fileUploaded;
         } catch (err) {
@@ -82,7 +81,7 @@ export class FileController {
     }
 
     @Get(':id')
-    async getFile(@Param('id') id: string): Promise<StreamableFile> {
+    async getFileById(@Param('id') id: string): Promise<StreamableFile> {
         const fileRecord = await this.fileService.getFileById(Number(id));
         if (!fileRecord) throw new NotFoundException('File not found in database');
 
