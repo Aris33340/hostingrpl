@@ -112,6 +112,7 @@ export class FileController {
             jpeg: 'image/jpeg',
             txt: 'text/plain',
             json: 'application/json',
+            zip: 'application/zip',
         };
         return map[type.toLowerCase()] || 'application/octet-stream';
     }

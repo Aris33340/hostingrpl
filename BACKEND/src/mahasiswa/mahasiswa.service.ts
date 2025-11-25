@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+<<<<<<< HEAD
 import { mahasiswa, Prisma } from '@prisma/client'
+=======
+import { mahasiswa, Prisma } from '@prisma/client';
+>>>>>>> origin/tya
 
 @Injectable()
 export class MahasiswaService {
   constructor(private prisma: PrismaService) { }
 
+<<<<<<< HEAD
   async getFieldMhs() {
     return Object.keys(Prisma.MahasiswaScalarFieldEnum)
   }
 
+=======
+>>>>>>> origin/tya
   // 🟩 1️⃣ Ambil satu mahasiswa berdasarkan unique key (id/nim)
   async mahasiswa(
     where: Prisma.mahasiswaWhereUniqueInput,
@@ -107,9 +114,15 @@ export class MahasiswaService {
   async createManyMahasiswa(
     data: Prisma.mahasiswaCreateManyInput[],
   ): Promise<{ count: number }> {
+<<<<<<< HEAD
 
     const validData = data.filter((d) => d.nim && d.nama);
 
+=======
+    
+    const validData = data.filter((d) => d.nim && d.nama);
+    
+>>>>>>> origin/tya
     const mahasiswas = await this.prisma.mahasiswa.createMany({
       data: validData,
       skipDuplicates: true,

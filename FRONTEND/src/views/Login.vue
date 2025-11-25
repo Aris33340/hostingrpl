@@ -15,8 +15,13 @@
         <form @submit.prevent="handleLogin">
 
           <div class="form-group">
+<<<<<<< HEAD
             <label for="email">Email</label>
             <input type="email" id="email" v-model="form.email" placeholder="Masukkan email Anda" required />
+=======
+            <label for="username">Username</label>
+            <input type="text" id="username" v-model="form.username" placeholder="Masukkan username Anda" required />
+>>>>>>> origin/tya
           </div>
 
           <div class="form-group">
@@ -48,6 +53,7 @@
   </div>
 </template>
 
+<<<<<<< HEAD
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
@@ -85,6 +91,70 @@ async function handleLogin() {
     showNotification('error', 'Email atau Password anda salah')
   }
 }
+=======
+<script>
+// --- MODIFIKASI UNTUK PINIA & INTERCEPTOR ---
+
+// 1. Impor 'mapActions' dari Pinia dan store kita
+import { mapActions } from 'pinia';
+import { useAuthStore } from '../stores/authStore';
+
+// 2. Impor 'apiClient' baru kita, BUKAN 'axios' biasa
+import { authApi } from '@/api'
+
+// Menggunakan VUE 2 (Options API)
+export default {
+  data() {
+    return {
+      form: {
+        username: '',
+        password: '',
+        remember: false
+      },
+      error: '',
+    };
+  },
+  methods: {
+    // 3. Petakan 'action' dari store kita ke komponen ini
+    ...mapActions(useAuthStore, ['setAuthData']),
+
+    async handleLogin() {
+      this.error = '';
+
+      try {
+        // 4. Gunakan 'apiClient' baru kita
+        const response = await authApi.post('/login', {
+          // Di backend, kita login pakai 'email', tapi form pakai 'username'
+          // Kita kirim 'username' dari form sebagai 'email' ke backend
+          email: this.form.username,
+          password: this.form.password
+        });
+
+        // 5. Backend HANYA mengirim 'access_token' dan 'role'
+        const accessToken = response.data.access_token;
+        const userRole = response.data.role;
+        const userId = response.data.id;
+        // 6. Panggil action Pinia untuk menyimpan data di memori
+        // BUKAN localStorage
+        this.setAuthData(accessToken, userRole, userId, this.form.remember);
+
+        // 7. Arahkan ke halaman utama setelah login
+        this.$router.push('/manajemen-mahasiswa');
+
+      } catch (err) {
+        // Interceptor akan menangani error 401 (token refresh)
+        // Ini hanya akan menangani error login (misal: password salah)
+        if (err.response && err.response.data && err.response.data.message) {
+          this.error = err.response.data.message;
+        } else {
+          this.error = 'Login gagal. Periksa kembali username dan password Anda.';
+        }
+        console.error('Login error:', err);
+      }
+    }
+  }
+};
+>>>>>>> origin/tya
 </script>
 
 <style scoped>
@@ -94,9 +164,16 @@ async function handleLogin() {
 /* Struktur Utama */
 .login-page {
   /* PERBAIKAN: Menggunakan 'position: fixed' 
+<<<<<<< HEAD
      Ini akan membuat halaman login "keluar" dari container 
      di App.vue dan menutupi seluruh layar.
   */
+=======
+    Ini akan membuat halaman login "keluar" dari container 
+    di App.vue dan menutupi seluruh layar.
+  */
+  position: fixed;
+>>>>>>> origin/tya
   top: 0;
   left: 0;
   width: 100vw;
@@ -181,7 +258,11 @@ h1 {
   margin-bottom: 0.5rem;
 }
 
+<<<<<<< HEAD
 .form-group input[type="email"],
+=======
+.form-group input[type="text"],
+>>>>>>> origin/tya
 .form-group input[type="password"] {
   width: 100%;
   padding: 0.875rem 1rem;
@@ -193,7 +274,11 @@ h1 {
   font-size: 0.9rem;
 }
 
+<<<<<<< HEAD
 .form-group input[type="email"]:focus,
+=======
+.form-group input[type="text"]:focus,
+>>>>>>> origin/tya
 .form-group input[type="password"]:focus {
   outline: none;
   border-color: #06B6D4;

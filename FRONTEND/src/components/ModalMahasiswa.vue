@@ -62,8 +62,11 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
               <input v-model="form.daerah_asal" type="text" placeholder="Daerah Asal"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+<<<<<<< HEAD
               <input v-model="form.nama_orang_tua" type="text" placeholder="Nama Orang Tua" 
                 class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+=======
+>>>>>>> origin/tya
             </div>
           </details>
 
@@ -106,8 +109,12 @@ const form = ref({
   daerah_penempatan: '',
   judul_skripsi: '',
   dosen_pembimbing: '',
+<<<<<<< HEAD
   daerah_asal: '',
   nama_orang_tua: ''
+=======
+  daerah_asal: ''
+>>>>>>> origin/tya
 })
 
 const errorMsg = ref('')
@@ -125,8 +132,12 @@ watch(() => props.mahasiswa, (val) => {
       daerah_penempatan: val.daerah_penempatan || '',
       judul_skripsi: val.judul_skripsi || '',
       dosen_pembimbing: val.dosen_pembimbing || '',
+<<<<<<< HEAD
       daerah_asal: val.daerah_asal || '',
       nama_orang_tua: val.nama_orang_tua || '',
+=======
+      daerah_asal: val.daerah_asal || ''
+>>>>>>> origin/tya
     }
   } else {
     form.value = {
@@ -138,8 +149,12 @@ watch(() => props.mahasiswa, (val) => {
       daerah_penempatan: '',
       judul_skripsi: '',
       dosen_pembimbing: '',
+<<<<<<< HEAD
       daerah_asal: '',
       nama_orang_tua: ''
+=======
+      daerah_asal: ''
+>>>>>>> origin/tya
     }
   }
   errorMsg.value = ''

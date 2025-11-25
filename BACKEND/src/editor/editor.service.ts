@@ -66,7 +66,6 @@ export class EditorService {
                             opacity: element.opacity ?? 1,
                         });
                     }
-
                 }
                 pdfDoc.insertPage(editablePages[i], page);
                 pdfDoc.removePage(editablePages[i] + 1);

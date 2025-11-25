@@ -19,13 +19,19 @@
 </template>
 
 <script setup>
+<<<<<<< HEAD
 import { onMounted } from 'vue';
+=======
+>>>>>>> origin/tya
 import Navbar from './components/Navbar.vue';
 import Notification from './components/Notification.vue';
 import { notification } from './composables/useNotification'
 import Modal from './components/Modal.vue';
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/tya
 // $route sudah tersedia secara global di dalam <template>,
 // jadi tidak perlu impor 'useRoute' dari 'vue-router'
 </script>
