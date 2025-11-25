@@ -4,14 +4,8 @@ import App from './App.vue'
 import router from './router/index';
 import 'jquery/dist/jquery.min'
 import 'popper.js/dist/popper.min'
-<<<<<<< HEAD
 import '@tailwindplus/elements';
 
-
-=======
->>>>>>> origin/tya
-
-// 1. Impor Pinia
 import { createPinia } from 'pinia'
 
 const app = createApp(App);

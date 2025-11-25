@@ -1,6 +1,6 @@
 <template>
   <div class="upload-container">
-    <h2>Upload Data Mahasiswa (Excel)</h2>
+    <h2>Upload Data Mahasiswa</h2>
 
     <input type="file" @change="handleFileUpload" accept=".xlsx, .xls" />
 
@@ -34,10 +34,7 @@ import * as XLSX from 'xlsx'
 import axios from 'axios'
 import { ref } from 'vue'
 import {mainApi} from '@/api'
-<<<<<<< HEAD
 import { showNotification } from '../composables/useNotification'
-=======
->>>>>>> origin/tya
 
 const preview = ref([])
 const message = ref('')
@@ -62,10 +59,7 @@ function handleFileUpload(event) {
 async function uploadData() {
   if (preview.value.length === 0) {
     message.value = 'Tidak ada data untuk dikirim.'
-<<<<<<< HEAD
     showNotification('error',message.value);
-=======
->>>>>>> origin/tya
     return
   }
 
@@ -73,15 +67,9 @@ async function uploadData() {
   try {
     const response = await mainApi.post('/mahasiswa/bulk', preview.value)
     message.value = ` Berhasil menambahkan ${response.data.count} mahasiswa!`;
-<<<<<<< HEAD
     showNotification('success',message.value);
   } catch (error) {
     showNotification('error',error.message);
-=======
-  } catch (error) {
-    console.error(error)
-    message.value = error;
->>>>>>> origin/tya
   } finally {
     loading.value = false
   }

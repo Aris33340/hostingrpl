@@ -109,12 +109,8 @@ const form = ref({
   daerah_penempatan: '',
   judul_skripsi: '',
   dosen_pembimbing: '',
-<<<<<<< HEAD
   daerah_asal: '',
   nama_orang_tua: ''
-=======
-  daerah_asal: ''
->>>>>>> origin/tya
 })
 
 const errorMsg = ref('')
@@ -132,12 +128,8 @@ watch(() => props.mahasiswa, (val) => {
       daerah_penempatan: val.daerah_penempatan || '',
       judul_skripsi: val.judul_skripsi || '',
       dosen_pembimbing: val.dosen_pembimbing || '',
-<<<<<<< HEAD
       daerah_asal: val.daerah_asal || '',
       nama_orang_tua: val.nama_orang_tua || '',
-=======
-      daerah_asal: val.daerah_asal || ''
->>>>>>> origin/tya
     }
   } else {
     form.value = {
@@ -149,12 +141,8 @@ watch(() => props.mahasiswa, (val) => {
       daerah_penempatan: '',
       judul_skripsi: '',
       dosen_pembimbing: '',
-<<<<<<< HEAD
       daerah_asal: '',
       nama_orang_tua: ''
-=======
-      daerah_asal: ''
->>>>>>> origin/tya
     }
   }
   errorMsg.value = ''

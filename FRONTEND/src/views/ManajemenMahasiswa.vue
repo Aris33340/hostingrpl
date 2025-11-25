@@ -62,7 +62,6 @@
             </button>
           </div>
         </div>
-<<<<<<< HEAD
 
         <!-- Modal -->
         <ModalMahasiswa
@@ -73,11 +72,6 @@
           @refresh="fetchMahasiswa"
         />
       </section>
-=======
-      </section>
-      <ModalMahasiswa :show="showModal" :mahasiswa="selectedMahasiswa" :isEdit="isEdit" @close="showModal = false"
-        @refresh="fetchMahasiswa" />
->>>>>>> origin/tya
     </div>
   </div>
 </template>
@@ -88,10 +82,7 @@ import { mainApi } from '@/api'
 import InputData from '@/components/InputData.vue'
 import TableMahasiswa from '@/components/TableMahasiswa.vue'
 import ModalMahasiswa from '@/components/ModalMahasiswa.vue'
-<<<<<<< HEAD
 import { showNotification } from '../composables/useNotification'
-=======
->>>>>>> origin/tya
 
 const mahasiswa = ref([])
 const search = ref('')
@@ -118,11 +109,7 @@ async function fetchMahasiswa() {
 
     mahasiswa.value = data.data || []
   } catch (err) {
-<<<<<<< HEAD
     showNotification('error', err.message || 'Gagal memuat tabel');
-=======
-    console.error('Gagal memuat data mahasiswa:', err)
->>>>>>> origin/tya
     mahasiswa.value = []
   } finally {
     isLoading.value = false
@@ -148,11 +135,7 @@ async function hapusMahasiswa(nim) {
     await mainApi.delete(`mahasiswa/${nim}`)
     fetchMahasiswa()
   } catch (err) {
-<<<<<<< HEAD
     showNotification('error', err.message || 'Gagal memuat tabel');
-=======
-    console.error('Gagal menghapus data mahasiswa:', err)
->>>>>>> origin/tya
   }
 }
 

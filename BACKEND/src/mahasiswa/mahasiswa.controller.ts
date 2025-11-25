@@ -9,7 +9,6 @@ import {
   Param, 
   Delete, 
   ParseIntPipe, 
-<<<<<<< HEAD
   BadRequestException, 
   HttpException,
   HttpStatus,
@@ -17,12 +16,6 @@ import {
 } from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
 import { Prisma } from '@prisma/client'
-=======
-  BadRequestException 
-} from '@nestjs/common';
-import { MahasiswaService } from './mahasiswa.service';
-import { Prisma } from '@prisma/client';
->>>>>>> origin/tya
 import { CryptoService } from 'src/crypto/crypto/CryptoService';
 
 @Controller('api/mahasiswa')

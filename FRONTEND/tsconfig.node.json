@@ -6,11 +6,8 @@
     "module": "ESNext",
     "types": ["node"],
     "skipLibCheck": true,
-<<<<<<< HEAD
     "allowJs": true,
     "checkJs": true,
-=======
->>>>>>> origin/tya
 
     /* Bundler mode */
     "moduleResolution": "bundler",

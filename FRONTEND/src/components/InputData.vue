@@ -52,10 +52,6 @@
       <p v-if="preview.length > 5" class="text-xs text-blue-200/70 mt-2">Menampilkan 5 baris pertama...</p>
     </div>
 
-<<<<<<< HEAD
-=======
-    <p v-if="message" class="mt-3 text-sm" :class="messageType === 'ok' ? 'text-green-400' : 'text-red-400'">{{ message }}</p>
->>>>>>> origin/tya
   </div>
 </template>
 
@@ -63,10 +59,7 @@
 import * as XLSX from 'xlsx'
 import { ref, computed } from 'vue'
 import {mainApi} from '@/api'
-<<<<<<< HEAD
 import { showNotification } from '../composables/useNotification'
-=======
->>>>>>> origin/tya
 
 const preview = ref([])
 const message = ref('')
@@ -105,10 +98,7 @@ async function uploadData() {
   try {
     const res = await mainApi.post('/mahasiswa/bulk', preview.value)
     message.value = `Berhasil menambahkan ${res.data.count || preview.value.length} mahasiswa.`
-<<<<<<< HEAD
     showNotification('success',message.value)
-=======
->>>>>>> origin/tya
     messageType.value = 'ok'
     preview.value = []
     fileName.value = ''
