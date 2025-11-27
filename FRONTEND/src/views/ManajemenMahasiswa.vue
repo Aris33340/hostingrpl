@@ -64,13 +64,8 @@
         </div>
 
         <!-- Modal -->
-        <ModalMahasiswa
-          :show="showModal"
-          :mahasiswa="selectedMahasiswa"
-          :isEdit="isEdit"
-          @close="showModal = false"
-          @refresh="fetchMahasiswa"
-        />
+        <ModalMahasiswa :show="showModal" :mahasiswa="selectedMahasiswa" :isEdit="isEdit" @close="showModal = false"
+          @refresh="fetchMahasiswa" />
       </section>
     </div>
   </div>
@@ -83,6 +78,8 @@ import InputData from '@/components/InputData.vue'
 import TableMahasiswa from '@/components/TableMahasiswa.vue'
 import ModalMahasiswa from '@/components/ModalMahasiswa.vue'
 import { showNotification } from '../composables/useNotification'
+import { useLoading } from '../composables/useLoading'
+const { show, hide } = useLoading()
 
 const mahasiswa = ref([])
 const search = ref('')

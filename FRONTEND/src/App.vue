@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="container">
+    <Loading />
 
     <Navbar v-if="!$route.meta.hideSidebar" />
 
@@ -7,12 +8,8 @@
       <router-view />
     </main>
 
-    <Notification 
-      :show="notification.show" 
-      :type="notification.type" 
-      :message="notification.message"
-      @close="notification.show = false" 
-    />
+    <Notification :show="notification.show" :type="notification.type" :message="notification.message"
+      @close="notification.show = false" />
 
     <Modal />
   </div>
@@ -24,6 +21,7 @@ import Navbar from './components/Navbar.vue';
 import Notification from './components/Notification.vue';
 import { notification } from './composables/useNotification'
 import Modal from './components/Modal.vue';
+import Loading from './components/Loading.vue';
 
 // $route sudah tersedia secara global di dalam <template>,
 // jadi tidak perlu impor 'useRoute' dari 'vue-router'

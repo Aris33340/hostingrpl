@@ -2,6 +2,7 @@
 
 import { userRole } from "@prisma/client";
 
+
 export interface RGBColor {
   r: number;
   g: number;
@@ -32,9 +33,9 @@ export interface Size {
   height: number;
 }
 
-export type ElementType = 'text' | 'image' | 'field';
+export type ElementType = 'text' | 'image' | 'field' | 'qr';
 
-export interface EditorElement {
+export interface ElementProperty {
   id: string;
   type: ElementType;
   content?: string;      // teks custom
@@ -42,23 +43,21 @@ export interface EditorElement {
   fileId?: string;       // untuk image
   position: Position;
   size: Size;
-  style?: TextStyle;
+  textstyle?: TextStyle;
   opacity?: number;
+  rotation: number;
 }
 
 
 
 export interface EditablePage {
   pageNumber: number;
-  elements: EditorElement[];
+  elements: ElementProperty[];
 }
 
 export interface RenderOption {
   saveToDb: boolean;
   insertMode?: boolean; // true = insert for each student, false = render only editable pages
-}
-export interface PDFDTO{
-
 }
 
 export default interface PdfEditRequestDto {
@@ -67,7 +66,7 @@ export default interface PdfEditRequestDto {
       pdfId:number,
       pdfFileName: string;
       renderOption: RenderOption;
-      editOption: 'renderonlyeditablepages' | 'renderinsidepage';
+      editOption: 'iterateInside' | 'iterateOutside';
   } 
   editablePages: EditablePage[];
 }
