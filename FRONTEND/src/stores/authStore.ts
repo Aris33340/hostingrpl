@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 import { authApi } from '../api';
 import { jwtDecode } from 'jwt-decode';
 import type { JwtPayload } from 'jwt-decode';
+import router from '../router';
 // import type { PdfEditRequestDto, EditablePage, EditorElement } from '@/types/editorDto';
 
 
@@ -93,6 +94,7 @@ export const useAuthStore = defineStore('auth', {
     },
     logout() {
       this.clearAuthData();
+      router.push('/login')
     }
   },
 });

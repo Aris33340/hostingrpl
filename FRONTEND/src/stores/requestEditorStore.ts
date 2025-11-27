@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { PdfEditRequestDto, EditablePage, ElementProperty, Size, ElementType, TextStyle, Position } from '../types/pdfEditor';
+import type { PdfEditRequestDto, EditablePage, ElementProperty, Size, ElementType, TextStyle, Position, RenderOption } from '../types/pdfEditor';
 import { useAuthStore } from './authStore';
 export const usePdfEditRequestStore = defineStore('pdfEditor', {
     state: (): PdfEditRequestDto => ({
@@ -13,10 +13,7 @@ export const usePdfEditRequestStore = defineStore('pdfEditor', {
             editOption: 'renderinsidepage',
             renderOption: { saveToDb: true, insertMode: true }
         },
-        editablePages: [{
-            pageNumber:1,
-            elements:[]
-        }],
+        editablePages: [],
     }),
 
     getters: {
@@ -33,6 +30,9 @@ export const usePdfEditRequestStore = defineStore('pdfEditor', {
         },
         setPdfId(pdfId:number){
             this.configuration.pdfId = pdfId;
+        },
+        setConfiguration(editOption:'renderonlyeditablepages' | 'renderinsidepage'){
+            this.configuration.editOption = editOption
         },
         showDto(){
             return this.$state;

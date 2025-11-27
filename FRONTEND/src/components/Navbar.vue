@@ -71,7 +71,6 @@ const menuRoutes = computed(() => {
 const handleLogout = () => {
   if (confirm("Apakah Anda yakin ingin logout?")) {
     authStore.logout();
-    router.push("/login");
   }
 };
 </script>

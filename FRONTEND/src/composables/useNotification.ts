@@ -2,11 +2,11 @@ import { reactive } from "vue";
 
 export const notification = reactive({
   show: false,
-  type: "success" as "success" | "error",
+  type: "success" as "success" | "error" |"warning",
   message: "",
 });
 
-type notifType = "success" | "error";
+type notifType = "success" | "error" | 'warning';
 
 let timeoutId: number | null = null;
 

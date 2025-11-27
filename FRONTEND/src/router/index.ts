@@ -13,6 +13,7 @@ import DashboardBuku from "../views/DashboardBuku.vue";
 import { UserIcon, QrCodeIcon, UploadIcon, MailIcon, HomeIcon } from "lucide-vue-next";
 import { useAuthStore } from "../stores/authStore";
 import NotFound from "../views/NotFound.vue";
+import Test from "../views/Test.vue";
 
 const routes = [
   // LOGIN
@@ -22,7 +23,12 @@ const routes = [
     component: Login,
     meta: { title: "Login", showNavbar: false, requiresAuth: false },
   },
-
+  {
+    path: "/test",
+    name: "Testing",
+    component: Test,
+    meta: { title: "Test", showNavbar: true, requiresAuth: true },
+  },
   // --- 2. ROUTE UTAMA SUPER ADMIN (PILIH AKTOR) ---
   {
     path: "/",
@@ -105,7 +111,7 @@ const routes = [
     path: "/editor",
     name: "Editor STIS GRAD",
     component: Editor,
-    meta: { title: "Editor STIS GRAD", icon: UserIcon, showInNavbar: true, requiresAuth: true, showNavbar: false },
+    meta: { title: "Editor STIS GRAD", icon: UserIcon, showInNavbar: false, requiresAuth: true, showNavbar: false },
     beforeEnter: (to: any, from: any, next: any) => {
       if (!to.query.fileId) {
         next({ name: "FileManager" });

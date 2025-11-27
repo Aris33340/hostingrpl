@@ -46,6 +46,8 @@ export interface EditorElement {
   opacity?: number;
 }
 
+
+
 export interface EditablePage {
   pageNumber: number;
   elements: EditorElement[];
@@ -54,6 +56,9 @@ export interface EditablePage {
 export interface RenderOption {
   saveToDb: boolean;
   insertMode?: boolean; // true = insert for each student, false = render only editable pages
+}
+export interface PDFDTO{
+
 }
 
 export default interface PdfEditRequestDto {

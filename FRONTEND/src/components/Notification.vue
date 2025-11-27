@@ -3,8 +3,8 @@
         <div v-if="show" :class="[
             'fixed top-6 right-6 max-w-md rounded-xl shadow-2xl border p-4 z-50 backdrop-blur-sm text-white transition-all',
             type === 'success'
-                ? 'bg-green-500/90 border-green-400'
-                : 'bg-red-500/90 border-red-400',
+                ? 'bg-green-500/90 border-green-400' 
+                : type === 'warning' ? 'bg-yellow-500/90 border-yellow-400' :  'bg-red-500/90 border-red-400',
         ]">
             <div class="flex items-start gap-3">
                 <!-- Success Icon -->

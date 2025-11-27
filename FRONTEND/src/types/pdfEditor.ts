@@ -55,11 +55,11 @@ export interface RenderOption {
 
 export interface PdfEditRequestDto {
     userDetail: userDetail;
-    configuration:{
-        pdfId:number,
+    configuration: {
+        pdfId: number,
         pdfFileName: string;
         renderOption: RenderOption;
         editOption: 'renderonlyeditablepages' | 'renderinsidepage';
-    } 
+    }
     editablePages: EditablePage[];
 }
