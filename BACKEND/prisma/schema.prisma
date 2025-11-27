@@ -76,10 +76,10 @@ model emailSendStatus {
   id_sendStatus Int      @id @default(autoincrement())
   waktu_dikirim DateTime @default(now())
   status        Int      @default(0)
-  peserta    peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
-  id_peserta Int?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  peserta       peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
+  id_peserta    Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model file {
@@ -87,6 +87,10 @@ model file {
   file_name String
   path      String @unique
   type      String
+
+  id_parent Int?
+  parent    file?  @relation("FolderToSubfolders", fields: [id_parent], references: [id_file])
+  children  file[] @relation("FolderToSubfolders")
 
   user       user?    @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
   id_user    Int
