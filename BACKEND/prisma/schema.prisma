@@ -76,8 +76,6 @@ model emailSendStatus {
   id_sendStatus Int      @id @default(autoincrement())
   waktu_dikirim DateTime @default(now())
   status        Int      @default(0)
-  email         String
-
   peserta    peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
   id_peserta Int?
   createdAt  DateTime @default(now())
