@@ -28,6 +28,7 @@ export class FileService {
     });
   }
 
+
   async getAllFiles(userId: number, query?: string) {
     return this.prisma.file.findMany({
       where: {

@@ -31,6 +31,9 @@ export const usePdfEditRequestStore = defineStore('pdfEditor', {
         setPdfId(pdfId:number){
             this.configuration.pdfId = pdfId;
         },
+        setPdfName(pdfName:string){
+            this.configuration.pdfFileName = pdfName;
+        },
         setConfiguration(editOption:'renderonlyeditablepages' | 'renderinsidepage'){
             this.configuration.editOption = editOption
         },

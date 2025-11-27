@@ -412,6 +412,7 @@ const propertyControlPanel = ref();
 const selectedObject = computed(() => objects.value.find(obj => obj.id === selectedObjectId.value));
 const dotPosition = computed(() => placement.value.dotPosition);
 
+const pdfId = ref(route.query.fileId);
 const pageTemplate = ref([]);
 const objects = ref([
     // { id: 1001, type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, pageNumber: 1, props: { font: 'Arial', content: 'testtt', fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } } },
@@ -549,16 +550,24 @@ const handleEnter = (e, object) => {
         finishEdit(object);
     }
 };
+const pdfFileName = ref()
+const renderOption = ref()
+const tableSelected = ref() 
 
-const configuration = ref({ "pdfId": 0, "pdfFileName": "", "editOption": "renderinsidepage", "renderOption": { "saveToDb": true, "insertMode": true } })
+const formConfiguration = reactive({
+    pdfFileName:'',
+    renderOption:'',
+    tableSelected:'',
+})
+
 
 const render = async () => {
     isLoadingRender.value = true
     DtoEditorStore.init();
     const configuration = {
-        "pdfId": 0,
-        "pdfFileName": "",
-        "editOption": "renderinsidepage",
+        "pdfId": pdfId.value,
+        "pdfFileName": formConfiguration.pdfFileName,
+        "editOption": formConfiguration.renderOption,
         "renderOption": {
             "saveToDb": true,
             "insertMode": true
@@ -579,10 +588,11 @@ const render = async () => {
     }
 }
 
-const pdfId = ref(route.query.fileId);
+
 const loadPDF = async () => {
     const res = await mainApi.get(`/files/${pdfId.value}`, { responseType: 'arraybuffer' });
     pdfDoc = await pdfjsLib.getDocument({ data: res.data }).promise;
+    DtoEditorStore.setPdfId(pdfId.value)
     const numPages = pdfDoc.numPages;
     for (let i = 1; i <= numPages; i++) {
         const page = await pdfDoc.getPage(i);
@@ -615,9 +625,7 @@ const loadPDF = async () => {
 
 const uploadImg = async () => {
     if (!fileImg.value) return;
-
     let interval = null;
-
     try {
         const formData = new FormData();
         formData.append('file', fileImg.value);
@@ -772,11 +780,11 @@ const onDrag = (e) => {
     updateObjectTransform(dragObjectId.value, { x: clampedX, y: clampedY });
 };
 const stopDrag = () => {
-    isDragging.value = false; dragObjectId.value = null;
+    isDragging.value = false;
+    dragObjectId.value = null;
     window.removeEventListener('mousemove', onDrag);
     window.removeEventListener('mouseup', stopDrag);
 };
-
 
 const updateDotPosition = (e) => {
     if (!workspaceDiv.value) return;
