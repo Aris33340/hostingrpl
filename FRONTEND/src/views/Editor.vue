@@ -439,7 +439,6 @@ const handleSelectAll = () => {
 
     const full = Array.from({ length: total }, (_, i) => i + 1);
 
-    // apakah saat ini sudah berisi semua halaman (tidak peduli urutan)?
     const current = pageTemplate.value || [];
     const currentSet = new Set(current);
     const isAllSelected =
@@ -448,7 +447,6 @@ const handleSelectAll = () => {
     if (isAllSelected) {
         if (deleteTemplate()) pageTemplate.value.splice(0, pageTemplate.value.length)
     } else {
-        // isi dengan seluruh daftar halaman (satu kali operasi splice)
         pageTemplate.value.splice(0, pageTemplate.value.length, ...full);
     }
 };
@@ -470,23 +468,18 @@ const getTextStyle = (props) => {
     if (!props) return {};
 
     return {
-        // Mapping font family
         fontFamily: props.font,
-        // Mapping font size
         fontSize: `${props.fontSize}px`,
-        // Mapping styles boolean
         fontWeight: props.isBold ? 'bold' : 'normal',
         fontStyle: props.isItalic ? 'italic' : 'normal',
         textDecoration: props.isUnderline ? 'underline' : 'none',
-        // Mapping warna dari object {r,g,b} ke string rgb()
         color: `rgb(${props.color.r}, ${props.color.g}, ${props.color.b})`,
-        // Pastikan input text background transparan agar menyatu
         backgroundColor: 'transparent'
     };
 };
 
 onMounted(async () => {
-    show("Mengambil data mahasiswa...");
+    show("Mengunduh file...");
     window.addEventListener("keydown", handleKeyDown);
     try {
         await loadPDF();
@@ -657,7 +650,6 @@ const render = async () => {
     })
 
     DtoEditorStore.setPages(editablePages)
-    // DtoEditorStore.
     try {
         const json = DtoEditorStore.getState();
         console.log(JSON.stringify(json))
@@ -928,7 +920,7 @@ const deleteTemplate = () => {
 const openAssetSelector = async () => {
     if (fab.value.enabled) {
         placement.value.mode = 'asset_select';
-        placement.value.selectedAssetId = null; // Reset selection
+        placement.value.selectedAssetId = null;
         console.log('Asset Selector Opened.');
         await loadLibrary();
     }
@@ -945,7 +937,7 @@ const startPlacement = (mode, assetId = null) => {
         placement.value.selectedAssetId = assetId;
     } else {
         placement.value.mode = mode;
-        placement.value.selectedAssetId = null; // Not asset-based
+        placement.value.selectedAssetId = null; 
     }
 
     if (placement.value.mode !== 'asset_select') {
