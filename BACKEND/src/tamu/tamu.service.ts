@@ -1,8 +1,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { tamu, Prisma } from '@prisma/client'
-
+import { tamu, Prisma } from '@prisma/client';
 @Injectable()
 export class TamuService {
   constructor(private prisma: PrismaService) {}

@@ -4,6 +4,9 @@ import { defineStore } from 'pinia';
 import { authApi } from '../api';
 import { jwtDecode } from 'jwt-decode';
 import type { JwtPayload } from 'jwt-decode';
+import router from '../router';
+// import type { PdfEditRequestDto, EditablePage, EditorElement } from '@/types/editorDto';
+
 
 
 interface MyJwtPayload extends JwtPayload {
@@ -48,8 +51,9 @@ export const useAuthStore = defineStore('auth', {
 
         this.setAuthData(accessToken, remember);
 
-      } catch (error) {
-        throw error;
+      } catch (error: any) {
+        const message = "Email atau password salah";
+        throw new Error(message);
       }
     },
 
@@ -90,6 +94,7 @@ export const useAuthStore = defineStore('auth', {
     },
     logout() {
       this.clearAuthData();
+      router.push('/login')
     }
   },
 });

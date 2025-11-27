@@ -9,13 +9,10 @@ import {
     Delete,
     BadRequestException,
     NotFoundException,
-    MaxFileSizeValidator,
-    ParseFilePipe,
     ParseFilePipeBuilder,
-    FileTypeValidator,
     HttpStatus,
-    Body,
-    Req
+    Req,
+    Query
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -26,14 +23,19 @@ import { createReadStream, existsSync, unlinkSync } from 'node:fs';
 import { AuthService } from 'src/auth/auth.service';
 
 
+
 @Controller('api/files')
 export class FileController {
-    constructor(private readonly fileService: FileService, private readonly authService:AuthService) { }
+    constructor(private readonly fileService: FileService, private readonly authService: AuthService) { }
 
     @Get()
-    async getAllFiles(@Req() req:any) {
+    async getAllFiles(@Req() req: any, @Query('type') type: string) {
         const userId = req.user.sub;
-        return this.fileService.getAllFiles(Number(userId));
+        const files = await this.fileService.getAllFiles(Number(userId), type.toLowerCase());
+        console.log('userId:', userId)
+        console.log('type:', type)
+        console.log('files:', files)
+        return files;
     }
 
     @Post()
@@ -49,12 +51,12 @@ export class FileController {
             }),
         })
     )
-    async uploadFile(@Req() req:any,
+    async uploadFile(@Req() req: any,
         @UploadedFile(
             new ParseFilePipeBuilder()
                 .addFileTypeValidator({
-                    fileType: /(pdf)$/,
-                    skipMagicNumbersValidation:true
+                    fileType: /(pdf|jpg|jpeg|png|gif)$/i,
+                    skipMagicNumbersValidation: true
                 })
                 .addMaxSizeValidator({
                     maxSize: 20 * 1024 * 1024, // 20 MB
@@ -66,15 +68,20 @@ export class FileController {
         file: Express.Multer.File,
     ) {
         const userId = req.user.sub;
-        if (!file) {
-            throw new BadRequestException('No file uploaded');
+        try {
+            if (!file) {
+                throw new BadRequestException('No file uploaded');
+            }
+            const fileUploaded = await this.fileService.saveFile(file, userId);
+            return fileUploaded;
+        } catch (err) {
+            unlinkSync(file.path);
+            throw err;
         }
-        const savedFile = await this.fileService.saveFile(file,userId);
-        return savedFile;
     }
 
     @Get(':id')
-    async getFile(@Param('id') id: string): Promise<StreamableFile> {
+    async getFileById(@Param('id') id: string): Promise<StreamableFile> {
         const fileRecord = await this.fileService.getFileById(Number(id));
         if (!fileRecord) throw new NotFoundException('File not found in database');
 
@@ -105,6 +112,7 @@ export class FileController {
             jpeg: 'image/jpeg',
             txt: 'text/plain',
             json: 'application/json',
+            zip: 'application/zip',
         };
         return map[type.toLowerCase()] || 'application/octet-stream';
     }

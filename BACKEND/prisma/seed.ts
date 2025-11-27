@@ -103,8 +103,7 @@ async function main() {
         })
         await prisma.emailSendStatus.create({
             data:{
-                email:res.nim+'@stis.ac.id',
-                pesertaId_peserta:pesertares.id_peserta,
+                id_peserta:pesertares.id_peserta,
                 status:0,
                 waktu_dikirim:new Date(),
                 createdAt:new Date()
@@ -139,8 +138,7 @@ async function main() {
         })
         await prisma.emailSendStatus.create({
             data: {
-                email: res.email,
-                pesertaId_peserta:pesertares.id_peserta,
+                id_peserta:pesertares.id_peserta,
                 status: 0,
                 waktu_dikirim: new Date(),
                 createdAt:new Date()

@@ -6,6 +6,10 @@ import { mahasiswa, Prisma } from '@prisma/client'
 export class MahasiswaService {
   constructor(private prisma: PrismaService) { }
 
+  async getFieldMhs() {
+    return Object.keys(Prisma.MahasiswaScalarFieldEnum)
+  }
+
   // 🟩 1️⃣ Ambil satu mahasiswa berdasarkan unique key (id/nim)
   async mahasiswa(
     where: Prisma.mahasiswaWhereUniqueInput,
@@ -103,9 +107,9 @@ export class MahasiswaService {
   async createManyMahasiswa(
     data: Prisma.mahasiswaCreateManyInput[],
   ): Promise<{ count: number }> {
-    
+
     const validData = data.filter((d) => d.nim && d.nama);
-    
+
     const mahasiswas = await this.prisma.mahasiswa.createMany({
       data: validData,
       skipDuplicates: true,

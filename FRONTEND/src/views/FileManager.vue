@@ -19,10 +19,9 @@
                                         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
                                     </path>
                                 </svg>
-                                <span class="text-white font-medium">{{ selectedFile ? selectedFile.name : 'Choose File'
-                                    }}</span>
+                                <span class="text-white font-medium">{{ selectedFile ? selectedFile.name : 'Choose File' }}</span>
                             </div>
-                            <input type="file" @change="onFileChange" class="hidden">
+                            <input type="file" @change="onFileChange" class="hidden" accept=".pdf,.pptx">
                         </label>
                         <button @click="uploadFile" :disabled="!selectedFile || uploading"
                             class="px-6 py-3 bg-gradient-to-r from-rgb-custom to-blue-600 hover:from-blue-700 hover:to-rgb-custom rounded-xl text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-blue-400/30">
@@ -85,7 +84,7 @@
                                             d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z">
                                         </path>
                                     </svg>
-                                    <svg v-else class="w-5 h-5 text-blue-400 flex-shrink-0" fill="currentColor"
+                                    <svg v-else-if="getFileType(file.file_name) === 'image'" class="w-5 h-5 text-blue-400 flex-shrink-0" fill="currentColor"
                                         viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
@@ -163,7 +162,7 @@ const getFileType = (fileName) => {
 
 const onFileChange = (event) => {
     selectedFile.value = event.target.files[0]
-}
+}   
 
 const uploadFile = async () => {
     if (!selectedFile.value) return
@@ -213,8 +212,7 @@ const viewFile = async (file) => {
         let mimeType = res.headers['content-type'];
         if (!mimeType || mimeType === 'application/octet-stream') {
             const ext = file.file_name.split('.').pop().toLowerCase();
-            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) mimeType = `image/${ext}`;
-            else if (ext === 'pdf') mimeType = 'application/pdf';
+            mimeType = 'application/pdf';
         }
 
         const blob = new Blob([res.data], { type: mimeType });
@@ -252,12 +250,13 @@ const deleteFile = async (file) => {
         showNotification('success', 'File berhasil dihapus!')
     } catch (err) {
         showNotification('error', 'Gagal menghapus file: ' + (err.response?.data?.message || err.message))
+        files.value = files.value.filter(f => f.id_file !== file.id_file)
     }
 }
 
 const loadFiles = async () => {
     try {
-        const res = await mainApi.get(`${API_BASE}`)
+        const res = await mainApi.get(`${API_BASE}?type=pdf`)
         files.value = res.data
     } catch {
         files.value = []

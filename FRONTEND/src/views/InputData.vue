@@ -1,6 +1,6 @@
 <template>
   <div class="upload-container">
-    <h2>Upload Data Mahasiswa (Excel)</h2>
+    <h2>Upload Data Mahasiswa</h2>
 
     <input type="file" @change="handleFileUpload" accept=".xlsx, .xls" />
 

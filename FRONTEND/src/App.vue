@@ -19,6 +19,7 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import Navbar from './components/Navbar.vue';
 import Notification from './components/Notification.vue';
 import { notification } from './composables/useNotification'

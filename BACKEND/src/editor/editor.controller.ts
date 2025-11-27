@@ -1,25 +1,24 @@
 // editor.controller.ts
-import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Req, BadRequestException, ConflictException, HttpException } from '@nestjs/common';
 import { EditorService } from './editor.service';
-import type PdfEditRequestDto  from './dto/editor.dto';
+import type PdfEditRequestDto from './dto/editor.dto';
 import type { Response } from 'express';
+import { Prisma } from '@prisma/client';
 
 @Controller('api/editor')
 export class EditorController {
-    constructor(private readonly editorService: EditorService) {}
-
+  constructor(private readonly editorService: EditorService) { }
   @Post('render')
-  async renderPdf(@Body() dto: PdfEditRequestDto, @Res() res: Response) {
+  async renderPdf(@Body() dto: PdfEditRequestDto, @Req() req: any) {
     try {
-      const pdfBytes = await this.editorService.renderPdf(dto);
-      // res.set({
-      //   'Content-Type': 'application/pdf',
-      //   'Content-Disposition': `attachment; filename=${dto.pdfFileName.replace('.pdf', '-rendered.pdf')}`,
-      // });
-      res.status(HttpStatus.OK).send(pdfBytes);
+      const userId = req.user.sub;
+      const renderStatus = await this.editorService.renderPdf(dto, Number(userId));
+      return renderStatus
     } catch (error) {
-      console.error(error);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Gagal merender PDF', error: error.message });
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new HttpException('Nama File Harus Berbeda', HttpStatus.BAD_REQUEST);
+      }
+      throw new HttpException(error.message,HttpStatus.BAD_REQUEST)
     }
   }
 }

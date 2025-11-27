@@ -34,7 +34,6 @@ export class AuthController {
         access_token: loginData.access_token
       };
     } catch (e) {
-      console.log(body)
       throw new UnauthorizedException('email or password invalid');
     }
 
@@ -64,7 +63,6 @@ export class AuthController {
         sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-      console.log("refresh",tokens.refresh_token);
       return {
         access_token: tokens.access_token,
       };

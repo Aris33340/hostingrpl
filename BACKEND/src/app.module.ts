@@ -6,9 +6,8 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/auth.middleware';
-import { TamuService } from './tamu/tamu.service';
 import { PrismaService } from './prisma/prisma.service';
-import { TamuModule } from './tamu/tamu.module';
+import { TamuModule } from './peserta/peserta.module';
 import { ScanModule } from './scan/scan.module';
 import { ScanController } from './scan/scan.controller';
 import { MahasiswaModule } from './mahasiswa/mahasiswa.module';
@@ -18,7 +17,7 @@ import { FileModule } from './file/file.module';
 import { CryptoModule } from './crypto/crypto/crypto.module';
 import { PresensiModule } from './presensi/presensi/presensi.module';
 import { EditorModule } from './editor/editor.module';
-import { QrCodeService } from './scan/qr/qr.service';
+import { QRModule } from './qr/qr.module';
 
 
 @Module({
@@ -33,7 +32,8 @@ import { QrCodeService } from './scan/qr/qr.service';
     FileModule,
     CryptoModule,
     PresensiModule,
-    EditorModule
+    EditorModule,
+    QRModule 
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],

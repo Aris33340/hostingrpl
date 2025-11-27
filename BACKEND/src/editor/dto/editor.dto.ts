@@ -1,9 +1,16 @@
 // dto/editor.dto.ts
 
+import { userRole } from "@prisma/client";
+
 export interface RGBColor {
   r: number;
   g: number;
   b: number;
+}
+
+export interface userDetail{
+  id :number;
+  role: userRole;
 }
 
 export interface TextStyle {
@@ -39,6 +46,8 @@ export interface EditorElement {
   opacity?: number;
 }
 
+
+
 export interface EditablePage {
   pageNumber: number;
   elements: EditorElement[];
@@ -48,11 +57,17 @@ export interface RenderOption {
   saveToDb: boolean;
   insertMode?: boolean; // true = insert for each student, false = render only editable pages
 }
+export interface PDFDTO{
+
+}
 
 export default interface PdfEditRequestDto {
-  pdfId: string;
-  pdfFileName: string;
-  editOption: 'renderonlyeditablepages' | 'renderinsidepage';
+  userDetail: userDetail;
+  configuration:{
+      pdfId:number,
+      pdfFileName: string;
+      renderOption: RenderOption;
+      editOption: 'renderonlyeditablepages' | 'renderinsidepage';
+  } 
   editablePages: EditablePage[];
-  renderOption: RenderOption;
 }

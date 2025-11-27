@@ -66,7 +66,7 @@ model presensi {
   waktu_presensi DateTime @default(now())
   status         Int      @default(0)
 
-  peserta    peserta  @relation(fields: [id_peserta], references: [id_peserta],onDelete: Cascade) 
+  peserta    peserta  @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
   id_peserta Int      @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -76,26 +76,24 @@ model emailSendStatus {
   id_sendStatus Int      @id @default(autoincrement())
   waktu_dikirim DateTime @default(now())
   status        Int      @default(0)
-  email         String
-
-  peserta           peserta? @relation(fields: [pesertaId_peserta], references: [id_peserta],onDelete: Cascade)
-  pesertaId_peserta Int?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  peserta    peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
+  id_peserta Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model file {
   id_file   Int    @id @default(autoincrement())
   file_name String
-  path      String
+  path      String @unique
   type      String
 
-  user              user?    @relation(fields: [userId_user], references: [id_user],onDelete: Cascade)
-  userId_user       Int
-  peserta           peserta? @relation(fields: [pesertaId_peserta], references: [id_peserta],onDelete: Cascade)
-  pesertaId_peserta Int?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  user       user?    @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  id_user    Int
+  peserta    peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
+  id_peserta Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model peserta {
@@ -104,8 +102,8 @@ model peserta {
   nim        Int?   @unique
   id_tamu    Int?   @unique
 
-  mahasiswa       mahasiswa?        @relation(fields: [nim], references: [nim],onDelete: Cascade)
-  tamu            tamu?             @relation(fields: [id_tamu], references: [id_tamu],onDelete: Cascade)
+  mahasiswa       mahasiswa?        @relation(fields: [nim], references: [nim], onDelete: Cascade)
+  tamu            tamu?             @relation(fields: [id_tamu], references: [id_tamu], onDelete: Cascade)
   files           file[]
   emailsendstatus emailSendStatus[]
   presensis       presensi[]
