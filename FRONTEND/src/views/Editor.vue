@@ -738,7 +738,7 @@ const onRotate = (e) => {
 const stopRotate = () => {
     isRotating.value = false;
     rotateObjectId.value = null;
-    selectedObjectId = null;
+    selectedObjectId.value = null;;
     window.removeEventListener('mousemove', onRotate);
     window.removeEventListener('mouseup', stopRotate);
 };
