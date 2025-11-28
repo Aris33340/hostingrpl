@@ -38,7 +38,7 @@ export interface ElementProperty {
     fileId?: number | null;
     position: Position;
     size: Size;
-    Textstyle?: TextStyle;
+    textstyle?: TextStyle;
     opacity?: number;
     rotation: number;
 }
@@ -59,7 +59,7 @@ export interface PdfEditRequestDto {
         pdfId: number,
         pdfFileName: string;
         renderOption: RenderOption;
-        editOption: 'renderonlyeditablepages' | 'renderinsidepage';
+        editOption: 'iterateInside' | 'iterateOutside';
     }
     editablePages: EditablePage[];
 }

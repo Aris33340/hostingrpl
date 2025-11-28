@@ -1,17 +1,17 @@
 <template>
     <div class="fixed inset-0 flex bg-gray-50 overflow-hidden">
         <!-- SidePreview -->
-        <div
+        <div @mouseenter="onHover = false" @mouseleave="onHover = true"
             class="flex flex-col w-24 relative h-full group transition-all duration-300 ease-in-out hover:w-60 bg-white shadow-xl z-20">
-            <router-link to="/input-file" @mouseenter="onHover = false" @mouseleave="onHover = true">
+            <router-link to="/input-file">
                 <div class="h-16 flex items-center justify-center p-2 border-b">
                     <span v-if="!onHover"
-                        class="text-lg font-semibold text-blue-600 transition-opacity duration-300 opacity-0 group-hover:opacity-100 group-hover:delay-150">
-                        <HomeIcon class="w-6 h-6 text-black" />
+                        class="text-lg font-semibold text-black transition-opacity duration-300 opacity-0 group-hover:opacity-100 group-hover:delay-150">
+                        <HomeIcon class="w-6 h-6" />
                     </span>
                     <span v-if="onHover"
-                        class="text-lg font-semibold text-blue-600 transition-opacity duration-300 opacity-100 group-hover:opacity-0 group-hover:delay-150">
-                        <LeftArrow class="w-6 h-6  text-white" />
+                        class="text-lg font-semibold text-black transition-opacity duration-300 opacity-100 group-hover:opacity-0 group-hover:delay-150">
+                        <LeftArrow class="w-6 h-6" />
                     </span>
                 </div>
             </router-link>
@@ -37,7 +37,7 @@
                 </button>
             </div>
 
-            <div class="absolute flex bottom-0 w-full p-2 bg-white border-t shadow-inner gap-2">
+            <div v-if="!onHover" class="absolute flex bottom-0 w-full p-2 bg-white border-t shadow-inner gap-2">
                 <!-- Button Select All -->
                 <button @click="handleSelectAll" class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors
                bg-gray-100 text-gray-700 hover:bg-gray-200 
@@ -59,8 +59,7 @@
 
         <!-- WorkSpace -->
         <div class="flex-1 flex flex-col items-center relative overflow-auto bg-transparent">
-            <ControlPanel v-if="showControlPanel" @property="handlePropertyControlPanel" :isLoading="isLoading1"
-                :prop="selectedObject.props" />
+            <ControlPanel v-if="showControlPanel" @property="handlePropertyControlPanel" :prop="selectedObject.props" />
             <div class="relative w-full h-full flex  items-center justify-center p-8 overflow-auto">
 
                 <div ref="workspaceDiv" class="shadow-2xl border bg-white relative">
@@ -104,12 +103,12 @@
                             'cursor-move border border-dashed transition-all duration-100',
                             selectedObjectId === object.id ? 'border-blue-500' : 'border-transparent hover:border-gray-300'
                         ]">
-                        <div class="w-full h-full flex items-center justify-center text-xs">
+                        <div class="w-full h-full flex items-center justify-center">
                             <!-- Jika type 'text', tampilkan teks -->
                             <span v-if="object.type === 'text'">
                                 <!-- Mode view -->
-                                <span v-if="editingObjectId !== object.id" :style="getTextStyle(object.props)"
-                                    class="text-black" @dblclick="handleInputText(object)">
+                                <span v-if="object.type === 'text'" :style="getTextStyle(object.props)"
+                                    class="absolute left-0 top-0" @dblclick="handleInputText(object)">
                                     {{ object.props.content }}
                                 </span>
 
@@ -133,90 +132,6 @@
                             @mousedown.stop="startResize($event, object.id)">
                         </div>
                     </div>
-
-                </div>
-
-                <!--add object container -->
-                <div class="fixed right-5 bottom-5 z-50 group">
-                    <div :class="[
-                        'relative bg-blue-600 text-white w-14 h-14 rounded-full shadow-xl transition-all duration-300 ease-out',
-                        fab.enabled ? 'opacity-100 pointer-events-auto cursor-pointer group-hover:h-72 group-hover:rounded-2xl' : 'opacity-40 pointer-events-none',
-                        'flex flex-col items-center justify-center overflow-hidden'
-                    ]" :title="!fab.enabled ? 'Set as template to enable' : 'Add Content'" tabindex="0">
-                        <div
-                            :class="['absolute transition-opacity duration-300', fab.enabled ? 'group-hover:opacity-0' : '']">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-
-                        </div>
-
-                        <ul :class="[
-                            'w-full h-full flex flex-col justify-evenly items-center transition-opacity duration-300 delay-150',
-                            fab.enabled ? 'group-hover:opacity-100' : 'opacity-0'
-                        ]">
-                            <li class="relative">
-                                <button @click="startPlacement('qr')" aria-label="Add QR"
-                                    class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
-                                    <svg class="w-6 h-6 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v.01m0 4v.01m0 4v.01m0 4v.01m-4-8h.01M8 8h.01m8 4h.01m-4 8h.01">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <span role="tooltip"
-                                    class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
-                                    Add Field
-                                </span>
-                            </li>
-                            <li class="relative">
-                                <button @click="startPlacement('qr')" aria-label="Add QR"
-                                    class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
-                                    <svg class="w-6 h-6 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v.01m0 4v.01m0 4v.01m0 4v.01m-4-8h.01M8 8h.01m8 4h.01m-4 8h.01">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <span role="tooltip"
-                                    class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
-                                    Add QR
-                                </span>
-                            </li>
-
-                            <li class="relative">
-                                <button @click="startPlacement('text')" aria-label="Add Text"
-                                    class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
-                                    <svg class="w-6 h-6 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 6V4m0 2h4m-4 0H8m0 0a2 2 0 100 4m0-4a2 2 0 110 4m4-4a2 2 0 100 4m0-4a2 2 0 110 4">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <span role="tooltip"
-                                    class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
-                                    Add Text
-                                </span>
-                            </li>
-
-                            <li class="relative">
-                                <button @click="openAssetSelector" aria-label="Add Image"
-                                    class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
-                                    <svg class="w-6 h-6 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-1-5a2 2 0 11-4 0 2 2 0 014 0zM6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <span role="tooltip"
-                                    class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
-                                    Add Image
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </div>
@@ -224,63 +139,155 @@
 
         <!-- Settings -->
         <transition>
-            <div
-                class="w-40 h-full bg-white shadow-xl z-20 transition-all duration-300 overflow-y-auto p-4 border-l flex flex-col">
-                <h3 class="text-lg font-bold text-black mb-4"></h3>
+            <div class="relative h-full bg-transparent transition-all duration-300 overflow-y-auto flex flex-row">
+                <!--add object container -->
+                <div class="flex flex-col bg-transparent">
+                    <div class="flex-1 bg-transparent"></div>
+                    <div class="m-5 group">
+                        <div :class="[
+                            'relative bg-blue-600 text-white w-14 h-14 rounded-full shadow-xl transition-all duration-300 ease-out',
+                            fab.enabled ? 'opacity-100 pointer-events-auto group-hover:h-72 group-hover:rounded-2xl' : 'opacity-40 pointer-events-none',
+                            'flex flex-col items-center justify-center overflow-hidden'
+                        ]" :title="!fab.enabled ? 'Set as template to enable' : 'Add Content'" tabindex="0">
+                            <div
+                                :class="['absolute transition-opacity duration-100', fab.enabled ? 'group-hover:opacity-0' : '']">
+                                <span>
+                                    <IconPlus class="w-12 h-12 m-auto" />
+                                </span>
+                            </div>
 
-                <div v-if="selectedObjectId">
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700">Orientation</label>
-                        <input type="number" :value="Math.floor(selectedObject.rotation)" @input="updateObjectTransform(selectedObjectId, {
-                            rotation: Math.min(360, Math.max(0, Number($event.target.value)))
-                        })" class=" mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
-                    </div>
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700">X Coordinate</label>
-                        <input type="number" :value="Math.floor(selectedObject.x)"
-                            @input="updateObjectTransform(selectedObjectId, { x: $event.target.value })"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
-                    </div>
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700">Y Coordinate</label>
-                        <input type="number" :value="Math.floor(selectedObject.y)"
-                            @input="updateObjectTransform(selectedObjectId, { y: $event.target.value })"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
-                    </div>
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700">Height</label>
-                        <input type="number" :value="Math.floor(selectedObject.height)"
-                            @input="updateObjectTransform(selectedObjectId, { height: $event.target.value })"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
-                    </div>
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700">Width</label>
-                        <input type="number" :value="Math.floor(selectedObject.width)"
-                            @input="updateObjectTransform(selectedObjectId, { width: $event.target.value })"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
-                    </div>
-                    <div class="mt-4">
-                        <button @click="deleteObject(selectedObjectId)"
-                            class="w-full py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
-                            Delete Object
-                        </button>
-                    </div>
+                            <ul :class="[
+                                'w-full h-full flex flex-col justify-evenly items-center opacity-0 transition-opacity duration-300 delay-150',
+                                fab.enabled ? 'group-hover:opacity-100' : 'opacity-0'
+                            ]">
+                                <li class="relative cursor-not-allowed">
+                                    <button :disabled="true" @click="startPlacement('qr')" aria-label="Add QR"
+                                        class="w-10 h-10 rounded-full bg-white text-blue-600  shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
+                                        <span class="text-blue-600 items-center justify-center">
+                                            <QrIcon class="w-6 h-6 m-auto" />
+                                        </span>
+                                    </button>
+                                    <span role="tooltip"
+                                        class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
+                                        Add Field
+                                    </span>
+                                </li>
+                                <li class="relative cursor-not-allowed">
+                                    <button :disabled="true" @click="startPlacement('qr')" aria-label="Add QR"
+                                        class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
+                                        <span>
+                                            <TextField class="w-6 h-6 m-auto" />
+                                        </span>
+                                    </button>
+                                    <span role="tooltip"
+                                        class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
+                                        Add QR
+                                    </span>
+                                </li>
 
+                                <li class="relative">
+                                    <button @click="startPlacement('text')" aria-label="Add Text"
+                                        class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
+                                        <span>
+                                            <Text class="w-6 h-6 m-auto" />
+                                        </span>
+                                    </button>
+                                    <span role="tooltip"
+                                        class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
+                                        Add Text
+                                    </span>
+                                </li>
+
+                                <li class="relative">
+                                    <button @click="openAssetSelector" aria-label="Add Image"
+                                        class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-md hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-white">
+                                        <span>
+                                            <IconGallery class="w-6 h-6 m-auto" />
+                                        </span>
+                                    </button>
+                                    <span role="tooltip"
+                                        class="absolute left-full ml-3 px-3 py-1 bg-black text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 delay-150">
+                                        Add Image
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <button @click="render" :disabled="isLoadingRender"
-                    class="mt-auto h-10 px-5 bg-blue-800 text-white hover:bg-blue-500 active:bg-blue-900 rounded-full cursor-pointer">
-                    <span v-if="!isLoadingRender" class="font-bold">RENDER</span>
-                    <span v-else class="flex items-center">
-                        <svg class="animate-spin h-5 w-5 mr-3 text-gray-50" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                            </circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                            </path>
-                        </svg>
-                        <span>Merender...</span>
-                    </span>
-                </button>
+
+                <transition enter-active-class="transition-all duration-300 ease-in-out"
+                    enter-from-class="opacity-0 translate-x-5" enter-to-class="opacity-100 translate-x-0"
+                    leave-active-class="transition-all duration-300 ease-in-out"
+                    leave-from-class="opacity-100 translate-x-0" leave-to-class="opacity-0 translate-x-5">
+                    <div class="flex flex-row">
+                        <button class="bg-gray-100 w-5 m-0 duration-400" @click="showSettings = !showSettings">
+                            <span class="flex text-black transition-transform duration-300"
+                                :class="{ 'rotate-180': !showSettings }">
+                                <LeftMiniArrow class="w-8 h-8" />
+                            </span>
+                        </button>
+
+                        <div v-show="showSettings"
+                            class="relative w-56 h-full bg-white shadow-xl z-20 transition-all duration-300 overflow-y-auto p-4 border-l flex flex-col">
+                            <h3 class="text-lg font-bold text-black mb-4">Settings</h3>
+
+                            <div v-if="selectedObjectId">
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Orientation</label>
+                                    <input type="number" :value="Math.floor(selectedObject.rotation)" @input="updateObjectTransform(selectedObjectId, {
+                                        rotation: Math.min(360, Math.max(0, Number($event.target.value)))
+                                    })" class=" mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700">X Coordinate</label>
+                                    <input type="number" :value="Math.floor(selectedObject.x)"
+                                        @input="updateObjectTransform(selectedObjectId, { x: $event.target.value })"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Y Coordinate</label>
+                                    <input type="number" :value="Math.floor(selectedObject.y)"
+                                        @input="updateObjectTransform(selectedObjectId, { y: $event.target.value })"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Height</label>
+                                    <input type="number" :value="Math.floor(selectedObject.height)"
+                                        @input="updateObjectTransform(selectedObjectId, { height: $event.target.value })"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700">Width</label>
+                                    <input type="number" :value="Math.floor(selectedObject.width)"
+                                        @input="updateObjectTransform(selectedObjectId, { width: $event.target.value })"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
+                                </div>
+                                <div class="mt-4">
+                                    <button @click="deleteObject(selectedObjectId)"
+                                        class="w-full py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                                        Delete Object
+                                    </button>
+                                </div>
+
+                            </div>
+                            <button @click="render" :disabled="isLoadingRender"
+                                class="mt-auto h-10 px-5 bg-blue-800 text-white hover:bg-blue-500 active:bg-blue-900 rounded-full cursor-pointer">
+                                <span v-if="!isLoadingRender" class="font-bold">RENDER</span>
+                                <span v-else class="flex items-center">
+                                    <svg class="animate-spin h-5 w-5 mr-3 text-gray-50" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4">
+                                        </circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                    <span>Merender...</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </transition>
             </div>
             <!-- Settings -->
         </transition>
@@ -354,22 +361,29 @@
 </template>
 
 <script setup>
+import IconGallery from '@/assets/icons/gallery.svg'
+import IconPlus from '@/assets/icons/image-plus-svgrepo-com.svg'
+import QrIcon from '@/assets/icons/qr-code-svgrepo-com.svg'
+import TextField from '@/assets/icons/text-field-svgrepo-com.svg'
+import Text from '@/assets/icons/text-circle-svgrepo-com.svg'
+import LeftMiniArrow from '@/assets/icons/arrow-next-small-svgrepo-com.svg'
+import LeftArrow from '@/assets/icons/left-arrow-svgrepo-com.svg'
+import Home from '@/assets/icons/home-smile-svgrepo-com.svg'
+import RotateIcon from '@/assets/icons/bended-arrow-svgrepo-com.svg'
 import { onMounted, ref, computed, watch, nextTick, reactive, onBeforeUnmount } from 'vue';
 import * as pdfjsLib from 'pdfjs-dist/webpack.mjs'
 import "pdfjs-dist/web/pdf_viewer.css";
 import { useRoute } from 'vue-router';
-import PlusIcon from '@/assets/icons/plus-large-svgrepo-com.svg'
-import LeftArrow from '@/assets/icons/left-arrow-svgrepo-com.svg'
-import Home from '@/assets/icons/home-smile-svgrepo-com.svg'
-import RotateIcon from '@/assets/icons/bended-arrow-svgrepo-com.svg'
 import { mainApi } from '@/api'
 import { showNotification } from '../composables/useNotification';
 import { usePdfEditRequestStore } from '../stores/requestEditorStore';
-import { HomeIcon } from 'lucide-vue-next';
+import { FileEditIcon, HomeIcon } from 'lucide-vue-next';
 import ControlPanel from '../components/EditorComponents/ControlPanel.vue';
+import { useLoading } from '../composables/useLoading';
 pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.mjs';
 
 // --- STATE MANAGEMENT (Simplified) ---
+const { show, hide } = useLoading();
 const onHover = ref(true)
 const DtoEditorStore = usePdfEditRequestStore();
 const route = useRoute();
@@ -399,8 +413,6 @@ const newObject = ref([
 const assetLibrary = ref([]);
 const editingObjectId = ref(null);
 const isLoadingRender = ref(false)
-const isLoading2 = ref(false);
-
 const mouseDrag = ref({ x: 0, y: 0 });
 const placement = ref({
     mode: 'asset_select' | 'text' | 'image' | 'field' | 'qr' | null,
@@ -411,18 +423,33 @@ const showControlPanel = ref(false);
 const propertyControlPanel = ref();
 const selectedObject = computed(() => objects.value.find(obj => obj.id === selectedObjectId.value));
 const dotPosition = computed(() => placement.value.dotPosition);
-
 const pdfId = ref(route.query.fileId);
 const pageTemplate = ref([]);
 const objects = ref([
     // { id: 1001, type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, pageNumber: 1, props: { font: 'Arial', content: 'testtt', fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } } },
     // { id: 1002, type: 'image', x: 400, y: 500, width: 100, height: 100, rotation: 15, pageNumber: 1, props: { font: 'Arial', content: 'testtt', fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } } },
 ]);
+const numPages = ref();
+const selectedObjectId = ref(null);
+const showSettings = ref(true)
 
+const handleSelectAll = () => {
+    const total = Number(numPages.value) || 0;
+    if (total <= 0) return;
 
-watch(pageTemplate.value, (event) => {
-    console.log(pageTemplate.value)
-})
+    const full = Array.from({ length: total }, (_, i) => i + 1);
+
+    const current = pageTemplate.value || [];
+    const currentSet = new Set(current);
+    const isAllSelected =
+        current.length === total && full.every((n) => currentSet.has(n));
+
+    if (isAllSelected) {
+        if (deleteTemplate()) pageTemplate.value.splice(0, pageTemplate.value.length)
+    } else {
+        pageTemplate.value.splice(0, pageTemplate.value.length, ...full);
+    }
+};
 
 const handlePropertyControlPanel = async (event) => {
     propertyControlPanel.value = event
@@ -441,25 +468,19 @@ const getTextStyle = (props) => {
     if (!props) return {};
 
     return {
-        // Mapping font family
         fontFamily: props.font,
-        // Mapping font size
         fontSize: `${props.fontSize}px`,
-        // Mapping styles boolean
         fontWeight: props.isBold ? 'bold' : 'normal',
         fontStyle: props.isItalic ? 'italic' : 'normal',
         textDecoration: props.isUnderline ? 'underline' : 'none',
-        // Mapping warna dari object {r,g,b} ke string rgb()
         color: `rgb(${props.color.r}, ${props.color.g}, ${props.color.b})`,
-        // Pastikan input text background transparan agar menyatu
         backgroundColor: 'transparent'
     };
 };
 
 onMounted(async () => {
-    console.log(pageTemplate.value)
+    show("Mengunduh file...");
     window.addEventListener("keydown", handleKeyDown);
-    isLoading2.value = true;
     try {
         await loadPDF();
         const previewScale = 1;
@@ -475,7 +496,7 @@ onMounted(async () => {
     } catch (e) {
         showNotification('warning', e.message);
     } finally {
-        isLoading2.value = false;
+        hide();
     }
 });
 
@@ -552,33 +573,87 @@ const handleEnter = (e, object) => {
 };
 const pdfFileName = ref()
 const renderOption = ref()
-const tableSelected = ref() 
+const tableSelected = ref()
 
 const formConfiguration = reactive({
-    pdfFileName:'',
-    renderOption:'',
-    tableSelected:'',
+    pdfFileName: '',
+    renderOption: '',
+    entityTarget: '',
 })
 
+
+const confirmPlacement = () => {
+    const newObject = {
+        id: Date.now(),
+        id_page: activePage.value,
+        type: placement.value.mode,
+        x: placement.value.dotPosition.x,
+        y: placement.value.dotPosition.y,
+        width: 100,
+        height: 100,
+        rotation: 0,
+        pageNumber: activePage.value,
+        opacity: 1,
+        props: {}
+    }
+    if (newObject.type === 'text') {
+        newObject.props = { font: 'Arial', content: 'TextField', fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } };
+    } else if (newObject.type === 'image') {
+        newObject.props = { assetId: placement.value.selectedAssetId, opacity: 100 };
+    }
+    objects.value.push(newObject);
+    selectObject(newObject);
+    cancelPlacement();
+    console.log(`Object placed: ${newObject.type}`);
+};
 
 const render = async () => {
     isLoadingRender.value = true
     DtoEditorStore.init();
-    const configuration = {
-        "pdfId": pdfId.value,
-        "pdfFileName": formConfiguration.pdfFileName,
-        "editOption": formConfiguration.renderOption,
-        "renderOption": {
-            "saveToDb": true,
-            "insertMode": true
-        }
-    }
+    DtoEditorStore.setConfiguration('renderinsidepage', 'filesaya.pdf');
+    const editablePages = pageTemplate.value.map((pageNum) => {
+        const thisObject = objects.value.filter((e) => e.id_page == Number(pageNum))
+        const restructuredObjects = thisObject.map((unstructuredObject) => {
+            console.log(JSON.stringify(unstructuredObject))
+            return {
+                id: unstructuredObject.id,
+                type: unstructuredObject.type,
+                content: unstructuredObject.props?.content ?? '',
+                fieldName: null,
+                fileId: unstructuredObject.props?.assetId,
+                position: {
+                    x: unstructuredObject.x,
+                    y: unstructuredObject.y
+                },
+                size: {
+                    width: unstructuredObject.width,
+                    height: unstructuredObject.height,
+                },
+                textstyle: {
+                    fontSize: unstructuredObject.props?.fontSize ?? 13,
+                    fontFamily: unstructuredObject.props?.font ?? 'Arial',
+                    bold: unstructuredObject.props?.isBold,
+                    italic: unstructuredObject.props?.isItalic,
+                    underline: unstructuredObject.props?.isUnderline,
+                    color: unstructuredObject.props?.color
+                },
+                opacity: unstructuredObject.opacity,
+                rotation: unstructuredObject.rotation
+            }
 
-    // DtoEditorStore.
+        });
+        console.log(JSON.stringify(objects.value))
+        return {
+            pageNumber: Number(pageNum),
+            elements: restructuredObjects,
+        }
+    })
+
+    DtoEditorStore.setPages(editablePages)
     try {
-        const json = DtoEditorStore.showDto();
+        const json = DtoEditorStore.getState();
         console.log(JSON.stringify(json))
-        // const res = await mainApi.post('editor/render', json);
+        const res = await mainApi.post('editor/render', json);
         showNotification('success', `Render Berhasil, cek pada file manager`)
     } catch (error) {
         showNotification('error', `Terjadi kesalahan render: ${error.message}`)
@@ -593,8 +668,8 @@ const loadPDF = async () => {
     const res = await mainApi.get(`/files/${pdfId.value}`, { responseType: 'arraybuffer' });
     pdfDoc = await pdfjsLib.getDocument({ data: res.data }).promise;
     DtoEditorStore.setPdfId(pdfId.value)
-    const numPages = pdfDoc.numPages;
-    for (let i = 1; i <= numPages; i++) {
+    numPages.value = pdfDoc.numPages;
+    for (let i = 1; i <= numPages.value; i++) {
         const page = await pdfDoc.getPage(i);
 
         const scale = 1;
@@ -766,16 +841,19 @@ const startDrag = (e, objectId) => {
     window.addEventListener('mouseup', stopDrag);
 };
 
+
 const onDrag = (e) => {
     if (!isDragging.value || !workspaceDiv.value) return;
     const height = window.visualViewport.height;
     mouseDrag.value.y = height - e.clientY;
+    const componentHeight = selectedObject.value.height
+    const componentWidth = selectedObject.value.width
     const mouseY = height - e.clientY;
     const rect = workspaceDiv.value.getBoundingClientRect();
     const rawX = e.clientX - rect.left - dragOffset.value.x;
     const rawY = e.clientY - rect.top - dragOffset.value.y;
-    const clampedX = Math.max(0, Math.min(rawX, rect.width - 100));
-    const clampedY = Math.max(0, Math.min(rawY, rect.height - 100));
+    const clampedX = Math.max(0, Math.min(rawX, rect.width - componentWidth));
+    const clampedY = Math.max(0, Math.min(rawY, rect.height - componentHeight));
     mouseDrag.value.x = rawY;
     updateObjectTransform(dragObjectId.value, { x: clampedX, y: clampedY });
 };
@@ -796,7 +874,7 @@ const updateDotPosition = (e) => {
 };
 
 const fab = ref({ enabled: false });
-const selectedObjectId = ref(null);
+
 
 const loadLibrary = async () => {
     const res = await mainApi.get('files?type=image');
@@ -826,19 +904,23 @@ const setTemplate = () => {
         fab.value.enabled = true;
         return
     }
+    deleteTemplate();
+};
+
+const deleteTemplate = () => {
     const confirmation = confirm('yakin hapus template?')
     if (confirmation) {
         const index = pageTemplate.value.findIndex((e) => e === activePage.value)
         pageTemplate.value.splice(index, 1);
         fab.value.enabled = false;
     }
-    console.log('FAB Activated.', pageTemplate.value);
-};
+    return confirmation
+}
 
 const openAssetSelector = async () => {
     if (fab.value.enabled) {
         placement.value.mode = 'asset_select';
-        placement.value.selectedAssetId = null; // Reset selection
+        placement.value.selectedAssetId = null;
         console.log('Asset Selector Opened.');
         await loadLibrary();
     }
@@ -855,35 +937,12 @@ const startPlacement = (mode, assetId = null) => {
         placement.value.selectedAssetId = assetId;
     } else {
         placement.value.mode = mode;
-        placement.value.selectedAssetId = null; // Not asset-based
+        placement.value.selectedAssetId = null; 
     }
 
     if (placement.value.mode !== 'asset_select') {
         console.log(`Entering placement mode: ${placement.value.mode}`);
     }
-};
-
-const confirmPlacement = () => {
-    const newObject = {
-        id: Date.now(),
-        type: placement.value.mode,
-        x: placement.value.dotPosition.x,
-        y: placement.value.dotPosition.y,
-        width: 100,
-        height: 100,
-        rotation: 0,
-        pageNumber: activePage.value,
-        props: {}
-    }
-    if (newObject.type === 'text') {
-        newObject.props = { font: 'Arial', content: 'TextField', fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } };
-    } else if (newObject.type === 'image') {
-        newObject.props = { assetId: placement.value.selectedAssetId, opacity: 100 };
-    }
-    objects.value.push(newObject);
-    selectObject(newObject);
-    cancelPlacement();
-    console.log(`Object placed: ${newObject.type}`);
 };
 
 

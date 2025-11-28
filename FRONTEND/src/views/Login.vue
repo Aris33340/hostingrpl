@@ -53,7 +53,8 @@ import { reactive, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import { showNotification } from '../composables/useNotification'
-
+import { useLoading } from '../composables/useLoading'
+const { show, hide } = useLoading()
 // Router
 const router = useRouter()
 
@@ -69,6 +70,7 @@ const form = reactive({
 const error = ref();
 // Handle login
 async function handleLogin() {
+  show()
   try {
     await auth.login(form.email, form.password, form.remember)
     switch (auth.getPayload().role) {
@@ -83,6 +85,8 @@ async function handleLogin() {
     }
   } catch (err) {
     showNotification('error', 'Email atau Password anda salah')
+  } finally {
+    hide()
   }
 }
 </script>

@@ -18,6 +18,7 @@ export class EditorService {
     }
 
     async renderPdf(dto: PdfEditRequestDto, userId: number): Promise<any> {
+        console.log(JSON.stringify(dto))
         function pxToPt(px: any, cssDPI = 96) {
             return px * (72 / cssDPI); // px * 0.75 jika cssDPI=96
         }
@@ -35,10 +36,8 @@ export class EditorService {
 
             const pdfBytes = await fs.readFile(`${file?.path}`);
             const mahasiswaList = await this.mhsService.mahasiswas();
-
             const editablePages = dto.editablePages.map(p => p.pageNumber - 1);
-
-            const outputPath = `./public/output/hasilujicoba.pdf`;
+            const outputPath = `./public/output/${dto.configuration.pdfFileName}`;
             for (const mhs of mahasiswaList) {
                 const pdfDoc = await PDFDocument.load(pdfBytes);
                 const copiedPages = await pdfDoc.copyPages(pdfDoc, editablePages);
@@ -49,22 +48,26 @@ export class EditorService {
                         const xPos = normalizeVal(element.position.x);
                         const yPosInput = normalizeVal(element.position.y);
                         const yPos = height - yPosInput;
+                        const elementHeight = normalizeVal(element.size.height);
                         if (element.type === 'field' || element.type === 'text') {
                             const fieldKey = element.fieldName ?? '';
+                            const fontSize = element.textstyle?.fontSize;
+                            console.log("fontsize : ",fontSize)
                             const text = (mhs as Record<string, any>)[fieldKey ?? ''] ?? element.content;
                             page.drawText(String(text), {
                                 x: xPos,
-                                y: yPos, // Sesuaikan offset font height jika perlu (misal: yPos - fontSize)
-                                size: normalizeVal(element.style?.fontSize) ?? 12,
+                                y: yPos - (fontSize ?? 0), // Sesuaikan offset font height jika perlu (misal: yPos - fontSize)
+                                size: normalizeVal(element.textstyle?.fontSize) ?? 12,
                                 font: await pdfDoc.embedFont(StandardFonts.TimesRoman),
-                                color: element.style?.color
-                                    ? rgb(element.style.color.r / 255, element.style.color.g / 255, element.style.color.b / 255)
-                                    : rgb(0, 0, 0),
+                                color: element.textstyle?.color
+                                ? rgb(element.textstyle?.color.r / 255, element.textstyle?.color.g / 255, element.textstyle?.color.b / 255)
+                                : rgb(0, 0, 0),
                             });
                         }
-
+                        
                         // 🔹 Tampilkan gambar (misal logo)
-                        else if (element.type === 'image' && element.fileId) {
+                        else if (element.type == 'image' && element.fileId) {
+                            console.log(element.type == 'image')
                             const imageBytes = await this.loadImage(element.fileId);
                             let img: any;
                             if (imageBytes.type === 'image/jpeg' || imageBytes.type === 'image/jpg') {
@@ -72,12 +75,12 @@ export class EditorService {
                             } else {
                                 img = await pdfDoc.embedPng(imageBytes.data);
                             }
-                            const imgHeight = normalizeVal(element.size.height);
+                            
                             page.drawImage(img, {
                                 x: xPos,
-                                y: yPos - imgHeight, // Koreksi Y agar gambar tidak naik ke atas
+                                y: yPos - elementHeight, // Koreksi Y agar gambar tidak naik ke atas
                                 width: normalizeVal(element.size.width),
-                                height: imgHeight,
+                                height: elementHeight,
                                 opacity: element.opacity ?? 1,
                             });
                         }

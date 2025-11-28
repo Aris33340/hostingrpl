@@ -74,7 +74,6 @@ const props = defineProps({
         isUnderline: Boolean,
         color: { r: Number, g: Number, b: Number } // Format RGB
     },
-    isLoading: Boolean,
 })
 
 const emits = defineEmits(['textType', 'isBold', 'isItalic', 'isUnderline', 'property'])

@@ -10,7 +10,7 @@ export const usePdfEditRequestStore = defineStore('pdfEditor', {
         configuration:{
             pdfId: 0,
             pdfFileName: '',
-            editOption: 'renderinsidepage',
+            editOption: 'iterateInside',
             renderOption: { saveToDb: true, insertMode: true }
         },
         editablePages: [],
@@ -28,16 +28,18 @@ export const usePdfEditRequestStore = defineStore('pdfEditor', {
             this.userDetail.id = Number(authStore.getPayload().sub)
             this.userDetail.role = authStore.getPayload().role
         },
+        setConfiguration(editOption:'iterateInside' | 'iterateOutside', pdfFileName:string){
+            this.configuration.editOption = editOption;
+            this.configuration.pdfFileName = pdfFileName;
+        },
         setPdfId(pdfId:number){
             this.configuration.pdfId = pdfId;
         },
         setPdfName(pdfName:string){
             this.configuration.pdfFileName = pdfName;
         },
-        setConfiguration(editOption:'renderonlyeditablepages' | 'renderinsidepage'){
-            this.configuration.editOption = editOption
-        },
-        showDto(){
+
+        getState(){
             return this.$state;
         },
         addPage(page: EditablePage) {
@@ -47,6 +49,9 @@ export const usePdfEditRequestStore = defineStore('pdfEditor', {
                 return
             }
             this.editablePages.push(page);
+        },
+        setPages(pages:EditablePage[]){
+            this.editablePages = pages;
         },
         setDto(dto: PdfEditRequestDto) {
             this.$state = dto;
@@ -67,7 +72,7 @@ export const usePdfEditRequestStore = defineStore('pdfEditor', {
             const page = this.$state.editablePages.find((p) => p.pageNumber===pageNum)
             page?.elements?.push(...element);
         },
-        createElement(id:number,position: Position, size: Size, type: ElementType, rotation?: number, content?: string, fieldName?: string, fileId?: number, Textstyle?: TextStyle, opacity?: number): ElementProperty {
+        createElement(id:number,position: Position, size: Size, type: ElementType, rotation?: number, content?: string, fieldName?: string, fileId?: number, textStyle?: TextStyle, opacity?: number): ElementProperty {
             const element: ElementProperty = {
                 id: id,
                 position: position,
@@ -77,7 +82,7 @@ export const usePdfEditRequestStore = defineStore('pdfEditor', {
                 rotation: rotation ?? 0,
                 fieldName: fieldName ?? null,
                 fileId: fileId ?? null,
-                Textstyle: Textstyle ?? {
+                textstyle: textStyle ?? {
                     fontSize: 11,
                     fontFamily: 'Arial',
                     bold: false,
