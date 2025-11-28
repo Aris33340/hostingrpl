@@ -167,15 +167,23 @@ function tabClass(active) {
 async function fetchData() {
   try {
     isLoading.value = true
+    const token = localStorage.getItem('token') || ''; // Ambil token dari Local Storage
     const endpoint = currentView.value === 'mahasiswa' ? 'mahasiswa/pagination' : 'tamu/pagination'
+    
     const { data } = await mainApi.get(endpoint, {
       params: { search: search.value || undefined, page: page.value, limit: limit },
-      // headers jika pakai token, bisa ditambahkan:
-      // headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
+      // AKTIFKAN DAN PERBAIKI HEADER UNTUK MENGIRIM TOKEN
+      headers: { Authorization: `Bearer ${token}` }
     })
+    
     dataList.value = data.data || []
   } catch (err) {
-    showNotification('error', err.response?.data?.message || `Gagal memuat data ${currentView.value}`)
+    // Tambahkan penanganan khusus untuk 401
+    if (err.response?.status === 401) {
+        showNotification('error', 'Sesi berakhir atau tidak terautentikasi. Silakan login ulang.');
+    } else {
+        showNotification('error', err.response?.data?.message || `Gagal memuat data ${currentView.value}`);
+    }
     dataList.value = []
   } finally {
     isLoading.value = false
@@ -209,10 +217,14 @@ async function hapusPeserta(item) {
   const entityName = currentView.value === 'mahasiswa' ? 'Mahasiswa' : 'Tamu'
   const endpoint = currentView.value === 'mahasiswa' ? 'mahasiswa' : 'tamu'
   const id = currentView.value === 'mahasiswa' ? item.nim : item.id_tamu
+  const token = localStorage.getItem('token') || ''; // Ambil token
 
   if (!confirm(`Yakin ingin menghapus data ${entityName} ini?`)) return
   try {
-    await mainApi.delete(`${endpoint}/${id}`)
+    // Tambahkan header Authorization saat delete
+    await mainApi.delete(`${endpoint}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
     showNotification('success', `${entityName} berhasil dihapus.`)
     fetchData()
   } catch (err) {
