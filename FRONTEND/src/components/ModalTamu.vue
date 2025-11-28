@@ -1,5 +1,4 @@
 <template>
-  <!-- Menggunakan CSS Modal Mahasiswa (tema terang) -->
   <transition name="fade">
     <div v-if="show" class="fixed inset-0 top-0 z-50 flex items-center justify-center" @click.self="$emit('close')">
       <!-- Background overlay -->
@@ -77,9 +76,9 @@ const isSubmitting = ref(false)
 // Watcher untuk mengisi form saat props.tamu berubah (mode edit)
 watch(() => props.tamu, (newTamu) => {
   if (newTamu) {
-    // Jika tamu ada, gunakan data yang ada, tapi pastikan tidak menimpa id
+    // Gunakan id_tamu sesuai schema
     formData.value = { 
-        id: newTamu.id, // Pertahankan ID untuk PUT request
+        id_tamu: newTamu.id_tamu,
         nama: newTamu.nama || '', 
         email: newTamu.email || '', 
         asal_instansi: newTamu.asal_instansi || '' 
@@ -94,26 +93,26 @@ async function handleSubmit() {
   isSubmitting.value = true
   try {
     if (props.isEdit) {
-      // Endpoint: PUT /tamu/:id
-      // Gunakan formData.value.id yang sudah disalin saat watch
-      await mainApi.put(`tamu/${formData.value.id}`, formData.value)
-      showNotification('success', 'Data Tamu berhasil diperbarui!');
-    } else {
-      // Endpoint: POST /tamu
-      // Pastikan payload hanya berisi field yang dibutuhkan untuk POST
-      const postPayload = {
+      // PUT request hanya pakai field yang dibutuhkan
+      await mainApi.put(`tamu/${formData.value.id_tamu}`, {
         nama: formData.value.nama,
         email: formData.value.email,
-        asal_instansi: formData.value.asal_instansi,
-      };
-      await mainApi.post('tamu', postPayload)
+        asal_instansi: formData.value.asal_instansi
+      })
+      showNotification('success', 'Data Tamu berhasil diperbarui!');
+    } else {
+      // POST request
+      await mainApi.post('tamu', {
+        nama: formData.value.nama,
+        email: formData.value.email,
+        asal_instansi: formData.value.asal_instansi
+      })
       showNotification('success', 'Tamu baru berhasil ditambahkan!');
     }
     
     emit('refresh')
     emit('close')
   } catch (err) {
-    // Menampilkan pesan error dari backend
     showNotification('error', err.response?.data?.message || 'Gagal menyimpan data.');
   } finally {
     isSubmitting.value = false

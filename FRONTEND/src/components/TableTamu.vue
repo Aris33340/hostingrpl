@@ -14,7 +14,7 @@
       <tbody>
         <tr 
           v-for="t in tamu" 
-          :key="t.id_peserta" 
+          :key="t.id_tamu" 
           class="hover:bg-gray-50"
         >
           <td class="p-3 border-b">{{ t.id_tamu }}</td>
@@ -31,7 +31,7 @@
             </button>
 
             <button
-              @click="$emit('hapus', t.id_peserta)"
+              @click="$emit('hapus', t)"
               class="px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white"
             >
               🗑️

@@ -29,7 +29,7 @@
           <td class="p-3 border-b">{{ m.nama_orang_tua || '-' }}</td>
           <td class="p-3 border-b text-center">
             <button @click="$emit('edit', m)" class="px-2 py-1 rounded-md bg-yellow-400 hover:bg-yellow-500 text-white mr-2">✏️</button>
-            <button @click="$emit('hapus', m.nim)" class="px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white">🗑️</button>
+            <button @click="$emit('hapus', m)" class="px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white">🗑️</button>
           </td>
         </tr>
       </tbody>

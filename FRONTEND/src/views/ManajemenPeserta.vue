@@ -14,27 +14,17 @@
       <div class="flex justify-center mb-8 gap-4">
         <button 
           @click="changeView('mahasiswa')"
-          :class="[
-            'px-6 py-2 rounded-full font-bold transition-all',
-            currentView === 'mahasiswa' 
-              ? 'bg-blue-600 shadow-lg shadow-blue-500/50 text-white' 
-              : 'bg-white/10 hover:bg-white/20 text-blue-200'
-          ]">
+          :class="[tabClass(currentView === 'mahasiswa')]">
           🎓 Data Mahasiswa
         </button>
         <button 
           @click="changeView('tamu')"
-          :class="[
-            'px-6 py-2 rounded-full font-bold transition-all',
-            currentView === 'tamu' 
-              ? 'bg-blue-600 shadow-lg shadow-blue-500/50 text-white' 
-              : 'bg-white/10 hover:bg-white/20 text-blue-200'
-          ]">
+          :class="[tabClass(currentView === 'tamu')]">
           👤 Data Tamu
         </button>
       </div>
 
-      <!-- Upload Section (Hanya untuk Mahasiswa) -->
+      <!-- Upload Section -->
       <section v-if="currentView === 'mahasiswa'" class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
         <UploadExcelMahasiswa @refresh="fetchData" @loading="isUploading = $event" />
         <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
@@ -43,7 +33,6 @@
         </div>
       </section>
 
-      <!-- Upload Section (Hanya untuk Tamu) -->
       <section v-if="currentView === 'tamu'" class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
         <UploadExcelTamu @refresh="fetchData" @loading="isUploading = $event" />
         <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
@@ -51,7 +40,6 @@
           <span>Sedang mengunggah data tamu...</span>
         </div>
       </section>
-
 
       <!-- CRUD & Table Section -->
       <section class="bg-white/6 backdrop-blur-sm rounded-2xl border border-blue-500/20 p-6">
@@ -74,7 +62,6 @@
         </div>
 
         <div class="relative min-h-96">
-          
           <!-- Tampilan Mahasiswa -->
           <TableMahasiswa 
             v-if="currentView === 'mahasiswa'"
@@ -99,7 +86,7 @@
           </div>
 
           <div v-if="!isLoading && dataList.length === 0" class="text-center py-12 text-blue-200/80">
-              Tidak ada data {{ currentView }} ditemukan.
+            Tidak ada data {{ currentView }} ditemukan.
           </div>
         </div>
 
@@ -148,15 +135,14 @@ import { ref, onMounted } from 'vue'
 import { mainApi } from '@/api'
 import UploadExcelMahasiswa from '@/components/UploadExcelMahasiswa.vue'
 import UploadExcelTamu from '@/components/UploadExcelTamu.vue'
-// Kita asumsikan Anda telah membuat atau memindahkan komponen ini
 import TableMahasiswa from '@/components/TableMahasiswa.vue'
 import ModalMahasiswa from '@/components/ModalMahasiswa.vue'
-import TableTamu from '@/components/TableTamu.vue' // BARU
-import ModalTamu from '@/components/ModalTamu.vue' // BARU
+import TableTamu from '@/components/TableTamu.vue'
+import ModalTamu from '@/components/ModalTamu.vue'
 import { showNotification } from '@/composables/useNotification'
 
-const currentView = ref('mahasiswa') // State untuk memilih Mahasiswa atau Tamu
-const dataList = ref([]) // Data yang dimuat (Mahasiswa atau Tamu)
+const currentView = ref('mahasiswa')
+const dataList = ref([])
 const search = ref('')
 const showModal = ref(false)
 const selectedPeserta = ref(null)
@@ -167,37 +153,42 @@ const page = ref(1)
 const limit = 10
 let searchTimeout = null
 
-// Fungsi utama untuk memuat data berdasarkan 'currentView'
+// Utility untuk kelas tab
+function tabClass(active) {
+  return [
+    'px-6 py-2 rounded-full font-bold transition-all',
+    active
+      ? 'bg-blue-600 shadow-lg shadow-blue-500/50 text-white'
+      : 'bg-white/10 hover:bg-white/20 text-blue-200'
+  ]
+}
+
+// Fetch data Mahasiswa/Tamu
 async function fetchData() {
   try {
     isLoading.value = true
     const endpoint = currentView.value === 'mahasiswa' ? 'mahasiswa/pagination' : 'tamu/pagination'
-    
-    // Asumsi di Backend, Anda akan membuat TamuController dengan endpoint 'tamu/pagination'
     const { data } = await mainApi.get(endpoint, {
-      params: {
-        search: search.value || undefined,
-        page: page.value,
-        limit: limit
-      }
+      params: { search: search.value || undefined, page: page.value, limit: limit },
+      // headers jika pakai token, bisa ditambahkan:
+      // headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
     })
-
     dataList.value = data.data || []
   } catch (err) {
-    showNotification('error', err.message || `Gagal memuat tabel ${currentView.value}`);
+    showNotification('error', err.response?.data?.message || `Gagal memuat data ${currentView.value}`)
     dataList.value = []
   } finally {
     isLoading.value = false
   }
 }
 
-// Mengganti view (tab)
+// Ganti tab
 function changeView(view) {
   if (currentView.value !== view) {
     currentView.value = view
-    search.value = '' // Reset search saat ganti tab
+    search.value = ''
     page.value = 1
-    fetchData() // Ambil data baru
+    fetchData()
   }
 }
 
@@ -208,59 +199,45 @@ function tambahPeserta() {
   showModal.value = true
 }
 
-function editPeserta(p) {
-  selectedPeserta.value = p
+function editPeserta(item) {
+  selectedPeserta.value = { ...item }
   isEdit.value = true
   showModal.value = true
 }
 
-async function hapusPeserta(id) {
+async function hapusPeserta(item) {
   const entityName = currentView.value === 'mahasiswa' ? 'Mahasiswa' : 'Tamu'
   const endpoint = currentView.value === 'mahasiswa' ? 'mahasiswa' : 'tamu'
-  
+  const id = currentView.value === 'mahasiswa' ? item.nim : item.id_tamu
+
   if (!confirm(`Yakin ingin menghapus data ${entityName} ini?`)) return
   try {
-    // ID yang digunakan: nim untuk mahasiswa, id_tamu untuk tamu
-    await mainApi.delete(`${endpoint}/${id}`) 
-    showNotification('success', `${entityName} berhasil dihapus.`);
+    await mainApi.delete(`${endpoint}/${id}`)
+    showNotification('success', `${entityName} berhasil dihapus.`)
     fetchData()
   } catch (err) {
-    showNotification('error', err.message || `Gagal menghapus data ${entityName}`);
+    showNotification('error', err.response?.data?.message || `Gagal menghapus data ${entityName}`)
   }
 }
 
 // Pagination
-function nextPage() {
-  page.value++
-  fetchData()
-}
-
-function prevPage() {
-  if (page.value > 1) {
-    page.value--
-    fetchData()
-  }
-}
+function nextPage() { page.value++; fetchData() }
+function prevPage() { if (page.value > 1) { page.value--; fetchData() } }
 
 // Debounce search
 function onSearch() {
   clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    page.value = 1
-    fetchData()
-  }, 400)
+  searchTimeout = setTimeout(() => { page.value = 1; fetchData() }, 400)
 }
 
-// Initial load
 onMounted(fetchData)
 </script>
 
 <style scoped>
-/* Styling Tambahan untuk membuat tab lebih interaktif */
 .bg-blue-600 {
-    background-color: #2563eb;
+  background-color: #2563eb;
 }
 .shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.5), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.5), 0 4px 6px -2 rgba(37, 99, 235, 0.05);
 }
 </style>
