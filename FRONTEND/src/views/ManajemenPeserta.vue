@@ -11,12 +11,10 @@
 
 
       <!-- Header -->
-      <header class="mb-8 text-center">
-        <h2 class="text-3xl font-extrabold tracking-tight text-white">
-          👥 Manajemen Peserta
-        </h2>
-        <p class="text-blue-200/70 mt-1 text-sm">Kelola data Mahasiswa & Tamu</p>
-      </header>
+      <div class="bg-white rounded-xl p-4 flex justify-between items-center shadow-md mb-6">
+        <h2 class="text-xl font-bold text-[#2e3e85] pl-2">Manajemen Peserta</h2>
+        <span class="text-gray-600 pr-2">Halo, Admin!</span>
+      </div>
 
       <!-- TAB Switcher -->
       <div class="flex justify-center mb-8 gap-4">
@@ -33,7 +31,9 @@
       </div>
 
       <!-- Upload Section -->
-      <section v-if="currentView === 'mahasiswa'" class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
+      <section 
+        v-if="currentView === 'mahasiswa'" 
+        class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
         <UploadExcelMahasiswa @refresh="fetchData" @loading="isUploading = $event" />
         <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
           <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>

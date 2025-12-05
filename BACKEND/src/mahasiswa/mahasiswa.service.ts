@@ -28,24 +28,45 @@ export class MahasiswaService {
   async getMahasiswaWithPagination(search?: string, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
 
-    const where: Prisma.mahasiswaWhereInput = search
-      ? {
-        OR: [
-          { nama: { contains: search } },
-          { prodi: { contains: search } },
-          { kelas: { contains: search } },
-          { no_telp: { contains: search } },
-          { nama_orang_tua: { contains: search } },
-          { judul_skripsi: { contains: search } },
-          { dosen_pembimbing: { contains: search } },
-          { daerah_asal: { contains: search } },
-          { daerah_penempatan: { contains: search } },
-          !isNaN(Number(search))
-            ? { nim: { equals: Number(search) } }
-            : undefined,
-        ].filter(Boolean) as any,
-      }
-      : {};
+const isNumberSearch = !isNaN(Number(search));
+
+const where: Prisma.mahasiswaWhereInput = search
+  ? {
+      OR: [
+        { nama: { contains: search } },
+        { prodi: { contains: search } },
+        { kelas: { contains: search } },
+        { no_telp: { contains: search } },
+        { nama_orang_tua: { contains: search } },
+        { judul_skripsi: { contains: search } },
+        { dosen_pembimbing: { contains: search } },
+        { daerah_asal: { contains: search } },
+        { daerah_penempatan: { contains: search } },
+
+        // Jika search adalah angka → cari exact match
+        isNumberSearch ? { nim: { equals: Number(search) } } : undefined,
+
+        // Jika search adalah angka → aktifkan partial search
+        isNumberSearch
+          ? {
+              nim: {
+                in: await this.prisma.mahasiswa
+                  .findMany({
+                    select: { nim: true },
+                  })
+                  .then((rows) =>
+                    rows
+                      .map((r) => String(r.nim))
+                      .filter((nim) => nim.includes(search))
+                      .map((nim) => Number(nim))
+                  ),
+              },
+            }
+          : undefined,
+      ].filter(Boolean) as any,
+    }
+  : {};
+
 
     const [data, total] = await Promise.all([
       this.prisma.mahasiswa.findMany({
