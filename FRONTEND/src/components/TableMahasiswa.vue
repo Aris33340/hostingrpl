@@ -8,6 +8,7 @@
           <th class="p-3 border-b text-left">Prodi</th>
           <th class="p-3 border-b text-left">Kelas</th>
           <th class="p-3 border-b text-left">No. Telp</th>
+          <th class="p-3 border-b text-left">Daerah Asal</th>
           <th class="p-3 border-b text-left">Penempatan</th>
           <th class="p-3 border-b text-left">Judul Skripsi</th>
           <th class="p-3 border-b text-left">Pembimbing</th>
@@ -23,6 +24,7 @@
           <td class="p-3 border-b">{{ m.prodi || '-' }}</td>
           <td class="p-3 border-b">{{ m.kelas || '-' }}</td>
           <td class="p-3 border-b">{{ m.no_telp || '-' }}</td>
+          <td class="p-3 border-b">{{ m.daerah_asal || '-' }}</td>
           <td class="p-3 border-b">{{ m.daerah_penempatan || '-' }}</td>
           <td class="p-3 border-b truncate max-w-[220px]">{{ m.judul_skripsi || '-' }}</td>
           <td class="p-3 border-b">{{ m.dosen_pembimbing || '-' }}</td>

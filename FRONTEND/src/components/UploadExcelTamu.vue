@@ -81,6 +81,16 @@ const fileName = ref('')
 const fileInput = ref(null)
 const emit = defineEmits(['refresh', 'loading'])
 
+/* 🟦 MAP NAMA KOLOM EXCEL → KOLOM DATABASE */
+const columnMap = {
+  "Nama": "nama",
+  "Email": "email",
+  "Asal Instansi": "asal_instansi",
+  "Orang Tua": "orang_tua",
+  "Alamat": "alamat",
+  "Nomor HP": "no_hp",
+}
+
 const headerKeys = computed(() =>
   preview.value.length ? Object.keys(preview.value[0]) : []
 )
@@ -98,25 +108,45 @@ function handleFileUpload(event) {
       const data = new Uint8Array(e.target.result)
       const workbook = XLSX.read(data, { type: 'array' })
       const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
-      const jsonData = XLSX.utils.sheet_to_json(firstSheet)
+      const rows = XLSX.utils.sheet_to_json(firstSheet)
 
-      if (
-        jsonData.length > 0 &&
-        (!jsonData[0].nama ||
-         !jsonData[0].email ||
-         !jsonData[0].asal_instansi)
-      ) {
-        showNotification('error', 'Kolom wajib (nama, email, asal_instansi) tidak ditemukan.')
+      if (!rows.length) {
+        showNotification('error', 'File kosong.')
+        return
+      }
+
+      // 🔧 MAPPING OTOMATIS KOLOM
+      const mapped = rows.map(row => {
+        const newRow = {}
+
+        Object.keys(row).forEach(key => {
+          const cleanKey = key.trim()
+
+          // jika ada di mapping → pakai nama DB
+          if (columnMap[cleanKey]) {
+            newRow[columnMap[cleanKey]] = row[cleanKey]
+          } else {
+            // kolom yang tidak dikenal → tetap masuk
+            newRow[cleanKey] = row[cleanKey]
+          }
+        })
+
+        return newRow
+      })
+
+      // VALIDASI KOLOM WAJIB
+      if (!mapped[0].nama || !mapped[0].email || !mapped[0].asal_instansi) {
+        showNotification('error', 'Kolom wajib (Nama, Email, Asal Instansi) tidak ditemukan.')
         batalUpload()
         return
       }
 
-      preview.value = jsonData
+      preview.value = mapped
 
-    } catch (error) {
+    } catch (err) {
+      console.error(err)
       showNotification('error', 'Gagal membaca file Excel.')
       batalUpload()
-      console.error(error)
     }
   }
   reader.readAsArrayBuffer(file)
@@ -127,6 +157,7 @@ async function uploadData() {
     showNotification('error', 'Tidak ada data untuk dikirim.')
     return
   }
+
   loading.value = true
   emit('loading', true)
 
@@ -152,8 +183,7 @@ async function uploadData() {
 function batalUpload() {
   preview.value = []
   fileName.value = ''
-  if (fileInput.value) {
-    fileInput.value.value = null
-  }
+  if (fileInput.value) fileInput.value.value = null
 }
 </script>
+

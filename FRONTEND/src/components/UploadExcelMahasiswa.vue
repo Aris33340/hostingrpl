@@ -57,56 +57,116 @@
 
 <script setup>
 import * as XLSX from 'xlsx'
-import { ref, computed } from 'vue'
-import {mainApi} from '@/api'
-import { showNotification } from '../composables/useNotification'
+import { ref, computed, defineEmits } from 'vue'
+import { mainApi } from '@/api'
+import { showNotification } from '@/composables/useNotification'
 
 const preview = ref([])
-const message = ref('')
-const messageType = ref('ok')
 const loading = ref(false)
 const fileName = ref('')
 const fileInput = ref(null)
 const emit = defineEmits(['refresh', 'loading'])
 
-const headerKeys = computed(() => preview.value.length ? Object.keys(preview.value[0]) : [])
+/* MAP NAMA KOLOM EXCEL → KOLOM DB */
+const columnMap = {
+  "NIM": "nim",
+  "Nama": "nama",
+  "Prodi": "prodi",
+  "Kelas": "kelas",
+  "No. Telp": "no_telp",
+  "Daerah Asal": "daerah_asal",
+  "Penempatan": "daerah_penempatan",
+  "Judul Skripsi": "judul_skripsi",
+  "Pembimbing": "dosen_pembimbing",
+  "Orang Tua": "nama_orang_tua",
+}
+
+/* KOLOM WAJIB */
+const requiredColumns = ["nim", "nama", "prodi", "kelas"]
+
+const headerKeys = computed(() =>
+  preview.value.length ? Object.keys(preview.value[0]) : []
+)
 
 function handleFileUpload(event) {
   const file = event.target.files[0]
   if (!file) return
   fileName.value = file.name
 
+  preview.value = []
+
   const reader = new FileReader()
   reader.onload = (e) => {
-    const data = new Uint8Array(e.target.result)
-    const workbook = XLSX.read(data, { type: 'array' })
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
-    preview.value = XLSX.utils.sheet_to_json(firstSheet)
-    message.value = ''
+    try {
+      const data = new Uint8Array(e.target.result)
+      const workbook = XLSX.read(data, { type: 'array' })
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
+      const rows = XLSX.utils.sheet_to_json(firstSheet)
+
+      if (!rows.length) {
+        showNotification('error', 'File kosong.')
+        return
+      }
+
+      // MAPPING KOLOM
+      const mapped = rows.map(row => {
+        const newRow = {}
+
+        Object.keys(row).forEach(key => {
+          const cleanKey = key.trim()
+          if (columnMap[cleanKey]) {
+            newRow[columnMap[cleanKey]] = row[key]
+          }
+        })
+
+        return newRow
+      })
+
+      // VALIDASI KOLOM WAJIB
+      const firstRow = mapped[0]
+
+      for (const col of requiredColumns) {
+        if (!firstRow[col]) {
+          showNotification('error', `Kolom wajib (${requiredColumns.join(', ')}) tidak ditemukan.`)
+          batalUpload()
+          return
+        }
+      }
+
+      preview.value = mapped
+
+    } catch (error) {
+      console.error(error)
+      showNotification('error', 'Gagal membaca file Excel.')
+      batalUpload()
+    }
   }
+
   reader.readAsArrayBuffer(file)
 }
 
 async function uploadData() {
   if (!preview.value.length) {
-    message.value = 'Tidak ada data untuk dikirim.'
-    messageType.value = 'err'
+    showNotification('error', 'Tidak ada data untuk dikirim.')
     return
   }
+
   loading.value = true
   emit('loading', true)
+
   try {
     const res = await mainApi.post('/mahasiswa/bulk', preview.value)
-    message.value = `Berhasil menambahkan ${res.data.count || preview.value.length} mahasiswa.`
-    showNotification('success',message.value)
-    messageType.value = 'ok'
+    const count = res.data.count || preview.value.length
+
+    showNotification('success', `Berhasil menambahkan ${count} mahasiswa.`)
+
     preview.value = []
     fileName.value = ''
     emit('refresh')
+
   } catch (err) {
     console.error(err)
-    message.value = 'Gagal upload data.'
-    messageType.value = 'err'
+    showNotification('error', err.response?.data?.message || 'Gagal upload data.')
   } finally {
     loading.value = false
     emit('loading', false)
@@ -116,9 +176,7 @@ async function uploadData() {
 function batalUpload() {
   preview.value = []
   fileName.value = ''
-  fileInput.value.value = null // reset input file
-  message.value = ''
+  if (fileInput.value) fileInput.value.value = null
 }
-
-
 </script>
+
