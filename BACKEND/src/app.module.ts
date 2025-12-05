@@ -18,7 +18,7 @@ import { CryptoModule } from './crypto/crypto/crypto.module';
 import { PresensiModule } from './presensi/presensi/presensi.module';
 import { EditorModule } from './editor/editor.module';
 import { QRModule } from './qr/qr.module';
-
+import { InvitationModule } from './invitation/invitation.module';//baru
 
 @Module({
 
@@ -33,7 +33,8 @@ import { QRModule } from './qr/qr.module';
     CryptoModule,
     PresensiModule,
     EditorModule,
-    QRModule 
+    QRModule,
+    InvitationModule, //baru 
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],

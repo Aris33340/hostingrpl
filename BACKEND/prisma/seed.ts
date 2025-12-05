@@ -58,8 +58,11 @@ async function main() {
     await prisma.emailSendStatus.deleteMany({})
     await prisma.file.deleteMany({})
     // ----------- Users -----------
+    // Kita simpan ID user terakhir untuk dipakai bikin folder
+    let lastUserId = 0;
+
     for (let i = 1; i <= 10; i++) {
-        await prisma.user.create({
+        const user = await prisma.user.create({
             data: {
                 username: `user${i}`,
                 email: `user${i}@example.com`,
@@ -67,7 +70,18 @@ async function main() {
                 role: i % 4 === 0 ? Enum.userRole.BUKUWISUDA : (i % 4 === 1 ? Enum.userRole.PETUGAS : (i % 4 === 2 ? Enum.userRole.SEKRETARIAT : Enum.userRole.SUPERADMIN)),
             },
         });
+        lastUserId = user.id_user;
     }
+    // --- [TAMBAHAN BARU 1: BUAT FOLDER DUMMY] ---
+    // Kita butuh folder ini sebagai "induk" dari log email
+    const folderDummy = await prisma.file.create({
+        data: {
+            file_name: "Folder Undangan (Seed)",
+            type: "FOLDER",
+            path: "folder-seed-dummy-unique", // Path harus unik
+            id_user: lastUserId, // Gunakan user yang baru dibuat
+        }
+    });
 
     // ----------- Mahasiswa -----------
     for (let i = 1; i <= 10; i++) {
@@ -106,7 +120,9 @@ async function main() {
                 id_peserta:pesertares.id_peserta,
                 status:0,
                 waktu_dikirim:new Date(),
-                createdAt:new Date()
+                createdAt:new Date(),
+                // --- [TAMBAHAN BARU 2] ---
+                id_folder: folderDummy.id_file
             }
         })
     }
@@ -141,7 +157,9 @@ async function main() {
                 id_peserta:pesertares.id_peserta,
                 status: 0,
                 waktu_dikirim: new Date(),
-                createdAt:new Date()
+                createdAt:new Date(),
+                // --- [TAMBAHAN BARU 3] ---
+                id_folder: folderDummy.id_file
             },
         });
     }

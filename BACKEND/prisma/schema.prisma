@@ -74,8 +74,20 @@ model presensi {
 
 model emailSendStatus {
   id_sendStatus Int      @id @default(autoincrement())
-  waktu_dikirim DateTime @default(now())
-  status        Int      @default(0)
+  waktu_dikirim DateTime @default(now())//terisi otomatis saat status jadi=2
+
+  //status: 0=gagal, 1=pending (queue), 2=berhasil
+  status        Int      @default(1)
+
+  //penambahan kolom 
+  errorMessage String? //terisi jika status 0 
+  //menunjukan log ini milik kegiatan apa (gladi/wisuda)
+  //relasi diarahkan ke tabel 'file' (karena folder disimpan di situ)
+  folder        file    @relation("LogFolder", fields: [id_folder],references: [id_file], onDelete: Cascade)
+  id_folder     Int
+
+  //relasi ke peserta
+  //karena "tambah peserta" dialihkan ke tabel tamu maka id_peserta tidak boleh null
   peserta       peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
   id_peserta    Int?
   createdAt     DateTime @default(now())
@@ -91,6 +103,9 @@ model file {
   id_parent Int?
   parent    file?  @relation("FolderToSubfolders", fields: [id_parent], references: [id_file])
   children  file[] @relation("FolderToSubfolders")
+
+  //relasi balik untuk log email(hanya sebagai folder)
+  emailLogs   emailSendStatus[] @relation("LogFolder")
 
   user       user?    @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
   id_user    Int
