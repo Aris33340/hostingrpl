@@ -1,6 +1,14 @@
 <template>
-  <div class="min-h-screen p-8 text-white">
-    <div class="max-w-7xl mx-auto">
+<div class="relative w-full min-h-screen overflow-hidden text-white">
+
+  <img 
+    src="@/assets/images/Background.png"
+    class="fixed top-0 left-0 w-full h-full object-cover z-0"
+    alt="Background"
+  />
+
+  <div class="relative z-10 min-h-screen p-8">
+
 
       <!-- Header -->
       <header class="mb-8 text-center">
