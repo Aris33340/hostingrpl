@@ -9,45 +9,93 @@
 
   <div class="relative z-10 min-h-screen p-8">
 
-
       <!-- Header -->
       <div class="bg-white rounded-xl p-4 flex justify-between items-center shadow-md mb-6">
         <h2 class="text-xl font-bold text-[#2e3e85] pl-2">Manajemen Peserta</h2>
         <span class="text-gray-600 pr-2">Halo, Admin!</span>
       </div>
 
-      <!-- TAB Switcher -->
-      <div class="flex justify-center mb-8 gap-4">
-        <button 
-          @click="changeView('mahasiswa')"
-          :class="[tabClass(currentView === 'mahasiswa')]">
-          🎓 Data Mahasiswa
-        </button>
-        <button 
-          @click="changeView('tamu')"
-          :class="[tabClass(currentView === 'tamu')]">
-          👤 Data Tamu
-        </button>
-      </div>
+    <div class="relative mb-8">
+        
+        <img :src="WisudawanIcon" 
+             class="absolute left-0 top-0 z-10 w-40 h-auto object-contain transform -translate-x-12 -translate-y-4" 
+             alt="Wisudawan Icon"/>
 
-      <!-- Upload Section -->
-      <section 
-        v-if="currentView === 'mahasiswa'" 
-        class="bg-white/ backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
-        <UploadExcelMahasiswa @refresh="fetchData" @loading="isUploading = $event" />
-        <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
-          <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
-          <span>Sedang mengunggah data...</span>
-        </div>
-      </section>
+        <img :src="WisudawatiIcon" 
+             class="absolute right-0 top-0 z-10 w-40 h-auto object-contain transform translate-x-12 -translate-y-4" 
+             alt="Wisudawati Icon"/>
 
-      <section v-if="currentView === 'tamu'" class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
-        <UploadExcelTamu @refresh="fetchData" @loading="isUploading = $event" />
-        <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
-          <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
-          <span>Sedang mengunggah data tamu...</span>
+        <!-- Button -->
+        <div class="flex justify-center mb-4 gap-4 relative z-20">
+            <button 
+                @click="changeView('mahasiswa')"
+                :class="[tabClass(currentView === 'mahasiswa')]">
+                🎓 Data Mahasiswa
+            </button>
+            <button 
+                @click="changeView('tamu')"
+                :class="[tabClass(currentView === 'tamu')]">
+                👤 Data Tamu
+            </button>
         </div>
-      </section>
+
+        <!-- Upload Excel -->
+        <section 
+            v-if="currentView === 'mahasiswa'" 
+            class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
+            <UploadExcelMahasiswa @refresh="fetchData" @loading="isUploading = $event" />
+            <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
+                <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
+                <span>Sedang mengunggah data...</span>
+            </div>
+        </section>
+
+        <section v-if="currentView === 'tamu'" class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
+            <UploadExcelTamu @refresh="fetchData" @loading="isUploading = $event" />
+            <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
+                <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
+                <span>Sedang mengunggah data tamu...</span>
+            </div>
+        </section>
+    </div>
+    
+<!--
+    NOTES: INI TUH KODE BERSIH yang TANPA ADA WISUDAWAN WISUDAWATI YAAA
+    
+TAB Switcher
+<div class="flex justify-center mb-8 gap-4">
+  <button
+    @click="changeView('mahasiswa')"
+    :class="[tabClass(currentView === 'mahasiswa')]">
+    🎓 Data Mahasiswa
+  </button>
+  <button
+    @click="changeView('tamu')"
+    :class="[tabClass(currentView === 'tamu')]">
+    👤 Data Tamu
+  </button>
+</div>
+
+Upload Excel
+<section 
+    v-if="currentView === 'mahasiswa'" 
+    class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
+    <UploadExcelMahasiswa @refresh="fetchData" @loading="isUploading = $event" />
+    <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
+        <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
+        <span>Sedang mengunggah data...</span>
+    </div>
+</section>
+
+<section v-if="currentView === 'tamu'" class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
+    <UploadExcelTamu @refresh="fetchData" @loading="isUploading = $event" />
+    <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
+        <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
+        <span>Sedang mengunggah data tamu...</span>
+    </div>
+</section>
+-->
+
 
       <!-- CRUD & Table Section -->
       <section class="bg-white/6 backdrop-blur-sm rounded-2xl border border-blue-500/20 p-6">
@@ -183,6 +231,9 @@ import ModalMahasiswa from '@/components/ModalMahasiswa.vue'
 import TableTamu from '@/components/TableTamu.vue'
 import ModalTamu from '@/components/ModalTamu.vue'
 import { showNotification } from '@/composables/useNotification'
+
+import WisudawanIcon from '@/assets/images/wisudawan.png'
+import WisudawatiIcon from '@/assets/images/wisudawati.png'
 
 const currentView = ref('mahasiswa')
 const dataList = ref([])
