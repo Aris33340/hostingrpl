@@ -163,9 +163,15 @@ async function uploadData() {
 
   try {
     const res = await mainApi.post('/tamu/bulk', preview.value)
-    const count = res.data.count || preview.value.length
+    const { inserted, duplicates } = res.data
 
-    showNotification('success', `Berhasil menambahkan ${count} tamu.`)
+    if (inserted > 0) {
+      showNotification('success', `Berhasil menambahkan ${inserted} tamu.`)
+    }
+
+    if (duplicates && duplicates.length) {
+      showNotification('warning', `Data duplicate tidak ditambahkan: ${duplicates.join(', ')}`)
+    }
 
     preview.value = []
     fileName.value = ''
@@ -179,6 +185,7 @@ async function uploadData() {
     emit('loading', false)
   }
 }
+
 
 function batalUpload() {
   preview.value = []

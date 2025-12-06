@@ -60,13 +60,40 @@ export class TamuService {
     return { data, total, page, limit };
   }
 
-  // 🟩 2️⃣ BULK CREATE (Upload banyak tamu dari Excel)
-  async bulkCreate(data: Prisma.tamuCreateManyInput[]) {
-    return this.prisma.tamu.createMany({
-      data,
-      skipDuplicates: true,
-    });
+// 🟩 2️⃣ BULK CREATE (Upload banyak tamu dari Excel) - tanpa duplikat nama/email/instansi
+async bulkCreate(data: Prisma.tamuCreateManyInput[]): Promise<{ inserted: number; duplicates: string[] }> {
+  // Filter data valid
+  const validData = data.filter(d => d.nama && d.email && d.asal_instansi)
+
+  // Ambil data tamu yang sudah ada (kombinasi nama + email + asal_instansi)
+  const existing = await this.prisma.tamu.findMany({
+    where: {
+      OR: validData.map(d => ({
+        nama: d.nama,
+        email: d.email,
+        asal_instansi: d.asal_instansi
+      }))
+    },
+    select: { nama: true, email: true, asal_instansi: true }
+  })
+
+  // Buat array string untuk tracking duplicate
+  const existingKeys = existing.map(e => `${e.nama} | ${e.email} | ${e.asal_instansi}`)
+
+  // Pisahkan data baru dan duplicate
+  const newData = validData.filter(d => !existingKeys.includes(`${d.nama} | ${d.email} | ${d.asal_instansi}`))
+  const duplicateKeys = validData
+    .filter(d => existingKeys.includes(`${d.nama} | ${d.email} | ${d.asal_instansi}`))
+    .map(d => `${d.nama} (${d.email} - ${d.asal_instansi})`)
+
+  // Insert data baru
+  if (newData.length > 0) {
+    await this.prisma.tamu.createMany({ data: newData })
   }
+
+  return { inserted: newData.length, duplicates: duplicateKeys }
+}
+
 
   // 🟩 3️⃣ GET TAMU by ID
   async tamu(where: Prisma.tamuWhereUniqueInput): Promise<tamu | null> {
