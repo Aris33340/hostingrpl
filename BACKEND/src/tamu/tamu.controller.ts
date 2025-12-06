@@ -17,6 +17,12 @@ import { Prisma } from '@prisma/client';
 export class TamuController {
   constructor(private readonly tamuService: TamuService) {}
 
+  // 🟦 Ambil list instansi unik (untuk filter)
+  @Get('field/instansi')
+  async getAllInstansi() {
+    return this.tamuService.getAllInstansi();
+  }
+
   // 🟩 1️⃣ GET /api/tamu  → semua tamu
   @Get()
   async getAllTamu() {
@@ -33,14 +39,27 @@ export class TamuController {
     return this.tamuService.tamu({ id_tamu: idNumber });
   }
 
-  // 🟩 3️⃣ GET /api/tamu/pagination?search=&page=&limit=
+  // 🟩 3️⃣ GET /api/tamu/pagination?search=&page=&limit=&instansi=
   @Get('pagination')
   async getTamuPagination(
     @Query('search') search?: string,
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
+    @Query('instansi') instansi?: string,  // ⬅ filter instansi
   ) {
-    return this.tamuService.getTamuWithPagination(search ?? '', +page, +limit);
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+
+    if (isNaN(pageNum) || isNaN(limitNum)) {
+      throw new BadRequestException('Page dan limit harus berupa angka');
+    }
+
+    return this.tamuService.getTamuWithPagination(
+      search ?? '',
+      pageNum,
+      limitNum,
+      instansi,  // ⬅ kirim ke service
+    );
   }
 
 

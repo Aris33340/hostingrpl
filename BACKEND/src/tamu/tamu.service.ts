@@ -6,20 +6,46 @@ import { tamu, Prisma } from '@prisma/client';
 export class TamuService {
   constructor(private prisma: PrismaService) {}
 
-  // 🟩 1️⃣ PAGINATION + SEARCH
-  async getTamuWithPagination(search: string, page: number, limit: number) {
+  // 🟦 Ambil list instansi unik (untuk dropdown filter)
+  async getAllInstansi() {
+    return this.prisma.tamu.findMany({
+      distinct: ['asal_instansi'],
+      select: { asal_instansi: true },
+      orderBy: { asal_instansi: 'asc' },
+    });
+  }
+
+  // 🟩 1️⃣ PAGINATION + SEARCH + FILTER instansi
+  async getTamuWithPagination(
+    search: string,
+    page: number,
+    limit: number,
+    instansi?: string,   // ⬅ filter tambahan
+  ) {
     const skip = (page - 1) * limit;
 
-    // 🔍 Pencarian di nama, email, dan asal_instansi
-    const where: Prisma.tamuWhereInput = search
-      ? {
-          OR: [
-            { nama: { contains: search } },
-            { email: { contains: search } },
-            { asal_instansi: { contains: search } },
-          ],
-        }
+    // 🔍 Build search conditions
+    const searchConditions: Prisma.tamuWhereInput[] = [];
+    if (search) {
+      searchConditions.push(
+        { nama: { contains: search } },
+        { email: { contains: search } },
+        { asal_instansi: { contains: search } }
+      );
+    }
+
+    // 🔵 Filter instansi jika ada
+    const filterCondition: Prisma.tamuWhereInput = instansi
+      ? { asal_instansi: instansi }
       : {};
+
+    // 🔵 Final WHERE
+    const where: Prisma.tamuWhereInput = {
+      AND: [
+        search ? { OR: searchConditions } : {},
+        filterCondition,
+      ],
+    };
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.tamu.findMany({

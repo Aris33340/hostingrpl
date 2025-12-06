@@ -33,7 +33,7 @@
       <!-- Upload Section -->
       <section 
         v-if="currentView === 'mahasiswa'" 
-        class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
+        class="bg-white/ backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 mb-8">
         <UploadExcelMahasiswa @refresh="fetchData" @loading="isUploading = $event" />
         <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
           <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
@@ -55,6 +55,41 @@
           <h3 class="text-xl font-semibold text-white">Daftar {{ currentView === 'mahasiswa' ? 'Mahasiswa' : 'Tamu' }}</h3>
 
           <div class="flex items-center gap-3 w-full md:w-auto">
+
+            <!-- FILTER -->
+<select 
+  v-if="currentView === 'mahasiswa'"
+  v-model="filterMahasiswa"
+  @change="applyFilter"
+  class="px-3 py-2 rounded-md bg-white/10 text-white border border-white/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+>
+
+              <option value="">Semua Kelas / Prodi</option>
+              <option 
+                v-for="item in listFilterMahasiswa" 
+                :key="item" 
+                :value="item">
+                {{ item }}
+              </option>
+            </select>
+
+<select 
+  v-if="currentView === 'tamu'"
+  v-model="filterInstansi"
+  @change="applyFilter"
+  class="px-3 py-2 rounded-md bg-white/10 text-white border border-white/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+>
+
+              <option value="">Semua Instansi</option>
+              <option 
+                v-for="item in listInstansi" 
+                :key="item" 
+                :value="item">
+                {{ item }}
+              </option>
+            </select>
+            <!-- END FILTER -->
+
             <input 
               v-model="search" 
               @input="onSearch" 
@@ -151,15 +186,45 @@ import { showNotification } from '@/composables/useNotification'
 
 const currentView = ref('mahasiswa')
 const dataList = ref([])
+
 const search = ref('')
+
 const showModal = ref(false)
 const selectedPeserta = ref(null)
 const isEdit = ref(false)
 const isLoading = ref(false)
 const isUploading = ref(false)
+
 const page = ref(1)
 const limit = 10
 let searchTimeout = null
+
+// FILTER
+const filterMahasiswa = ref('')
+const filterInstansi = ref('')
+const listFilterMahasiswa = ref([])
+const listInstansi = ref([])
+
+async function loadFilters() {
+  try {
+    if (currentView.value === 'mahasiswa') {
+      const kelasRes = await mainApi.get('mahasiswa/field/kelas')
+      const prodiRes = await mainApi.get('mahasiswa/field/prodi')
+
+      const kelas = kelasRes.data.map(i => i.kelas)
+      const prodi = prodiRes.data.map(i => i.prodi)
+
+      listFilterMahasiswa.value = [...kelas, ...prodi]
+
+    } else {
+      const instansiRes = await mainApi.get('tamu/field/instansi')
+      listInstansi.value = instansiRes.data.map(i => i.asal_instansi)
+    }
+  } catch(err) {
+    showNotification('error', 'Gagal memuat filter.')
+  }
+}
+
 
 // Utility untuk kelas tab
 function tabClass(active) {
@@ -176,10 +241,19 @@ async function fetchData() {
   try {
     isLoading.value = true
     const token = localStorage.getItem('token') || ''; // Ambil token dari Local Storage
-    const endpoint = currentView.value === 'mahasiswa' ? 'mahasiswa/pagination' : 'tamu/pagination'
+
+    const endpoint = currentView.value === 'mahasiswa' 
+    ? 'mahasiswa/pagination' 
+    : 'tamu/pagination'
     
     const { data } = await mainApi.get(endpoint, {
-      params: { search: search.value || undefined, page: page.value, limit: limit },
+      params: { 
+        search: search.value || undefined, 
+        page: page.value, 
+        limit: limit,
+        filter: currentView.value === 'mahasiswa' ? filterMahasiswa.value : undefined,
+        instansi: currentView.value === 'tamu' ? filterInstansi.value : undefined
+       },
       // AKTIFKAN DAN PERBAIKI HEADER UNTUK MENGIRIM TOKEN
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -198,17 +272,30 @@ async function fetchData() {
   }
 }
 
+function applyFilter() {
+  page.value = 1
+  fetchData()
+}
+
 // Ganti tab
 function changeView(view) {
   if (currentView.value !== view) {
     currentView.value = view
     search.value = ''
+    filterMahasiswa.value = ''
+    filterInstansi.value = ''
     page.value = 1
+    loadFilters()
     fetchData()
   }
 }
 
-// CRUD Functions
+function refreshAll() {
+  loadFilters()
+  fetchData()
+}
+
+// CRUD
 function tambahPeserta() {
   selectedPeserta.value = null
   isEdit.value = false
@@ -250,7 +337,10 @@ function onSearch() {
   searchTimeout = setTimeout(() => { page.value = 1; fetchData() }, 400)
 }
 
-onMounted(fetchData)
+onMounted(() => {
+  loadFilters()
+  fetchData()
+})
 </script>
 
 <style scoped>
@@ -260,4 +350,10 @@ onMounted(fetchData)
 .shadow-lg {
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.5), 0 4px 6px -2 rgba(37, 99, 235, 0.05);
 }
+
+select option {
+    color: black; 
+    background-color: white; /* Opsional: Memastikan latar belakang option putih */
+}
+
 </style>
