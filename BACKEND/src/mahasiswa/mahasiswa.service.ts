@@ -154,35 +154,43 @@ async getMahasiswaWithPagination(
     return mahasiswa;
   }
 
-  // 🟩 5️⃣ Tambah banyak mahasiswa (import Excel)
-  async createManyMahasiswa(
-    data: Prisma.mahasiswaCreateManyInput[],
-  ): Promise<{ count: number }> {
+// 🟩 5️⃣ Tambah banyak mahasiswa (import Excel) - dengan validasi duplicate
+async createManyMahasiswa(
+  data: Prisma.mahasiswaCreateManyInput[],
+): Promise<{ inserted: number; duplicates: string[] }> {
 
-    const validData = data.filter((d) => d.nim && d.nama);
+  const validData = data.filter((d) => d.nim && d.nama);
 
-    const mahasiswas = await this.prisma.mahasiswa.createMany({
-      data: validData,
-      skipDuplicates: true,
-    });
+  // 🔵 Ambil NIM yang sudah ada di database
+  const existing = await this.prisma.mahasiswa.findMany({
+    where: { nim: { in: validData.map(d => Number(d.nim)) } },
+    select: { nim: true },
+  });
+  const existingNims = existing.map(e => String(e.nim));
 
+  // 🔵 Pisahkan data baru dan duplicate
+  const newData = validData.filter(d => !existingNims.includes(String(d.nim)));
+  const duplicateNims = validData
+    .filter(d => existingNims.includes(String(d.nim)))
+    .map(d => String(d.nim));
+
+  // 🔵 Insert data baru
+  if (newData.length > 0) {
+    await this.prisma.mahasiswa.createMany({ data: newData });
     await this.prisma.peserta.createMany({
-      data: validData.map((e) => ({
-        nim: Number(e.nim),
-        jenis: 'mahasiswa'
-      })), skipDuplicates: true
+      data: newData.map(e => ({ nim: Number(e.nim), jenis: 'mahasiswa' })),
     });
 
     const pesertas = await this.prisma.peserta.findMany();
-
     await this.prisma.presensi.createMany({
-      data: pesertas.map((e) => ({
-        id_peserta: Number(e.id_peserta)
-      })), skipDuplicates: true
+      data: pesertas.map(e => ({ id_peserta: Number(e.id_peserta) })),
+      skipDuplicates: true,
     });
-
-    return mahasiswas;
   }
+
+  return { inserted: newData.length, duplicates: duplicateNims };
+}
+
 
   // 🟩 6️⃣ Update mahasiswa
   async updateMahasiswa(params: {

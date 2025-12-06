@@ -92,7 +92,6 @@ function handleFileUpload(event) {
   const file = event.target.files[0]
   if (!file) return
   fileName.value = file.name
-
   preview.value = []
 
   const reader = new FileReader()
@@ -111,22 +110,18 @@ function handleFileUpload(event) {
       // MAPPING KOLOM
       const mapped = rows.map(row => {
         const newRow = {}
-
         Object.keys(row).forEach(key => {
           const cleanKey = key.trim()
           if (columnMap[cleanKey]) {
             newRow[columnMap[cleanKey]] = row[key]
           }
         })
-
         return newRow
       })
 
       // VALIDASI KOLOM WAJIB
-      const firstRow = mapped[0]
-
       for (const col of requiredColumns) {
-        if (!firstRow[col]) {
+        if (!mapped[0][col]) {
           showNotification('error', `Kolom wajib (${requiredColumns.join(', ')}) tidak ditemukan.`)
           batalUpload()
           return
@@ -156,9 +151,17 @@ async function uploadData() {
 
   try {
     const res = await mainApi.post('/mahasiswa/bulk', preview.value)
-    const count = res.data.count || preview.value.length
+    const { inserted, duplicates } = res.data
 
-    showNotification('success', `Berhasil menambahkan ${count} mahasiswa.`)
+    // Notifikasi berhasil
+    if (inserted > 0) {
+      showNotification('success', `Berhasil menambahkan ${inserted} mahasiswa.`)
+    }
+
+    // Notifikasi duplicate
+    if (duplicates && duplicates.length) {
+      showNotification('warning', `NIM duplicate tidak ditambahkan: ${duplicates.join(', ')}`)
+    }
 
     preview.value = []
     fileName.value = ''
@@ -179,4 +182,3 @@ function batalUpload() {
   if (fileInput.value) fileInput.value.value = null
 }
 </script>
-
