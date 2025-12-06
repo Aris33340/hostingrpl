@@ -7,6 +7,8 @@ import FileManager from "../views/FileManager.vue";
 import PetugasDashboard from "../views/PetugasDashboard.vue";
 import Editor from "../views/Editor.vue";
 import ManajemenUndangan from "../views/ManajemenUndangan.vue";
+import TulisUndangan from "../views/TulisUndangan.vue"; // <-- IMPORT BARU
+
 import SuperAdminDashboard from "../views/SuperAdminDashboard.vue";
 import DashboardSekre from "../views/DashboardSekre.vue";
 import DashboardBuku from "../views/DashboardBuku.vue";
@@ -29,12 +31,11 @@ const routes = [
     component: Test,
     meta: { title: "Test", showNavbar: true, requiresAuth: true },
   },
-  // --- 2. ROUTE UTAMA SUPER ADMIN (PILIH AKTOR) ---
+  // --- 2. ROUTE UTAMA SUPER ADMIN ---
   {
     path: "/",
     name: "SuperAdminDashboard",
     component: SuperAdminDashboard,
-    // showNavbar: false agar layar penuh saat memilih aktor
     meta: { title: "Super Admin", showNavbar: false, requiresAuth: true },
   },
 
@@ -43,19 +44,16 @@ const routes = [
     path: "/dashboard-sekre",
     name: "DashboardSekre",
     component: DashboardSekre,
-    // showInNavbar: true agar muncul 'Beranda' di sidebar saat masuk sini
     meta: { title: "Beranda", icon: HomeIcon, showInNavbar: true, requiresAuth: true },
   },
 
-  // --- 4. DASHBOARD BUKU WISUDA (UPDATE BARU) ---
+  // --- 4. DASHBOARD BUKU WISUDA ---
   {
     path: "/dashboard-buku",
     name: "DashboardBuku",
-    component: DashboardBuku, // Sekarang mengarah ke file DashboardBuku.vue yang benar
-    // showInNavbar: true agar muncul 'Beranda' di sidebar saat masuk sini
+    component: DashboardBuku,
     meta: { title: "Beranda Buku", icon: HomeIcon, showInNavbar: true, requiresAuth: true },
   },
-  // -------------------------------------------
 
   {
     path: "/manajemen-mahasiswa",
@@ -64,7 +62,7 @@ const routes = [
     meta: { title: "Manajemen Mahasiswa", icon: UserIcon, showInNavbar: true, requiresAuth: true },
   },
 
-  // DASHBOARD UNDANGAN
+  // DASHBOARD UNDANGAN (TAB MENU)
   {
     path: "/manajemen-undangan",
     name: "ManajemenUndangan",
@@ -72,20 +70,13 @@ const routes = [
     meta: { title: "Manajemen Undangan", icon: MailIcon, showInNavbar: true, requiresAuth: true },
   },
 
-  // UNDANGAN MAHASISWA
+  // --- HALAMAN TULIS UNDANGAN DINAMIS ---
   {
-    path: "/manajemen-undangan-mahasiswa",
-    name: "ManajemenUndanganMahasiswa",
-    component: () => import("../views/ManajemenUndanganMahasiswa.vue"),
-    meta: { title: "Undangan Mahasiswa", showNavbar: false, requiresAuth: true },
-  },
-
-  // UNDANGAN TAMU
-  {
-    path: "/manajemen-undangan-tamu",
-    name: "ManajemenUndanganTamu",
-    component: () => import("../views/ManajemenUndanganTamu.vue"),
-    meta: { title: "Undangan Tamu", showNavbar: false, requiresAuth: true },
+    path: "/tulis-undangan/:folderName", // Menerima parameter nama folder
+    name: "TulisUndangan",
+    component: TulisUndangan,
+    props: true,
+    meta: { title: "Tulis Undangan", showNavbar: false, requiresAuth: true },
   },
 
   // FILE MANAGER
