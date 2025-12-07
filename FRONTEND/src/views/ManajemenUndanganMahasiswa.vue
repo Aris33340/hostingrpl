@@ -2,10 +2,8 @@
   <div class="page-container">
 
     <!-- Tombol Kembali -->
-    <button
-      @click="goBack"
-      class="absolute top-6 left-6 px-4 py-2 rounded-full bg-black text-white shadow hover:bg-gray-800 transition"
-    >
+    <button @click="goBack"
+      class="absolute top-6 left-6 px-4 py-2 rounded-full bg-black text-white shadow hover:bg-gray-800 transition">
       ← Kembali
     </button>
 
@@ -21,20 +19,11 @@
             <input type="file" accept=".zip" @change="handleZipUpload" hidden />
           </label>
 
-          <input
-            v-model="search"
-            type="text"
-            placeholder="Cari File"
-            class="search-input"
-          />
+          <input v-model="search" type="text" placeholder="Cari File" class="search-input" />
 
           <div class="file-list">
 
-            <div
-              v-for="(f, idx) in filteredFiles"
-              :key="idx"
-              class="file-item"
-            >
+            <div v-for="(f, idx) in filteredFiles" :key="idx" class="file-item">
               📄 {{ f }}
             </div>
 
@@ -49,19 +38,10 @@
         <div class="right-panel">
 
           <label>Subjek Email</label>
-          <input
-            v-model="form.subject"
-            class="input-box"
-            type="text"
-            placeholder="Masukkan subjek email"
-          />
+          <input v-model="form.subject" class="input-box" type="text" placeholder="Masukkan subjek email" />
 
           <label>Isi Pesan</label>
-          <textarea
-            v-model="form.body"
-            class="textarea-box"
-            placeholder="Tulis isi pesan undangan..."
-          ></textarea>
+          <textarea v-model="form.body" class="textarea-box" placeholder="Tulis isi pesan undangan..."></textarea>
 
           <!-- ATTACHMENT BOX -->
           <div class="mb-6">
@@ -101,7 +81,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { emailApi } from "@/api";   // ✔ WAJIB ADA
+import emailApi from "../api/email";
 
 const router = useRouter();
 
@@ -182,7 +162,6 @@ function goBack() {
 
 
 <style scoped>
-
 /* =============== LAYOUT =============== */
 
 .page-container {

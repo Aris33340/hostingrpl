@@ -57,6 +57,7 @@ export class PresensiService {
             throw new NotFoundException('data tidak ditemukan');
         }
     }
+
     async getPesertaByIdPresensi(id:number){
         try {
             const res = this.prisma.presensi.findFirst({
@@ -196,6 +197,7 @@ export class PresensiService {
             throw new BadRequestException('Gagal menandai hadir',e);
         }
     }
+    
     async setAllPresensiTidakHadir(){
         try {
             await this.prisma.presensi.updateMany({

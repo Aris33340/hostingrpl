@@ -47,7 +47,7 @@
                 <!-- INPUT COLOR TERSEMBUNYI -->
                 <!-- Input ini tidak terlihat, tapi akan diklik secara programatis -->
                 <input ref="colorInputRef" type="color" :value="currentHexColor" @input="handleColorChange"
-                    class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer -z-10" />
+                class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer -z-10" />
             </span>
 
             <!-- Spacer -->
@@ -60,9 +60,9 @@
 import { computed, ref } from 'vue'
 import DropDown from './DropDown.vue'
 
-// Refs
 const selected = ref("")
-const colorInputRef = ref(null) // Referensi ke elemen input color
+const colorInputRef = ref(null) 
+const menuItems = ["Arial", "Verdana", "Times New Roman"]
 
 const props = defineProps({
     prop: {
@@ -72,20 +72,16 @@ const props = defineProps({
         isBold: Boolean,
         isItalic: Boolean,
         isUnderline: Boolean,
-        color: { r: Number, g: Number, b: Number } // Format RGB
+        color: { r: Number, g: Number, b: Number } 
     },
 })
 
 const emits = defineEmits(['textType', 'isBold', 'isItalic', 'isUnderline', 'property'])
 
-// --- LOGIC WARNA ---
-
-// 1. Helper: Mengubah RGB Object ke Hex String (untuk value input html)
 const rgbToHex = (r, g, b) => {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-// 2. Helper: Mengubah Hex String ke RGB Object (untuk update props)
 const hexToRgb = (hex) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -95,7 +91,6 @@ const hexToRgb = (hex) => {
     } : { r: 0, g: 0, b: 0 };
 }
 
-// 3. Computed properti untuk binding ke input color
 const currentHexColor = computed(() => {
     if (props.prop.color) {
         return rgbToHex(props.prop.color.r, props.prop.color.g, props.prop.color.b);
@@ -103,26 +98,21 @@ const currentHexColor = computed(() => {
     return '#000000';
 });
 
-// 4. Trigger click pada input hidden saat wrapper diklik
 const triggerColorPicker = () => {
     colorInputRef.value.click();
 }
 
-// 5. Handle perubahan warna dari picker
 const handleColorChange = (event) => {
     const hex = event.target.value;
     const rgbObj = hexToRgb(hex);
 
-    // Update props secara reaktif (karena object props di vue reaktif)
     props.prop.color = rgbObj;
 
-    // Emit event jika parent butuh notifikasi
     emits('property', {
         key: 'color',
         value: rgbObj
     });
 }
-// -------------------
 
 
 const handleBold = () => {
@@ -153,7 +143,6 @@ const unfocus = (e) => {
     e.target.blur();
 }
 
-const menuItems = ["Arial", "Verdana", "Times New Roman"]
 
 const onEmits = async (event) => {
     props.prop.font = event

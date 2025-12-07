@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PesertaService {
-  constructor(private prisma:PrismaService){}
+  constructor(private prisma: PrismaService) { }
   async getFieldLength(table: string, select: Prisma.mahasiswaSelect | Prisma.tamuSelect, lengthType: string) {
     let peserta: any;
     switch (table) {
@@ -56,6 +56,7 @@ export class PesertaService {
     })
     return value
   }
+  
   async getFields(table: string) {
     let fields: any;
     switch (table) {

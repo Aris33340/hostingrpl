@@ -2,25 +2,17 @@
   <div class="page-container">
     <header class="page-header">
       <h2 class="page-title">Manajemen Undangan</h2>
-      <span class="user-greeting">Halo, Admin!</span>
+      <span class="user-greeting">Halo, {{  }}</span>
     </header>
 
     <div class="switch-wrapper">
       <div class="switch-container">
-        
-        <button 
-          class="switch-item" 
-          :class="{ active: activeTab === 'buat' }"
-          @click="activeTab = 'buat'"
-        >
+
+        <button class="switch-item" :class="{ active: activeTab === 'buat' }" @click="activeTab = 'buat'">
           Buat Undangan
         </button>
 
-        <button 
-          class="switch-item" 
-          :class="{ active: activeTab === 'riwayat' }"
-          @click="activeTab = 'riwayat'"
-        >
+        <button class="switch-item" :class="{ active: activeTab === 'riwayat' }" @click="activeTab = 'riwayat'">
           Riwayat Pengiriman Undangan
         </button>
 
@@ -29,7 +21,7 @@
 
     <div class="content-area">
       <BuatUndangan v-if="activeTab === 'buat'" />
-      
+
       <RiwayatUndangan v-else />
     </div>
 
@@ -62,7 +54,7 @@ const activeTab = ref('buat');
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .page-title {
@@ -75,7 +67,8 @@ const activeTab = ref('buat');
 .switch-wrapper {
   margin-bottom: 1rem;
   display: flex;
-  justify-content: flex-start; /* Ini kuncinya: Rata Kiri */
+  justify-content: flex-start;
+  /* Ini kuncinya: Rata Kiri */
 }
 
 .switch-container {
@@ -101,7 +94,7 @@ const activeTab = ref('buat');
 .switch-item.active {
   background: white;
   color: black;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .switch-item:not(.active) {

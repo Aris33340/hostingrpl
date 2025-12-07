@@ -6,7 +6,6 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
-
             <div
                 class="lg:col-span-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-blue-500/20">
@@ -19,7 +18,8 @@
                                         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
                                     </path>
                                 </svg>
-                                <span class="text-white font-medium">{{ selectedFile ? selectedFile.name : 'Choose File' }}</span>
+                                <span class="text-white font-medium">{{ selectedFile ? selectedFile.name : 'Choose File'
+                                    }}</span>
                             </div>
                             <input type="file" @change="onFileChange" class="hidden" accept=".pdf,.pptx">
                         </label>
@@ -75,20 +75,13 @@
                     <ul class="space-y-2">
                         <li v-for="file in files" :key="file.id_file"
                             class="group bg-white/5 hover:bg-white/10 rounded-lg p-3 transition-all duration-200 border border-transparent hover:border-blue-500/30">
-                            <div class="flex items-center justify-between">
+                            <div v-if="file.type == 'application/pdf'" class="flex items-center justify-between">
                                 <div class="flex items-center gap-2 flex-1 min-w-0">
-                                    <svg v-if="getFileType(file.file_name) === 'pdf'"
-                                        class="w-5 h-5 text-red-400 flex-shrink-0" fill="currentColor"
+                                    <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="currentColor"
                                         viewBox="0 0 20 20">
                                         <path
                                             d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z">
                                         </path>
-                                    </svg>
-                                    <svg v-else-if="getFileType(file.file_name) === 'image'" class="w-5 h-5 text-blue-400 flex-shrink-0" fill="currentColor"
-                                        viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                            clip-rule="evenodd"></path>
                                     </svg>
                                     <span class="text-sm text-white truncate">{{ file.file_name }}</span>
                                 </div>
@@ -99,7 +92,8 @@
                                         title="View">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                            </path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                                             </path>
@@ -128,7 +122,82 @@
                                     </button>
                                 </div>
                             </div>
+
+                            <!-- Folder -->
+                            <div v-if="file.type === 'FOLDER'" class="cursor-pointer"
+                                @click="toggleFolder(file.id_file)">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M2 6a2 2 0 012-2h4l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                                        </svg>
+                                        <span class="text-sm text-white">{{ file.file_name }}</span>
+                                    </div>
+
+                                    <svg class="w-4 h-4 text-white transition-transform"
+                                        :class="{ 'rotate-90': openFolders[file.id_file] }" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- CHILD files -->
+                            <transition name="slide-fade">
+                                <ul v-if="openFolders[file.id_file]" class="pl-6 mt-2 space-y-2">
+                                    <li v-for="child in file.childs" :key="child.id_file"
+                                        class="flex items-center justify-between p-2 bg-black rounded-lg">
+
+                                        <div v-if="child.type == 'application/pdf'"
+                                            class="flex items-center justify-between w-full">
+                                            <div class="flex items-center gap-2 flex-1 min-w-0"> <svg
+                                                    class="w-5 h-5 text-red-400 flex-shrink-0" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path
+                                                        d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z">
+                                                    </path>
+                                                </svg>
+                                                <span class="text-sm text-white truncate block flex-1 min-w-0">{{child.file_name }}</span>
+                                            </div>
+
+                                            <div class="flex items-center gap-1 ml-2">
+                                                <button @click="viewFile(child)"
+                                                    class="p-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 transition-all duration-200"
+                                                    title="View">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                                        </path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+
+                                                <button @click="deleteFile(child)"
+                                                    class="p-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-300 transition-all duration-200"
+                                                    title="Delete">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </transition>
+
                         </li>
+
                     </ul>
                 </div>
             </div>
@@ -162,7 +231,7 @@ const getFileType = (fileName) => {
 
 const onFileChange = (event) => {
     selectedFile.value = event.target.files[0]
-}   
+}
 
 const uploadFile = async () => {
     if (!selectedFile.value) return
@@ -254,10 +323,26 @@ const deleteFile = async (file) => {
     }
 }
 
+const openFolders = ref({})
+const toggleFolder = (id) => {
+    openFolders.value[id] = !openFolders.value[id]
+}
+
 const loadFiles = async () => {
     try {
-        const res = await mainApi.get(`${API_BASE}?type=pdf`)
-        files.value = res.data
+        const res = await mainApi.get(`${API_BASE}?type=pdf&folder=FOLDER`)
+        const foldershow = res.data.filter(e => e.id_parent == null)
+
+        const fileMap = res.data
+            .filter(e => e.type === 'FOLDER' || e.id_parent === null)
+            .map(folder => ({
+                ...folder,
+                childs: res.data.filter(f => f.id_parent === folder.id_file)
+            }))
+
+        console.log(JSON.stringify(fileMap))
+        // files.value = res.data.filter(e => e.id_parent == null)
+        files.value = fileMap
     } catch {
         files.value = []
     }

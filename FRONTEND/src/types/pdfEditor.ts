@@ -1,65 +1,87 @@
-export interface userDetail {
-    id: number;
-    role: string;
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, ValidateNested, IsArray } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export const UserRole = {
+  SUPERADMIN: 'SUPERADMIN',
+  SEKRETARIAT: 'SEKRETARIAT',
+  BUKUWISUDA: 'BUKUWISUDA',
+  PETUGAS: 'PETUGAS',
+} as const;
+export type UserRoleKeys = (typeof UserRole)[keyof typeof UserRole];
+
+export const ElementType = {
+  TEXT: 'text',
+  IMAGE: 'image',
+  FIELD: 'field', 
+  QR: 'qr',      
+} as const;
+export type ElementTypeKeys = (typeof ElementType)[keyof typeof ElementType]; 
+
+
+export class RGBColor {
+  @IsNumber() r!: number;
+  @IsNumber() g!: number;
+  @IsNumber() b!: number;
 }
 
-export interface RGBColor {
-    r: number;
-    g: number;
-    b: number;
+export class TextStyle {
+  @IsNumber() fontSize!: number;
+  @IsString() fontFamily!: string;
+  @IsOptional() @IsBoolean() bold?: boolean;
+  @IsOptional() @IsBoolean() italic?: boolean;
+  @IsOptional() @ValidateNested() @Type(() => RGBColor) color?: RGBColor;
 }
 
-export interface TextStyle {
-    fontSize: number;
-    fontFamily: string;
-    bold?: boolean;
-    italic?: boolean;
-    underline?: boolean;
-    color?: RGBColor;
+export class Position {
+  @IsNumber() x!: number;
+  @IsNumber() y!: number;
 }
 
-export interface Position {
-    x: number;
-    y: number;
+export class Size {
+  @IsNumber() width!: number;
+  @IsNumber() height!: number;
 }
 
-export interface Size {
-    width: number;
-    height: number;
+export class ElementProperty {
+  @IsString() id!: string;
+  @IsEnum(ElementType) type!: ElementTypeKeys; 
+  
+  @IsOptional() @IsString() fieldName?: string;
+  @IsOptional() @IsString() content?: string; 
+  @IsOptional() @IsString() fileId?: string; 
+  
+  @ValidateNested() @Type(() => Position) position!: Position;
+  @ValidateNested() @Type(() => Size) size!: Size;
+  @IsOptional() @ValidateNested() @Type(() => TextStyle) textstyle?: TextStyle;
+  
+  @IsOptional() @IsNumber() opacity?: number;
+  @IsOptional() @IsNumber() rotation?: number;
 }
 
-export type ElementType = 'text' | 'image' | 'field' | 'qr';
-
-export interface ElementProperty {
-    id: number;
-    type: ElementType;
-    content?: string;
-    fieldName?: string | null;
-    fileId?: number | null;
-    position: Position;
-    size: Size;
-    textstyle?: TextStyle;
-    opacity?: number;
-    rotation: number;
+export class EditablePage {
+  @IsNumber() pageNumber!: number; 
+  @ValidateNested({ each: true }) @Type(() => ElementProperty) elements!: ElementProperty[];
+  @IsOptional() @IsBoolean() isIterative?: boolean; 
 }
 
-export interface EditablePage {
-    pageNumber: number;
-    elements: ElementProperty[];
+export class RenderOption {
+  @IsBoolean() saveToDb!: boolean;
+  @IsOptional() @IsBoolean() asZip?: boolean; 
 }
 
-export interface RenderOption {
-    saveToDb: boolean;
-    insertMode?: boolean;
+export class Configuration {
+  @IsNumber() pdfId!: number; 
+  @IsString() pdfFileName!: string; 
+  @IsString() projectName!: string;
+  @IsEnum(['mahasiswa', 'tamu']) tableReference!: 'mahasiswa' | 'tamu';
+  
+  @ValidateNested() @Type(() => RenderOption) renderOption!: RenderOption;
+  @IsEnum(['iterateInside', 'iterateOutside']) editOption!: 'iterateInside' | 'iterateOutside';
 }
 
-export interface PdfEditRequestDto {
-    userDetail: userDetail;
-    configuration: {
-        pdfId: number,
-        pdfFileName: string;
-        renderOption: RenderOption;
-        editOption: 'iterateInside' | 'iterateOutside';
-    }
-    editablePages: EditablePage[];
+export default class PdfEditRequestDto {
+  @IsNumber() userId!: number; 
+  @IsEnum(UserRole) userRole!: UserRoleKeys;
+  @ValidateNested() @Type(() => Configuration) configuration!: Configuration;
+  @IsArray() @ValidateNested({ each: true }) @Type(() => EditablePage) editablePages!: EditablePage[];
 }
