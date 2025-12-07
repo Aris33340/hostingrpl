@@ -29,15 +29,16 @@ export class FileService {
   }
 
 
-  async getAllFiles(userId: number, query?: string) {
+  async getAllFiles(userId: number, query?: string, folder?: string) {
     return this.prisma.file.findMany({
       where: {
         user: {
           id_user: userId
         },
-        type: {
-          contains: query
-        }
+        OR: [
+          { type: { contains: query } },
+          folder ? { type: { contains: 'FOLDER' } } : {}
+        ].filter(Boolean)
       }
     });
   }

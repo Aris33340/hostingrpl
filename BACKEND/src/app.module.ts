@@ -7,7 +7,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { PrismaService } from './prisma/prisma.service';
-import { TamuModule } from './peserta/peserta.module';
 import { ScanModule } from './scan/scan.module';
 import { ScanController } from './scan/scan.controller';
 import { MahasiswaModule } from './mahasiswa/mahasiswa.module';
@@ -18,6 +17,8 @@ import { CryptoModule } from './crypto/crypto/crypto.module';
 import { PresensiModule } from './presensi/presensi/presensi.module';
 import { EditorModule } from './editor/editor.module';
 import { QRModule } from './qr/qr.module';
+import { PesertaModule } from './peserta/peserta.module';
+import { TestingModule } from './testing/testing.module';
 
 
 @Module({
@@ -25,7 +26,6 @@ import { QRModule } from './qr/qr.module';
   imports: [
     PrismaModule, 
     AuthModule,
-    TamuModule,
     ScanModule,
     MahasiswaModule,
     ConfigModule.forRoot({ isGlobal: true }),
@@ -33,7 +33,9 @@ import { QRModule } from './qr/qr.module';
     CryptoModule,
     PresensiModule,
     EditorModule,
-    QRModule 
+    QRModule,
+    PesertaModule,
+    TestingModule
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],

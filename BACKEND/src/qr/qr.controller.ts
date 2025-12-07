@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Get, InternalServerErrorException, Req } from "@nestjs/common";
+import { Controller, Post, Body, HttpException, HttpStatus, Get, InternalServerErrorException, Req, Res, StreamableFile } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { QrCodeService } from "./qr.service";
 import type QRDTO from "./dto/qroptions.dto";
@@ -10,7 +10,7 @@ export class QRcontroller {
     @Post('generate-qr')
     async qreateQr(@Body('data') data: string, @Body('config') qrDto?: QRDTO) {
         try {
-            const pdfBuffer = await this.qrCodeService.createQR(data,qrDto);
+            const pdfBuffer = await this.qrCodeService.createQR(data, qrDto);
             if (!fs.existsSync(`./public/qr-generate/`)) {
                 fs.mkdirSync(`./public/qr-generate/`, { recursive: true });
             }
@@ -42,23 +42,25 @@ export class QRcontroller {
                         path: path,
                         type: 'image/png',
                         id_peserta: Number(data.id_peserta),
-                        id_user:userId
+                        id_user: userId
                     }
                 })
             })
-            // return await this.prismaService.file.create({
-            //     data:{
-            //         file_name:'test',
-            //         path:'test',
-            //         type:'test',
-            //         id_peserta:1,
-            //         id_user:1
-            //     }
-            // })
-            // return 'success'
         } catch (e) {
             throw new InternalServerErrorException(e.message)
         }
+    }
+
+    @Post('generate/sample')
+    async generateQR(
+      @Body() body: { options?: QRDTO }
+    ): Promise<StreamableFile> {
+      const buffer = await this.qrCodeService.createQR('QRcodeSample', body.options);
+  
+      return new StreamableFile(buffer, {
+        type: 'image/png',
+        disposition: 'inline; filename="qrcode.png"',
+      });
     }
 
 }

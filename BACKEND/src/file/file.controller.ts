@@ -29,12 +29,9 @@ export class FileController {
     constructor(private readonly fileService: FileService, private readonly authService: AuthService) { }
 
     @Get()
-    async getAllFiles(@Req() req: any, @Query('type') type: string) {
+    async getAllFiles(@Req() req: any, @Query('type') type: string, @Query('folder') folder:string) {
         const userId = req.user.sub;
-        const files = await this.fileService.getAllFiles(Number(userId), type.toLowerCase());
-        console.log('userId:', userId)
-        console.log('type:', type)
-        console.log('files:', files)
+        const files = await this.fileService.getAllFiles(Number(userId), type.toLowerCase(), folder.toLowerCase());
         return files;
     }
 

@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PesertaService } from './peserta.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { PesertaController } from './peserta.controller';
 
 @Module({
   providers: [PesertaService, PrismaService],
-  controllers:[]
+  controllers:[PesertaController]
 })
-export class TamuModule {}
+export class PesertaModule {}

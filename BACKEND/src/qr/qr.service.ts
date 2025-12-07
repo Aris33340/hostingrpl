@@ -10,6 +10,7 @@ import { CryptoService } from 'src/crypto/crypto/CryptoService';
 @Injectable()
 export class QrCodeService {
   constructor(private prisma: PrismaService, private crypto: CryptoService) { }
+  
   async createQR(data: string, qrDto?: QRDTO) {
     let saveBuffer: Buffer;
     const qrCodeImage = new QRCodeStyling({
@@ -46,21 +47,20 @@ export class QrCodeService {
     }
 
     return saveBuffer;
-    // else {
-    //   throw new Error("Unknown buffer format returned by qrCodeImage.getRawData()");
-    // }
-    // if (!fs.existsSync(`./public/qr-generate/${qrDto.folderName}`)) {
-    //   fs.mkdirSync(`./public/qr-generate/${qrDto.folderName}`, { recursive: true });
-    // }
-    // fs.writeFileSync(`./public/qr-generate/${qrDto.folderName}/${qrDto.fileName}.png`, saveBuffer);
   }
+  // else {
+  //   throw new Error("Unknown buffer format returned by qrCodeImage.getRawData()");
+  // }
+  // if (!fs.existsSync(`./public/qr-generate/${qrDto.folderName}`)) {
+  //   fs.mkdirSync(`./public/qr-generate/${qrDto.folderName}`, { recursive: true });
+  // }
+  // fs.writeFileSync(`./public/qr-generate/${qrDto.folderName}/${qrDto.fileName}.png`, saveBuffer);
 
   async generateQRmahasiswa() {
     try {
       const mahasiswa = await this.prisma.presensi.findMany({
         where: { peserta: { jenis: 'mahasiswa' } },
         select: {
-
           id_presensi: true, peserta: {
             select:
             {
@@ -93,4 +93,5 @@ export class QrCodeService {
       throw new NotFoundException('Data Presensi Tidak ditemukan');
     }
   }
+
 }

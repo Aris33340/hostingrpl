@@ -94,31 +94,6 @@ export class EditorService {
                 const pdfBytesOut = await pdfDoc.save();
                 writeFileSync(outputPath, pdfBytesOut);
             }
-
-
-
-            // // for (const mahasiswa of mahasiswaList) {
-            // //     for (const [i,pageConfig] of dto.editablePages.entries()) {
-            // //         const page = copiedPages[i];
-
-            // //         pdfDoc.insertPage(pageConfig.pageNumber-1,page);
-            // //         pdfDoc.removePage(pageConfig.pageNumber);
-            // //     }
-
-            // // }
-
-
-            // if (dto.renderOption.saveToDb) {
-            //     console.log('PDF disiapkan untuk disimpan ke database...');
-            // } else {
-            //     const outputPath = `./public/output/${dto.pdfFileName.replace(
-            //         '.pdf',
-            //         '-rendered.pdf',
-            //     )}`;
-            //     writeFileSync(outputPath, pdfBytesOut);
-            //     console.log(`✅ PDF berhasil disimpan ke: ${outputPath}`);
-            // }
-
             const renderedFile = await this.prisma.file.create({
                 data: {
                     file_name: `rendered-${userId}.pdf`,
@@ -135,30 +110,9 @@ export class EditorService {
     }
 
     private async loadImage(
-        fileId: string,
+        fileId: number,
     ): Promise<{ data: Uint8Array; type: string }> {
         const path = await this.prisma.file.findUnique({ where: { id_file: Number(fileId) } })
-        // const pngPath = `./public/uploads/${fileId}.png`;
-        // const jpgPath = `./public/uploads/${fileId}.jpg`;
-        // const jpegPath = `./public/uploads/${fileId}.jpeg`;
-
-        // let filePath = '';
-        // let fileType: 'png' | 'jpg' | null = null;
-
-        // if (existsSync(pngPath)) {
-        //     filePath = pngPath;
-        //     fileType = 'png';
-        // } else if (existsSync(jpgPath)) {
-        //     filePath = jpgPath;
-        //     fileType = 'jpg';
-        // } else if (existsSync(jpegPath)) {
-        //     filePath = jpegPath;
-        //     fileType = 'jpg';
-        // }
-
-        // if (!filePath || !fileType) {
-        //     throw new Error(`File gambar tidak ditemukan untuk fileId: ${fileId}`);
-        // }
         const filePath = path?.path;
         if (!filePath) {
             throw new NotFoundException;

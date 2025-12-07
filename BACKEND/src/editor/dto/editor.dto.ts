@@ -1,72 +1,83 @@
-// dto/editor.dto.ts
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, ValidateNested, IsArray } from 'class-validator';
+import { Type } from 'class-transformer';
 
-import { userRole } from "@prisma/client";
-
-
-export interface RGBColor {
-  r: number;
-  g: number;
-  b: number;
+export enum UserRole {
+  SUPERADMIN = 'SUPERADMIN',
+  SEKRETARIAT = 'SEKRETARIAT',
+  BUKUWISUDA = 'BUKUWISUDA',
+  PETUGAS = 'PETUGAS',
 }
 
-export interface userDetail{
-  id :number;
-  role: userRole;
+export enum ElementType {
+  TEXT = 'text',
+  IMAGE = 'image',
+  FIELD = 'field', // Data dinamis dari DB
+  QR = 'qr',       // QR Code
 }
 
-export interface TextStyle {
-  fontSize: number;
-  fontFamily: string;
-  bold?: boolean;
-  italic?: boolean;
-  underline?: boolean;
-  color?: RGBColor;
+export class RGBColor {
+  @IsNumber() r: number;
+  @IsNumber() g: number;
+  @IsNumber() b: number;
 }
 
-export interface Position {
-  x: number;
-  y: number;
+export class TextStyle {
+  @IsNumber() fontSize: number;
+  @IsString() fontFamily: string; // 'TimesRoman', 'Helvetica', etc.
+  @IsOptional() @IsBoolean() bold?: boolean;
+  @IsOptional() @IsBoolean() italic?: boolean;
+  @IsOptional() @ValidateNested() @Type(() => RGBColor) color?: RGBColor;
 }
 
-export interface Size {
-  width: number;
-  height: number;
+export class Position {
+  @IsNumber() x: number;
+  @IsNumber() y: number;
 }
 
-export type ElementType = 'text' | 'image' | 'field' | 'qr';
-
-export interface ElementProperty {
-  id: string;
-  type: ElementType;
-  content?: string;      // teks custom
-  fieldName?: string;    // nama field mahasiswa (misal: 'nama', 'nim')
-  fileId?: string;       // untuk image
-  position: Position;
-  size: Size;
-  textstyle?: TextStyle;
-  opacity?: number;
-  rotation: number;
+export class Size {
+  @IsNumber() width: number;
+  @IsNumber() height: number;
 }
 
-
-
-export interface EditablePage {
-  pageNumber: number;
-  elements: ElementProperty[];
+export class ElementProperty {
+  @IsString() id: string;
+  @IsEnum(ElementType) type: ElementType;
+  
+  @IsOptional() @IsString() fieldName?: string; // key untuk mapping DB: 'mahasiswa.nama', 'tamu.instansi'
+  @IsOptional() @IsString() content?: string;   // Teks statis
+  @IsOptional() @IsNumber() fileId?: number;    // ID File untuk static image (Logo)
+  
+  @ValidateNested() @Type(() => Position) position: Position;
+  @ValidateNested() @Type(() => Size) size: Size;
+  @IsOptional() @ValidateNested() @Type(() => TextStyle) textstyle?: TextStyle;
+  
+  @IsOptional() @IsNumber() opacity?: number;
+  @IsOptional() @IsNumber() rotation?: number;
 }
 
-export interface RenderOption {
-  saveToDb: boolean;
-  insertMode?: boolean; // true = insert for each student, false = render only editable pages
+export class EditablePage {
+  @IsNumber() pageNumber: number; // Halaman ke-berapa di PDF Template asli (1-based)
+  @ValidateNested({ each: true }) @Type(() => ElementProperty) elements: ElementProperty[];
+  @IsOptional() @IsBoolean() isIterative?: boolean; // True jika halaman ini dicetak ulang per siswa
 }
 
-export default interface PdfEditRequestDto {
-  userDetail: userDetail;
-  configuration:{
-      pdfId:number,
-      pdfFileName: string;
-      renderOption: RenderOption;
-      editOption: 'iterateInside' | 'iterateOutside';
-  } 
-  editablePages: EditablePage[];
+export class RenderOption {
+  @IsBoolean() saveToDb: boolean;
+  @IsOptional() @IsBoolean() asZip?: boolean; // Opsi baru: Bungkus hasil 'outside' jadi ZIP?
+}
+
+export class Configuration {
+  @IsNumber() pdfId: number; // ID File Template di DB
+  @IsString() pdfFileName: string; // Nama output
+  @IsString() projectName: string;
+  @IsEnum(['mahasiswa', 'tamu']) tableReference: 'mahasiswa' | 'tamu';
+  
+  @ValidateNested() @Type(() => RenderOption) renderOption: RenderOption;
+  @IsEnum(['iterateInside', 'iterateOutside']) editOption: 'iterateInside' | 'iterateOutside';
+}
+
+export default class PdfEditRequestDto {
+  @IsNumber() userId: number; // Dikirim dari Controller (dari JWT/Session)
+  @ValidateNested() @Type(() => Configuration) configuration: Configuration;
+  @IsArray() @ValidateNested({ each: true }) @Type(() => EditablePage) editablePages: EditablePage[];
 }
