@@ -41,6 +41,7 @@ import { InvitationModule } from './invitation/invitation.module';//baru
     PesertaModule,
     TestingModule,
     InvitationModule, //baru 
+    TamuModule
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],

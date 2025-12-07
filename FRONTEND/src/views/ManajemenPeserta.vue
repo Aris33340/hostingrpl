@@ -1,13 +1,10 @@
 <template>
-<div class="relative w-full min-h-screen overflow-hidden text-white">
+  <div class="relative w-full min-h-screen overflow-hidden text-white">
 
-  <img 
-    src="@/assets/images/Background.png"
-    class="fixed top-0 left-0 w-full h-full object-cover z-0"
-    alt="Background"
-  />
+    <img src="@/assets/images/Background.png" class="fixed top-0 left-0 w-full h-full object-cover z-0"
+      alt="Background" />
 
-  <div class="relative z-10 min-h-screen p-8">
+    <div class="relative z-10 min-h-screen p-8">
 
       <!-- Header -->
       <div class="bg-white rounded-xl p-4 flex justify-between items-center shadow-md mb-6">
@@ -15,51 +12,47 @@
         <span class="text-gray-600 pr-2">Halo, Admin!</span>
       </div>
 
-    <div class="relative mb-8">
-        
-        <img :src="WisudawanIcon" 
-             class="absolute left-0 top-0 z-10 w-40 h-auto object-contain transform -translate-x-12 -translate-y-4" 
-             alt="Wisudawan Icon"/>
+      <div class="relative mb-8">
 
-        <img :src="WisudawatiIcon" 
-             class="absolute right-0 top-0 z-10 w-40 h-auto object-contain transform translate-x-12 -translate-y-4" 
-             alt="Wisudawati Icon"/>
+        <img :src="WisudawanIcon"
+          class="absolute left-0 top-0 z-10 w-40 h-auto object-contain transform -translate-x-12 -translate-y-4"
+          alt="Wisudawan Icon" />
+
+        <img :src="WisudawatiIcon"
+          class="absolute right-0 top-0 z-10 w-40 h-auto object-contain transform translate-x-12 -translate-y-4"
+          alt="Wisudawati Icon" />
 
         <!-- Button -->
         <div class="flex justify-center mb-4 gap-4 relative z-20">
-            <button 
-                @click="changeView('mahasiswa')"
-                :class="[tabClass(currentView === 'mahasiswa')]">
-                🎓 Data Mahasiswa
-            </button>
-            <button 
-                @click="changeView('tamu')"
-                :class="[tabClass(currentView === 'tamu')]">
-                👤 Data Tamu
-            </button>
+          <button @click="changeView('mahasiswa')" :class="[tabClass(currentView === 'mahasiswa')]">
+            🎓 Data Mahasiswa
+          </button>
+          <button @click="changeView('tamu')" :class="[tabClass(currentView === 'tamu')]">
+            👤 Data Tamu
+          </button>
         </div>
 
         <!-- Upload Excel -->
-        <section 
-            v-if="currentView === 'mahasiswa'" 
-            class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
-            <UploadExcelMahasiswa @refresh="fetchData" @loading="isUploading = $event" />
-            <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
-                <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
-                <span>Sedang mengunggah data...</span>
-            </div>
+        <section v-if="currentView === 'mahasiswa'"
+          class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
+          <UploadExcelMahasiswa @refresh="fetchData" @loading="isUploading = $event" />
+          <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
+            <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
+            <span>Sedang mengunggah data...</span>
+          </div>
         </section>
 
-        <section v-if="currentView === 'tamu'" class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
-            <UploadExcelTamu @refresh="fetchData" @loading="isUploading = $event" />
-            <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
-                <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
-                <span>Sedang mengunggah data tamu...</span>
-            </div>
+        <section v-if="currentView === 'tamu'"
+          class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
+          <UploadExcelTamu @refresh="fetchData" @loading="isUploading = $event" />
+          <div v-if="isUploading" class="mt-4 flex items-center gap-2 text-sm text-blue-100/80">
+            <span class="w-4 h-4 border-2 border-blue-300/40 border-t-blue-500 rounded-full animate-spin"></span>
+            <span>Sedang mengunggah data tamu...</span>
+          </div>
         </section>
-    </div>
-    
-<!--
+      </div>
+
+      <!--
     NOTES: INI TUH KODE BERSIH yang TANPA ADA WISUDAWAN WISUDAWATI YAAA
     
 TAB Switcher
@@ -100,51 +93,34 @@ Upload Excel
       <!-- CRUD & Table Section -->
       <section class="bg-white/6 backdrop-blur-sm rounded-2xl border border-blue-500/20 p-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-          <h3 class="text-xl font-semibold text-white">Daftar {{ currentView === 'mahasiswa' ? 'Mahasiswa' : 'Tamu' }}</h3>
+          <h3 class="text-xl font-semibold text-white">Daftar {{ currentView === 'mahasiswa' ? 'Mahasiswa' : 'Tamu' }}
+          </h3>
 
           <div class="flex items-center gap-3 w-full md:w-auto">
 
             <!-- FILTER -->
-<select 
-  v-if="currentView === 'mahasiswa'"
-  v-model="filterMahasiswa"
-  @change="applyFilter"
-  class="px-3 py-2 rounded-md bg-white/10 text-white border border-white/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
->
+            <select v-if="currentView === 'mahasiswa'" v-model="filterMahasiswa" @change="applyFilter"
+              class="px-3 py-2 rounded-md bg-white/10 text-white border border-white/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
 
               <option value="">Semua Kelas / Prodi</option>
-              <option 
-                v-for="item in listFilterMahasiswa" 
-                :key="item" 
-                :value="item">
+              <option v-for="item in listFilterMahasiswa" :key="item" :value="item">
                 {{ item }}
               </option>
             </select>
 
-<select 
-  v-if="currentView === 'tamu'"
-  v-model="filterInstansi"
-  @change="applyFilter"
-  class="px-3 py-2 rounded-md bg-white/10 text-white border border-white/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
->
+            <select v-if="currentView === 'tamu'" v-model="filterInstansi" @change="applyFilter"
+              class="px-3 py-2 rounded-md bg-white/10 text-white border border-white/30 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
 
               <option value="">Semua Instansi</option>
-              <option 
-                v-for="item in listInstansi" 
-                :key="item" 
-                :value="item">
+              <option v-for="item in listInstansi" :key="item" :value="item">
                 {{ item }}
               </option>
             </select>
             <!-- END FILTER -->
 
-            <input 
-              v-model="search" 
-              @input="onSearch" 
-              type="text" 
+            <input v-model="search" @input="onSearch" type="text"
               :placeholder="'Cari ' + (currentView === 'mahasiswa' ? 'Mahasiswa (NIM, Nama, Prodi...)' : 'Tamu (Nama, Email, Instansi...)')"
-              class="w-full md:w-72 px-3 py-2 rounded-lg bg-white/10 border border-transparent placeholder-blue-200 text-white focus:outline-none focus:ring-2 focus:ring-blue-400" 
-            />
+              class="w-full md:w-72 px-3 py-2 rounded-lg bg-white/10 border border-transparent placeholder-blue-200 text-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
             <button @click="tambahPeserta"
               class="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold shadow-sm transition">
               + Tambah {{ currentView === 'mahasiswa' ? 'Mahasiswa' : 'Tamu' }}
@@ -154,21 +130,12 @@ Upload Excel
 
         <div class="relative min-h-96">
           <!-- Tampilan Mahasiswa -->
-          <TableMahasiswa 
-            v-if="currentView === 'mahasiswa'"
-            :mahasiswa="dataList" 
-            @edit="editPeserta" 
-            @hapus="hapusPeserta" 
-          />
+          <TableMahasiswa v-if="currentView === 'mahasiswa'" :mahasiswa="dataList" @edit="editPeserta"
+            @hapus="hapusPeserta" />
 
           <!-- Tampilan Tamu -->
-          <TableTamu
-            v-else-if="currentView === 'tamu'"
-            :tamu="dataList" 
-            @edit="editPeserta" 
-            @hapus="hapusPeserta" 
-          />
-          
+          <TableTamu v-else-if="currentView === 'tamu'" :tamu="dataList" @edit="editPeserta" @hapus="hapusPeserta" />
+
           <!-- Loading overlay -->
           <div v-if="isLoading"
             class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm rounded-lg">
@@ -200,22 +167,10 @@ Upload Excel
         </div>
 
         <!-- Modals -->
-        <ModalMahasiswa
-          v-if="currentView === 'mahasiswa'"
-          :show="showModal"
-          :mahasiswa="selectedPeserta"
-          :isEdit="isEdit"
-          @close="showModal = false"
-          @refresh="fetchData"
-        />
-        <ModalTamu
-          v-if="currentView === 'tamu'"
-          :show="showModal"
-          :tamu="selectedPeserta"
-          :isEdit="isEdit"
-          @close="showModal = false"
-          @refresh="fetchData"
-        />
+        <ModalMahasiswa v-if="currentView === 'mahasiswa'" :show="showModal" :mahasiswa="selectedPeserta"
+          :isEdit="isEdit" @close="showModal = false" @refresh="fetchData" />
+        <ModalTamu v-if="currentView === 'tamu'" :show="showModal" :tamu="selectedPeserta" :isEdit="isEdit"
+          @close="showModal = false" @refresh="fetchData" />
       </section>
     </div>
   </div>
@@ -271,7 +226,7 @@ async function loadFilters() {
       const instansiRes = await mainApi.get('tamu/field/instansi')
       listInstansi.value = instansiRes.data.map(i => i.asal_instansi)
     }
-  } catch(err) {
+  } catch (err) {
     showNotification('error', 'Gagal memuat filter.')
   }
 }
@@ -293,29 +248,29 @@ async function fetchData() {
     isLoading.value = true
     const token = localStorage.getItem('token') || ''; // Ambil token dari Local Storage
 
-    const endpoint = currentView.value === 'mahasiswa' 
-    ? 'mahasiswa/pagination' 
-    : 'tamu/pagination'
-    
+    const endpoint = currentView.value === 'mahasiswa'
+      ? 'mahasiswa/pagination'
+      : 'tamu/pagination'
+
     const { data } = await mainApi.get(endpoint, {
-      params: { 
-        search: search.value || undefined, 
-        page: page.value, 
+      params: {
+        search: search.value || undefined,
+        page: page.value,
         limit: limit,
         filter: currentView.value === 'mahasiswa' ? filterMahasiswa.value : undefined,
         instansi: currentView.value === 'tamu' ? filterInstansi.value : undefined
-       },
+      },
       // AKTIFKAN DAN PERBAIKI HEADER UNTUK MENGIRIM TOKEN
       headers: { Authorization: `Bearer ${token}` }
     })
-    
+
     dataList.value = data.data || []
   } catch (err) {
     // Tambahkan penanganan khusus untuk 401
     if (err.response?.status === 401) {
-        showNotification('error', 'Sesi berakhir atau tidak terautentikasi. Silakan login ulang.');
+      showNotification('error', 'Sesi berakhir atau tidak terautentikasi. Silakan login ulang.');
     } else {
-        showNotification('error', err.response?.data?.message || `Gagal memuat data ${currentView.value}`);
+      showNotification('error', err.response?.data?.message || `Gagal memuat data ${currentView.value}`);
     }
     dataList.value = []
   } finally {
@@ -329,7 +284,7 @@ function applyFilter() {
 }
 
 // Ganti tab
-function changeView(view) {
+const changeView = (view) => {
   if (currentView.value !== view) {
     currentView.value = view
     search.value = ''
@@ -369,7 +324,7 @@ async function hapusPeserta(item) {
   try {
     // Tambahkan header Authorization saat delete
     await mainApi.delete(`${endpoint}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` }
     })
     showNotification('success', `${entityName} berhasil dihapus.`)
     fetchData()
@@ -398,13 +353,14 @@ onMounted(() => {
 .bg-blue-600 {
   background-color: #2563eb;
 }
+
 .shadow-lg {
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.5), 0 4px 6px -2 rgba(37, 99, 235, 0.05);
 }
 
 select option {
-    color: black; 
-    background-color: white; /* Opsional: Memastikan latar belakang option putih */
+  color: black;
+  background-color: white;
+  /* Opsional: Memastikan latar belakang option putih */
 }
-
 </style>

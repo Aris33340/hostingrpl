@@ -2,10 +2,8 @@
   <div class="page-container">
 
     <!-- Tombol Kembali -->
-    <button
-      @click="goBack"
-      class="absolute top-6 left-6 px-4 py-2 rounded-full bg-black text-white shadow hover:bg-gray-800 transition"
-    >
+    <button @click="goBack"
+      class="absolute top-6 left-6 px-4 py-2 rounded-full bg-black text-white shadow hover:bg-gray-800 transition">
       ← Kembali
     </button>
 
@@ -23,19 +21,10 @@
             <input type="file" accept=".pdf" @change="handlePdfUpload" hidden />
           </label>
 
-          <input
-            v-model="search"
-            type="text"
-            placeholder="File"
-            class="search-input"
-          />
+          <input v-model="search" type="text" placeholder="File" class="search-input" />
 
           <div class="file-list">
-            <div
-              v-for="(f, idx) in filteredFiles"
-              :key="idx"
-              class="file-item"
-            >
+            <div v-for="(f, idx) in filteredFiles" :key="idx" class="file-item">
               {{ f }}
             </div>
 
@@ -49,27 +38,14 @@
         <div class="right-panel">
 
           <label>Subjek Email</label>
-          <input
-            v-model="form.subject"
-            class="input-box"
-            type="text"
-            placeholder="Masukkan subjek email"
-          />
+          <input v-model="form.subject" class="input-box" type="text" placeholder="Masukkan subjek email" />
 
           <label>Penerima</label>
-          <input
-            v-model="form.to"
-            class="input-box"
-            type="text"
-            placeholder="contoh: tamu1@gmail.com, tamu2@gmail.com"
-          />
+          <input v-model="form.to" class="input-box" type="text"
+            placeholder="contoh: tamu1@gmail.com, tamu2@gmail.com" />
 
           <label>Isi Pesan</label>
-          <textarea
-            v-model="form.body"
-            class="textarea-box"
-            placeholder="Tulis isi pesan undangan..."
-          ></textarea>
+          <textarea v-model="form.body" class="textarea-box" placeholder="Tulis isi pesan undangan..."></textarea>
 
           <!-- ATTACHMENT BOX -->
           <div class="mb-6">

@@ -27,7 +27,7 @@ const route = useRoute();
 const path = route.fullPath || '';
 
 function goHome() {
-    router.push({ name: 'ManajemenMahasiswa' }).catch(() => {});
+    router.push({ name: 'ManajemenMahasiswa' }).catch(() => { });
 }
 
 function goBack() {
