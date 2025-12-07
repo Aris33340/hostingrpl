@@ -314,14 +314,14 @@
 
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700">Orientation</label>
-                            <input type="number" :value="Math.floor(selectedObject.rotation)" @input="updateObjectTransform(selectedObjectId, {
+                            <input type="number" :value="Math.floor(selectedObject?.rotation)" @input="updateObjectTransform(selectedObjectId, {
                                 rotation: Math.min(360, Math.max(0, Number($event.target.value)))
                             })" class=" mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
                         </div>
 
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700">X Coordinate</label>
-                            <input type="number" :value="Math.floor(selectedObject.x)"
+                            <input type="number" :value="Math.floor(selectedObject?.x)"
                                 @input="updateObjectTransform(selectedObjectId, { x: $event.target.value })"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
                         </div>
@@ -493,9 +493,9 @@ const pageTemplate = ref([]);
 
 // --- State: Editor Objects ---
 const objects = ref([
-    { id: 1001, type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, pageNumber: 1, props: { font: 'Arial', content: 'testtt', fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } } }
+    // { id: 1001, type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, pageNumber: 1, props: { font: 'Arial', content: 'testtt', fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } } }
 ]);
-const selectedObjectId = ref(1001);
+const selectedObjectId = ref(null);
 const editingObjectId = ref(null);
 const selectedObject = computed(() => objects.value.find(obj => obj.id === selectedObjectId.value));
 const newObject = ref([{ id: 0, type: 'field', x: 0, y: 0 }]); // Ref placeholder
