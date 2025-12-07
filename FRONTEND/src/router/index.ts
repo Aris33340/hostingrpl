@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from "vue-router";
 
-import ManajemenMahasiswa from "../views/ManajemenMahasiswa.vue";
+import ManajemenPeserta from "../views/ManajemenPeserta.vue";
 import Login from "../views/Login.vue";
 import QrGenerator from "../components/QrGenerator.vue";
 import FileManager from "../views/FileManager.vue";
@@ -56,10 +56,10 @@ const routes = [
   },
 
   {
-    path: "/manajemen-mahasiswa",
-    name: "ManajemenMahasiswa",
-    component: ManajemenMahasiswa,
-    meta: { title: "Manajemen Mahasiswa", icon: UserIcon, showInNavbar: true, requiresAuth: true },
+    path: "/manajemen-peserta",
+    name: "ManajemenPeserta",
+    component: ManajemenPeserta,
+    meta: { title: "Manajemen Peserta", icon: UserIcon, showInNavbar: true, requiresAuth: true },
   },
 
   // DASHBOARD UNDANGAN (TAB MENU)

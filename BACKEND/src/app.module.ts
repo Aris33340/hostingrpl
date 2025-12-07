@@ -6,7 +6,9 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/auth.middleware';
+import { TamuService } from './tamu/tamu.service';
 import { PrismaService } from './prisma/prisma.service';
+import { TamuModule } from './tamu/tamu.module';
 import { ScanModule } from './scan/scan.module';
 import { ScanController } from './scan/scan.controller';
 import { MahasiswaModule } from './mahasiswa/mahasiswa.module';
@@ -19,6 +21,7 @@ import { EditorModule } from './editor/editor.module';
 import { QRModule } from './qr/qr.module';
 import { PesertaModule } from './peserta/peserta.module';
 import { TestingModule } from './testing/testing.module';
+import { QrCodeService } from './scan/qr/qr.service';
 
 import { InvitationModule } from './invitation/invitation.module';//baru
 
@@ -58,3 +61,4 @@ export class AppModule {
       .forRoutes('*');
   }
 }
+

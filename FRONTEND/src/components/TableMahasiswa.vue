@@ -8,6 +8,7 @@
           <th class="p-3 border-b text-left">Prodi</th>
           <th class="p-3 border-b text-left">Kelas</th>
           <th class="p-3 border-b text-left">No. Telp</th>
+          <th class="p-3 border-b text-left">Daerah Asal</th>
           <th class="p-3 border-b text-left">Penempatan</th>
           <th class="p-3 border-b text-left">Judul Skripsi</th>
           <th class="p-3 border-b text-left">Pembimbing</th>
@@ -23,13 +24,14 @@
           <td class="p-3 border-b">{{ m.prodi || '-' }}</td>
           <td class="p-3 border-b">{{ m.kelas || '-' }}</td>
           <td class="p-3 border-b">{{ m.no_telp || '-' }}</td>
+          <td class="p-3 border-b">{{ m.daerah_asal || '-' }}</td>
           <td class="p-3 border-b">{{ m.daerah_penempatan || '-' }}</td>
           <td class="p-3 border-b truncate max-w-[220px]">{{ m.judul_skripsi || '-' }}</td>
           <td class="p-3 border-b">{{ m.dosen_pembimbing || '-' }}</td>
           <td class="p-3 border-b">{{ m.nama_orang_tua || '-' }}</td>
           <td class="p-3 border-b text-center">
             <button @click="$emit('edit', m)" class="px-2 py-1 rounded-md bg-yellow-400 hover:bg-yellow-500 text-white mr-2">✏️</button>
-            <button @click="$emit('hapus', m.nim)" class="px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white">🗑️</button>
+            <button @click="$emit('hapus', m)" class="px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white">🗑️</button>
           </td>
         </tr>
       </tbody>
