@@ -5,7 +5,9 @@
     <Navbar v-if="!$route.meta.hideSidebar" />
 
     <main class="main-content">
-      <router-view />
+      <transition name="fade" mode="out-in">
+        <router-view />
+      </transition>
     </main>
 
     <Notification :show="notification.show" :type="notification.type" :message="notification.message"
@@ -37,5 +39,21 @@ import Loading from './components/Loading.vue';
 */
 .main-content {
   width: 100vw;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+  transform: translateY(0px);
 }
 </style>
