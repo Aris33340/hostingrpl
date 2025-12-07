@@ -20,6 +20,7 @@ import { QRModule } from './qr/qr.module';
 import { PesertaModule } from './peserta/peserta.module';
 import { TestingModule } from './testing/testing.module';
 
+import { InvitationModule } from './invitation/invitation.module';//baru
 
 @Module({
 
@@ -35,7 +36,8 @@ import { TestingModule } from './testing/testing.module';
     EditorModule,
     QRModule,
     PesertaModule,
-    TestingModule
+    TestingModule,
+    InvitationModule, //baru 
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],
