@@ -1,12 +1,9 @@
-// src/stores/authStore.ts
+// src/stores/authStore.ts (atau auth.ts)
 
 import { defineStore } from 'pinia';
 import { authApi } from '../api';
 import { jwtDecode } from 'jwt-decode';
 import type { JwtPayload } from 'jwt-decode';
-// import type { PdfEditRequestDto, EditablePage, EditorElement } from '@/types/editorDto';
-
-
 
 interface MyJwtPayload extends JwtPayload {
   email: string;
@@ -27,10 +24,23 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isAuthenticated: (state) => !!(state.access_token ?? localStorage.getItem("access_token")),
+    
     authHeader: (state) => {
       const token = state.access_token ?? localStorage.getItem("access_token");
       return token ? { Authorization: `Bearer ${token}` } : {};
     },
+
+    // --- TAMBAHAN PENTING (Agar router bisa baca role) ---
+    user: (state): MyJwtPayload | null => {
+      const token = state.access_token ?? localStorage.getItem("access_token");
+      if (!token) return null;
+      
+      try {
+        return jwtDecode<MyJwtPayload>(token);
+      } catch (error) {
+        return null;
+      }
+    }
   },
 
   actions: {
@@ -66,6 +76,8 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Action ini opsional jika sudah ada getter 'user', 
+    // tapi boleh disimpan jika dipakai di komponen lain.
     getPayload(): MyJwtPayload {
       const access_token = this.access_token ?? localStorage.getItem("access_token");
       if (!access_token) {
@@ -91,8 +103,11 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem("access_token");
       this.access_token = null;
     },
+    
     logout() {
       this.clearAuthData();
+      // Opsional: reload halaman atau redirect paksa
+      // window.location.href = '/login'; 
     }
   },
 });

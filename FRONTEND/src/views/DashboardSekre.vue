@@ -1,56 +1,55 @@
 <template>
-  <div class="relative min-h-screen w-full overflow-x-hidden">
-    <!-- HEADER ATAS -->
-    <div class="pt-6 px-10 ml-24">
-      <div
-        class="w-full flex justify-between items-center bg-white/95 rounded-[999px] px-6 py-3 shadow-md"
-      >
-        <div class="font-semibold text-[#23408e] text-lg">Beranda</div>
-        <div class="flex items-center gap-2">
-          <span class="text-gray-700 text-sm md:text-base">Halo, Admin!</span>
-        </div>
-      </div>
-    </div>
+  <div class="relative w-full min-h-screen overflow-hidden">
+    <img
+      src="@/assets/images/Background.png"
+      class="fixed top-0 left-0 w-full h-full object-cover z-0"
+      alt="Background"
+    />
 
-    <!-- KONTEN UTAMA -->
-    <div class="px-10 pb-10 pt-6 ml-24 space-y-6">
+    <div class="relative z-10 p-8 pt-10 ml-20">
       
-      <!-- 1. HERO SECTION (Orang dengan Toga) -->
-      <section
-        class="bg-white rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-12 py-10 mt-4"
+      <div
+        class="bg-white rounded-xl p-4 flex justify-between items-center shadow-md mb-6"
       >
-        <!-- Judul -->
+        <h2 class="text-xl font-bold text-[#2e3e85] pl-2">Beranda Sekretariat</h2>
+        <span class="text-gray-600 pr-2">Halo, Admin!</span>
+      </div>
+
+      <section
+        class="bg-white rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-6 md:px-12 py-10 mt-2"
+      >
         <div class="text-center mb-6">
-          <h1 class="text-3xl md:text-4xl font-extrabold text-[#202020]">
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#202020]">
             Selamat Datang di Dashboard Wisuda!!!
           </h1>
-          <p class="mt-3 text-base md:text-lg text-gray-600 leading-relaxed">
+          <p class="mt-3 text-sm md:text-base lg:text-lg text-gray-600 leading-relaxed">
             Kelola seluruh kegiatan wisuda dengan mudah dan efisien.<br />
-            Mulai dari presensi hingga pembuatan buku wisuda.
+            Mulai dari presensi hingga manajemen undangan.
           </p>
         </div>
 
-        <!-- Konten Utama: Ilustrasi & Slider -->
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-10 px-6">
-          <!-- FIGURE BESAR -->
-          <div class="flex-1 flex justify-center items-end gap-3 mt-[-15px]">
+        <div
+          class="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10 px-2 md:px-6"
+        >
+          <div
+            class="flex-1 flex justify-center items-end gap-2 md:gap-3 mt-[-15px]"
+          >
             <img
               :src="cowoImg"
-              class="w-[300px] md:w-[330px] object-contain drop-shadow-2xl"
+              class="w-[160px] md:w-[200px] lg:w-[300px] object-contain drop-shadow-2xl"
             />
             <img
               :src="ceweImg"
-              class="w-[300px] md:w-[330px] object-contain drop-shadow-2xl"
+              class="w-[160px] md:w-[200px] lg:w-[300px] object-contain drop-shadow-2xl"
             />
           </div>
 
-          <!-- SLIDER FOTO WISUDA -->
-          <div class="flex-1 flex justify-center">
+          <div class="flex-1 flex justify-center w-full">
             <div
-              class="relative bg-white rounded-[24px] shadow-[0_12px_30px_rgba(0,0,0,0.20)] overflow-hidden w-full max-w-2xl h-[360px] md:h-[400px]"
+              class="relative bg-white rounded-[24px] shadow-[0_12px_30px_rgba(0,0,0,0.20)] overflow-hidden w-full max-w-2xl h-[300px] md:h-[320px] lg:h-[360px]"
             >
               <button
-                class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-black text-3xl font-bold hover:bg-gray-200 active:scale-95 transition"
+                class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-black text-2xl md:text-3xl font-bold hover:bg-gray-200 active:scale-95 transition"
                 @click="prevSlide"
               >
                 ‹
@@ -63,7 +62,7 @@
               />
 
               <button
-                class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-black text-3xl font-bold hover:bg-gray-200 active:scale-95 transition"
+                class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-black text-2xl md:text-3xl font-bold hover:bg-gray-200 active:scale-95 transition"
                 @click="nextSlide"
               >
                 ›
@@ -73,7 +72,7 @@
                 <span
                   v-for="(slide, i) in slides"
                   :key="slide.id"
-                  class="w-3 h-3 rounded-full transition"
+                  class="w-2 h-2 md:w-3 md:h-3 rounded-full transition"
                   :class="i === activeIndex ? 'bg-[#377dff]' : 'bg-white/70 border border-gray-300'"
                 />
               </div>
@@ -82,7 +81,6 @@
         </div>
       </section>
 
-      <!-- CARD QUICK STATS -->
       <section class="mt-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
           <StatCard title="TOTAL" subtitle="PESERTA WISUDA" :value="totalPesertaWisuda" />
@@ -92,9 +90,8 @@
         </div>
       </section>
 
-      <!-- 2. RINGKASAN STATISTIK (SCROLL DOWN) -->
       <section class="mt-8 pb-10" id="statistik">
-        <div class="bg-white/90 rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-8 py-8">
+        <div class="bg-white/95 rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-8 py-8">
           <div class="text-center mb-8">
             <h2 class="text-2xl font-bold text-[#202020]">Ringkasan Statistik</h2>
             <p class="mt-1 text-sm md:text-base text-gray-600">
@@ -104,15 +101,12 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
-            <!-- A. TOTAL PESERTA (DIAGRAM DONAT) -->
-            <!-- Link: Manajemen Mahasiswa (/manajemen-mahasiswa) -->
             <div class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col min-h-[300px]">
               <div class="flex justify-between items-start mb-4">
                 <div>
                   <h3 class="font-bold text-gray-800">Total Peserta</h3>
                   <p class="text-[11px] text-gray-500">Gabungan Mahasiswa & Tamu</p>
                 </div>
-                <!-- Link ke /manajemen-mahasiswa -->
                 <button @click="goToPage('/manajemen-mahasiswa')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
@@ -138,15 +132,12 @@
               </div>
             </div>
 
-            <!-- B. DIAGRAM BATANG KEHADIRAN MAHASISWA PER PRODI -->
-            <!-- Link: Dashboard Petugas Scanner (/petugas) -->
             <div class="bg-white rounded-[24px] shadow px-6 py-6 min-h-[300px]">
               <div class="flex justify-between items-start mb-4">
                 <div>
                   <h3 class="font-bold text-gray-800">Kehadiran Mahasiswa per Prodi</h3>
                   <p class="text-[11px] text-gray-500">Gladi Wisuda vs Wisuda</p>
                 </div>
-                <!-- Link ke /petugas -->
                 <button @click="goToPage('/petugas')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
@@ -185,12 +176,9 @@
               </div>
             </div>
 
-            <!-- C. DIAGRAM LINGKARAN TAMU (HADIR/BELUM) -->
-            <!-- Link: Dashboard Petugas Scanner (/petugas) -->
             <div class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col items-center">
               <div class="w-full flex justify-between items-start mb-2">
                 <h3 class="font-bold text-gray-800 text-sm">Kehadiran Tamu</h3>
-                <!-- Link ke /petugas -->
                 <button @click="goToPage('/petugas')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
@@ -214,12 +202,9 @@
               </div>
             </div>
 
-            <!-- D. TOTAL UNDANGAN MAHASISWA -->
-            <!-- Link: Manajemen Undangan (/manajemen-undangan) -->
             <div class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col items-center">
               <div class="w-full flex justify-between items-start mb-2">
                 <h3 class="font-bold text-gray-800 text-sm">Undangan Mahasiswa</h3>
-                <!-- Link ke /manajemen-undangan -->
                 <button @click="goToPage('/manajemen-undangan')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
@@ -241,12 +226,9 @@
               </div>
             </div>
 
-             <!-- E. TOTAL UNDANGAN TAMU -->
-             <!-- Link: Manajemen Undangan (/manajemen-undangan) -->
              <div class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col items-center lg:col-span-2 xl:col-span-1">
               <div class="w-full flex justify-between items-start mb-2">
                 <h3 class="font-bold text-gray-800 text-sm">Undangan Tamu</h3>
-                <!-- Link ke /manajemen-undangan -->
                 <button @click="goToPage('/manajemen-undangan')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
@@ -436,3 +418,6 @@ const StatCard = {
   `
 }
 </script>
+
+<style scoped>
+</style>

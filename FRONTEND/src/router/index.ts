@@ -1,7 +1,15 @@
-import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from "vue-router";
+import { 
+  createRouter, 
+  createWebHistory, 
+  type RouteLocationNormalized, 
+  type NavigationGuardNext 
+} from "vue-router";
 
-import ManajemenMahasiswa from "../views/ManajemenMahasiswa.vue";
+
+import { useAuthStore } from "../stores/authStore";
+
 import Login from "../views/Login.vue";
+import ManajemenMahasiswa from "../views/ManajemenMahasiswa.vue";
 import QrGenerator from "../components/QrGenerator.vue";
 import FileManager from "../views/FileManager.vue";
 import PetugasDashboard from "../views/PetugasDashboard.vue";
@@ -10,9 +18,15 @@ import ManajemenUndangan from "../views/ManajemenUndangan.vue";
 import SuperAdminDashboard from "../views/SuperAdminDashboard.vue";
 import DashboardSekre from "../views/DashboardSekre.vue";
 import DashboardBuku from "../views/DashboardBuku.vue";
-import { UserIcon, QrCodeIcon, UploadIcon, MailIcon, HomeIcon } from "lucide-vue-next";
-import { useAuthStore } from "../stores/authStore";
 import NotFound from "../views/NotFound.vue";
+
+import {
+  UserIcon,
+  QrCodeIcon,
+  UploadIcon,
+  MailIcon,
+  HomeIcon,
+} from "lucide-vue-next";
 
 const routes = [
   // LOGIN
@@ -23,103 +37,138 @@ const routes = [
     meta: { title: "Login", showNavbar: false, requiresAuth: false },
   },
 
-  // --- 2. ROUTE UTAMA SUPER ADMIN (PILIH AKTOR) ---
+  // --- SUPER ADMIN (PILIH AKTOR) ---
   {
     path: "/",
     name: "SuperAdminDashboard",
     component: SuperAdminDashboard,
-    // showNavbar: false agar layar penuh saat memilih aktor
-    meta: { title: "Super Admin", showNavbar: false, requiresAuth: true },
+    meta: {
+      title: "Super Admin",
+      showNavbar: false,
+      requiresAuth: true,
+    },
   },
 
-  // --- 3. DASHBOARD KESEKRETARIATAN ---
+  // --- DASHBOARD KESEKRETARIATAN ---
   {
     path: "/dashboard-sekre",
     name: "DashboardSekre",
     component: DashboardSekre,
-    // showInNavbar: true agar muncul 'Beranda' di sidebar saat masuk sini
-    meta: { title: "Beranda", icon: HomeIcon, showInNavbar: true, requiresAuth: true },
+    meta: {
+      title: "Beranda",
+      icon: HomeIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+    },
   },
 
-  // --- 4. DASHBOARD BUKU WISUDA (UPDATE BARU) ---
+  // --- DASHBOARD BUKU WISUDA ---
   {
     path: "/dashboard-buku",
     name: "DashboardBuku",
-    component: DashboardBuku, // Sekarang mengarah ke file DashboardBuku.vue yang benar
-    // showInNavbar: true agar muncul 'Beranda' di sidebar saat masuk sini
-    meta: { title: "Beranda Buku", icon: HomeIcon, showInNavbar: true, requiresAuth: true },
+    component: DashboardBuku,
+    meta: {
+      title: "Beranda Buku Wisuda",
+      icon: HomeIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+    },
   },
-  // -------------------------------------------
 
+  // MANAJEMEN MAHASISWA
   {
     path: "/manajemen-mahasiswa",
     name: "ManajemenMahasiswa",
     component: ManajemenMahasiswa,
-    meta: { title: "Manajemen Mahasiswa", icon: UserIcon, showInNavbar: true, requiresAuth: true },
+    meta: {
+      title: "Manajemen Mahasiswa",
+      icon: UserIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+    },
   },
 
-  // DASHBOARD UNDANGAN
+  // MANAJEMEN UNDANGAN
   {
     path: "/manajemen-undangan",
     name: "ManajemenUndangan",
     component: ManajemenUndangan,
-    meta: { title: "Manajemen Undangan", icon: MailIcon, showInNavbar: true, requiresAuth: true },
+    meta: {
+      title: "Manajemen Undangan",
+      icon: MailIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+    },
   },
 
-  // UNDANGAN MAHASISWA
-  {
-    path: "/manajemen-undangan-mahasiswa",
-    name: "ManajemenUndanganMahasiswa",
-    component: () => import("../views/ManajemenUndanganMahasiswa.vue"),
-    meta: { title: "Undangan Mahasiswa", showNavbar: false, requiresAuth: true },
-  },
-
-  // UNDANGAN TAMU
-  {
-    path: "/manajemen-undangan-tamu",
-    name: "ManajemenUndanganTamu",
-    component: () => import("../views/ManajemenUndanganTamu.vue"),
-    meta: { title: "Undangan Tamu", showNavbar: false, requiresAuth: true },
-  },
-
-  // FILE MANAGER
+  // FILE
   {
     path: "/input-file",
     name: "FileManager",
     component: FileManager,
-    meta: { title: "Input File", icon: UploadIcon, showInNavbar: true, requiresAuth: true },
+    meta: {
+      title: "Input File",
+      icon: UploadIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+    },
   },
+
+  // QR
   {
     path: "/generate-qr",
     name: "QrGenerator",
     component: QrGenerator,
-    meta: { title: "Generate QR", icon: QrCodeIcon, showInNavbar: true, requiresAuth: true },
+    meta: {
+      title: "Generate QR",
+      icon: QrCodeIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+    },
   },
+
+  // PETUGAS SCANNER
   {
     path: "/petugas",
     name: "DashboardPetugas",
     component: PetugasDashboard,
-    meta: { title: "Dashboard Petugas Scanner", icon: QrCodeIcon, showInNavbar: true, requiresAuth: true },
+    meta: {
+      title: "Dashboard Petugas Scanner",
+      icon: QrCodeIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+    },
   },
+
+  // EDITOR
   {
     path: "/editor",
     name: "Editor STIS GRAD",
     component: Editor,
-    meta: { title: "Editor STIS GRAD", icon: UserIcon, showInNavbar: true, requiresAuth: true, showNavbar: false },
-    beforeEnter: (to: any, from: any, next: any) => {
+    meta: {
+      title: "Editor STIS GRAD",
+      icon: UserIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+      showNavbar: false,
+    },
+    // Menambahkan tipe data untuk to, from, next
+    beforeEnter: (to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
       if (!to.query.fileId) {
         next({ name: "FileManager" });
       } else {
         next();
       }
-    }
+    },
   },
+
+  // NOT FOUND
   {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: NotFound,
     meta: { title: "Not Found", showNavbar: false },
-  }
+  },
 ];
 
 const router = createRouter({
@@ -127,16 +176,25 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, from, next) => {
+/**
+ * GLOBAL GUARD
+ */
+router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const authStore = useAuthStore();
   const isAuth = authStore.isAuthenticated;
+  const userRole = authStore.user?.role; 
 
+  // 1. Cek jika butuh login tapi belum login
   if (to.meta.requiresAuth && !isAuth) {
     return next("/login");
   }
 
-  if (to.path === "/login" && isAuth) {
-    return next("/");
+  // 2. Logika jika user SUDAH LOGIN
+  if (isAuth) {
+    
+    if (to.path === "/" && userRole !== "SUPERADMIN") {
+       return next("/login");
+    }
   }
 
   return next();

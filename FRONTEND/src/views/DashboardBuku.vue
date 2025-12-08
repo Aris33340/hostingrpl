@@ -1,6 +1,5 @@
 <template>
   <div class="relative w-full min-h-screen overflow-hidden">
-    <!-- Background -->
     <img
       src="@/assets/images/Background.png"
       class="fixed top-0 left-0 w-full h-full object-cover z-0"
@@ -8,7 +7,6 @@
     />
 
     <div class="relative z-10 p-8 pt-10 ml-20">
-      <!-- HEADER ATAS -->
       <div
         class="bg-white rounded-xl p-4 flex justify-between items-center shadow-md mb-6"
       >
@@ -16,79 +14,70 @@
         <span class="text-gray-600 pr-2">Halo, Admin!</span>
       </div>
 
-      <!-- HERO: JUDUL + ILUSTRASI + SLIDER -->
       <section
-        class="bg-white rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-12 py-10 mt-2"
+        class="bg-white rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-6 md:px-12 py-10 mt-2"
       >
-        <!-- Judul -->
         <div class="text-center mb-6">
-          <h1 class="text-3xl md:text-4xl font-extrabold text-[#202020]">
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#202020]">
             Selamat Datang di Dashboard Wisuda!!!
           </h1>
-          <p class="mt-3 text-base md:text-lg text-gray-600 leading-relaxed">
+          <p class="mt-3 text-sm md:text-base lg:text-lg text-gray-600 leading-relaxed">
             Kelola seluruh kegiatan wisuda dengan mudah dan efisien.<br />
             Mulai dari presensi hingga penyusunan buku wisuda.
           </p>
         </div>
 
-        <!-- Konten utama -->
         <div
-          class="flex flex-col lg:flex-row items-center justify-between gap-10 px-6"
+          class="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10 px-2 md:px-6"
         >
-          <!-- FIGURE MAHASISWA -->
           <div
-            class="flex-1 flex justify-center items-end gap-3 mt-[-15px]"
+            class="flex-1 flex justify-center items-end gap-2 md:gap-3 mt-[-15px]"
           >
             <img
               :src="cowoImg"
-              class="w-[260px] md:w-[300px] object-contain drop-shadow-2xl"
+              class="w-[160px] md:w-[200px] lg:w-[300px] object-contain drop-shadow-2xl"
             />
             <img
               :src="ceweImg"
-              class="w-[260px] md:w-[300px] object-contain drop-shadow-2xl"
+              class="w-[160px] md:w-[200px] lg:w-[300px] object-contain drop-shadow-2xl"
             />
           </div>
 
-          <!-- SLIDER FOTO WISUDA -->
-          <div class="flex-1 flex justify-center">
+          <div class="flex-1 flex justify-center w-full">
             <div
-              class="relative bg-white rounded-[24px] shadow-[0_12px_30px_rgba(0,0,0,0.20)] overflow-hidden w-full max-w-2xl h-[320px] md:h-[360px]"
+              class="relative bg-white rounded-[24px] shadow-[0_12px_30px_rgba(0,0,0,0.20)] overflow-hidden w-full max-w-2xl h-[300px] md:h-[320px] lg:h-[360px]"
             >
-              <!-- Panah kiri -->
               <button
-                class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full shadow-lg
-                       flex items-center justify-center text-black text-3xl font-bold
+                class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 bg-white rounded-full shadow-lg
+                       flex items-center justify-center text-black text-2xl md:text-3xl font-bold
                        hover:bg-gray-200 active:scale-95 transition"
                 @click="prevSlide"
               >
                 ‹
               </button>
 
-              <!-- Foto aktif -->
               <img
                 :src="activeSlide.src"
                 :alt="activeSlide.alt"
                 class="w-full h-full object-cover"
               />
 
-              <!-- Panah kanan -->
               <button
-                class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full shadow-lg
-                       flex items-center justify-center text-black text-3xl font-bold
+                class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 bg-white rounded-full shadow-lg
+                       flex items-center justify-center text-black text-2xl md:text-3xl font-bold
                        hover:bg-gray-200 active:scale-95 transition"
                 @click="nextSlide"
               >
                 ›
               </button>
 
-              <!-- Dots indikator -->
               <div
                 class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20"
               >
                 <span
                   v-for="(slide, i) in slides"
                   :key="slide.id"
-                  class="w-3 h-3 rounded-full transition"
+                  class="w-2 h-2 md:w-3 md:h-3 rounded-full transition"
                   :class="
                     i === activeIndex
                       ? 'bg-[#377dff]'
@@ -101,7 +90,6 @@
         </div>
       </section>
 
-      <!-- KARTU RINGKASAN ATAS (2 BUAH) -->
       <section class="mt-4">
         <div
           class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center"
@@ -119,14 +107,12 @@
         </div>
 
         <div class="mt-2 text-xs h-4">
-          <!-- Loading state tetap ditampilkan jika perlu, tapi error merah dihapus -->
           <span v-if="isLoading" class="text-gray-500">
             Memuat data ringkasan...
           </span>
         </div>
       </section>
 
-      <!-- RINGKASAN STATISTIK (SCROLL KE BAWAH) -->
       <section class="mt-8 pb-10">
         <div
           class="bg-white/95 rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-8 py-8"
@@ -142,8 +128,6 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Donut: Total Template/File berdasarkan jenis -->
-            <!-- Link: /input-file -->
             <div class="bg-white rounded-[24px] shadow px-4 py-4 flex flex-col">
               <div class="flex justify-between items-center mb-2">
                 <h3 class="font-semibold text-sm">
@@ -184,8 +168,6 @@
               </div>
             </div>
 
-            <!-- Bar: Mahasiswa berdasarkan Prodi -->
-            <!-- Link: /manajemen-mahasiswa -->
             <div class="bg-white rounded-[24px] shadow px-4 py-4">
               <div class="flex justify-between items-center mb-2">
                 <h3 class="font-semibold text-sm">
@@ -271,7 +253,6 @@ const prevSlide = () => {
 
 /* ================= DATA RINGKASAN ================= */
 const isLoading = ref(false)
-// const error = ref('') // Tidak dipakai di template lagi untuk menghindari tulisan merah
 
 const totalMahasiswa = ref(0)
 const totalTemplateBuku = ref(0)
@@ -282,26 +263,41 @@ const listFiles = ref([])
 
 async function fetchSummary() {
   isLoading.value = true
-  // error.value = ''
 
   try {
-    // 1. Ambil Data Mahasiswa (Endpoint 'Get All')
+    // 1. Ambil Data Mahasiswa
     const { data: mhs } = await mainApi.get('mahasiswa')
-    // Handle jika response {data: [...]} atau langsung array [...]
     const arrMhs = Array.isArray(mhs) ? mhs : mhs?.data || []
     listMahasiswa.value = arrMhs
     totalMahasiswa.value = arrMhs.length
 
-    // 2. Ambil Data File / Template (Endpoint '/files' dari FileManager)
-    const { data: files } = await mainApi.get('files')
-    const arrFiles = Array.isArray(files) ? files : files?.data || []
-    listFiles.value = arrFiles
-    totalTemplateBuku.value = arrFiles.length
+    // 2. Ambil Data File (PERBAIKAN UTAMA DI SINI)
+    // Karena backend error jika type kosong, kita request per tipe (pdf dan image) lalu digabung.
+    const [resPdf, resImg] = await Promise.allSettled([
+      mainApi.get('files?type=pdf'),
+      mainApi.get('files?type=image')
+    ])
+
+    let combinedFiles = []
+    
+    // Gabungkan hasil PDF jika sukses
+    if (resPdf.status === 'fulfilled' && Array.isArray(resPdf.value.data)) {
+      combinedFiles = [...combinedFiles, ...resPdf.value.data]
+    }
+    
+    // Gabungkan hasil Image jika sukses
+    if (resImg.status === 'fulfilled' && Array.isArray(resImg.value.data)) {
+      combinedFiles = [...combinedFiles, ...resImg.value.data]
+    }
+
+    // Hilangkan duplikat jika ada (berdasarkan id_file)
+    const uniqueFiles = [...new Map(combinedFiles.map(item => [item.id_file, item])).values()]
+
+    listFiles.value = uniqueFiles
+    totalTemplateBuku.value = uniqueFiles.length
 
   } catch (err) {
     console.error('Gagal memuat data ringkasan:', err)
-    // error.value = 'Gagal memuat data ringkasan' 
-    // Kita suppress error display di UI sesuai request
   } finally {
     isLoading.value = false
   }
@@ -315,8 +311,6 @@ const getFileType = (fileName) => {
   const ext = fileName.split('.').pop().toLowerCase()
   if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'Gambar'
   if (ext === 'pdf') return 'PDF'
-  if (['doc', 'docx'].includes(ext)) return 'Word'
-  if (['xls', 'xlsx'].includes(ext)) return 'Excel'
   return 'Lainnya'
 }
 
@@ -342,7 +336,7 @@ const templateByJenis = computed(() => {
 // Donut Style
 const donutTemplateStyle = computed(() => {
   if (!templateByJenis.value.length) {
-    return { background: '#e5e7eb' } // abu-abu jika kosong
+    return { background: '#e5e7eb' }
   }
   const total = templateByJenis.value.reduce((s, t) => s + t.jumlah, 0) || 1
   let start = 0
@@ -360,11 +354,9 @@ const donutTemplateStyle = computed(() => {
 
 /* ================= STATISTIK MAHASISWA (PRODI) ================= */
 
-// Chart Data: Mahasiswa per Prodi
 const mahasiswaByProdiWithPercent = computed(() => {
   const map = {}
   for (const m of listMahasiswa.value) {
-    // Sesuaikan field prodi dari backend. Bisa string atau object.
     const prodi = m.prodi || 'Tanpa Prodi'
     if (!map[prodi]) map[prodi] = 0
     map[prodi]++
@@ -377,7 +369,6 @@ const mahasiswaByProdiWithPercent = computed(() => {
 
   if (!rows.length) return []
   
-  // Hitung persentase untuk lebar bar
   const max = Math.max(...rows.map((r) => r.jumlah)) || 1
   return rows.map((r) => ({
     ...r,
@@ -425,5 +416,4 @@ const StatCard = {
 </script>
 
 <style scoped>
-/* Tambahan styling */
 </style>
