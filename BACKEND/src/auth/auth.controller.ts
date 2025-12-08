@@ -79,8 +79,8 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       path: '/',
+      sameSite:'lax'
     });
-
     return { message: 'Logged out successfully' };
   }
 }

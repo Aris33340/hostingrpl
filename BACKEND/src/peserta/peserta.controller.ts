@@ -7,6 +7,11 @@ import { Prisma } from "@prisma/client";
 export class PesertaController {
     constructor(private pesertaService: PesertaService, private prisma: PrismaService) { }
 
+    /* Untuk mendapatkan nama kolom dari tabel mahasiswa atau tamu 
+    ** Request : GET localhost:3000/api/peserta/fields?table=mahasiswa
+    ** Request : GET localhost:3000/api/peserta/fields?table=tamu
+    ** Response : ['nama','nim',...]
+    */
     @Get('fields')
     async getFields(@Query('table') table: string) {
         const fields = await this.pesertaService.getFields(table);

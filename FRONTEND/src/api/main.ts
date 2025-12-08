@@ -7,15 +7,11 @@ const mainApi = axios.create({
   withCredentials: true,
 })
 
-
-
 mainApi.interceptors.request.use((config) => {
   const authStore = useAuthStore();
   Object.assign(config.headers, authStore.authHeader);
   return config;
 });
-
-
 
 mainApi.interceptors.response.use(
   (response) => {

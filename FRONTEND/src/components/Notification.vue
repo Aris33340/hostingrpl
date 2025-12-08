@@ -24,7 +24,7 @@
                 <!-- Text -->
                 <div class="flex-1">
                     <h3 class="text-white font-semibold mb-1">
-                        {{ type === 'success' ? 'Success' : 'Error' }}
+                        {{ type === 'success' ? 'Success' :  type === 'Error' ? 'Error' : 'Warning'}}
                     </h3>
                     <p class="text-white/90 text-sm">{{ message }}</p>
                 </div>

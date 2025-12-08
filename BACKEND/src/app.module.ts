@@ -20,7 +20,6 @@ import { PresensiModule } from './presensi/presensi/presensi.module';
 import { EditorModule } from './editor/editor.module';
 import { QRModule } from './qr/qr.module';
 import { PesertaModule } from './peserta/peserta.module';
-import { TestingModule } from './testing/testing.module';
 import { QrCodeService } from './scan/qr/qr.service';
 
 import { InvitationModule } from './invitation/invitation.module';//baru
@@ -39,7 +38,6 @@ import { InvitationModule } from './invitation/invitation.module';//baru
     EditorModule,
     QRModule,
     PesertaModule,
-    TestingModule,
     InvitationModule, //baru 
     TamuModule
   ],
@@ -58,6 +56,7 @@ export class AppModule {
         { path: 'auth/register', method: RequestMethod.POST },
         { path: 'auth/login', method: RequestMethod.POST },
         { path: 'auth/refresh', method: RequestMethod.POST },
+        { path: 'auth/logout', method: RequestMethod.POST },
       )
       .forRoutes('*');
   }

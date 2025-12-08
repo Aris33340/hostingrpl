@@ -2,12 +2,14 @@
   <div id="app" class="container">
     <Loading />
 
-    <Navbar v-if="!$route.meta.hideSidebar" />
+    <Sidebar v-if="!$route.meta.hideSidebar" />
 
     <main class="main-content">
-      <transition name="fade" mode="out-in">
-        <router-view />
-      </transition>
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
 
     <Notification :show="notification.show" :type="notification.type" :message="notification.message"
@@ -19,7 +21,7 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import Navbar from './components/Navbar.vue';
+import Sidebar from './components/SideBar.vue';
 import Notification from './components/Notification.vue';
 import { notification } from './composables/useNotification'
 import Modal from './components/Modal.vue';
@@ -40,6 +42,7 @@ import Loading from './components/Loading.vue';
 .main-content {
   width: 100vw;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;

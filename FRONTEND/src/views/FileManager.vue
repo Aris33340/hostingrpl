@@ -71,6 +71,7 @@
                     <span class="text-sm text-blue-300">{{ files.length }} items</span>
                 </div>
 
+                <!-- folder -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar">
                     <ul class="space-y-2">
                         <li v-for="file in files" :key="file.id_file"
@@ -128,19 +129,29 @@
                                 @click="toggleFolder(file.id_file)">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
                                             <path
                                                 d="M2 6a2 2 0 012-2h4l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
                                         </svg>
                                         <span class="text-sm text-white">{{ file.file_name }}</span>
                                     </div>
-
-                                    <svg class="w-4 h-4 text-white transition-transform"
-                                        :class="{ 'rotate-90': openFolders[file.id_file] }" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 5l7 7-7 7" />
-                                    </svg>
+                                    <div class="flex gap-2">
+                                        <button @click="deleteFile(file)"
+                                            class="p-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-300 transition-all duration-200"
+                                            title="Delete">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                        <svg class="w-4 h-4 text-white transition-transform"
+                                            :class="{ 'rotate-90': openFolders[file.id_file] }" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
 
@@ -159,7 +170,9 @@
                                                         d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z">
                                                     </path>
                                                 </svg>
-                                                <span class="text-sm text-white truncate block flex-1 min-w-0">{{child.file_name }}</span>
+                                                <span class="text-sm text-white truncate block flex-1 min-w-0">{{
+                                                    child.file_name
+                                                    }}</span>
                                             </div>
 
                                             <div class="flex items-center gap-1 ml-2">
@@ -268,7 +281,6 @@ const uploadFile = async () => {
         uploading.value = false
         uploadProgress.value = 0
         showNotification('error', 'Gagal upload: ' + (err.response?.data?.message || err.message))
-        console.log(err.response?.data?.message)
     }
 }
 
@@ -339,9 +351,6 @@ const loadFiles = async () => {
                 ...folder,
                 childs: res.data.filter(f => f.id_parent === folder.id_file)
             }))
-
-        console.log(JSON.stringify(fileMap))
-        // files.value = res.data.filter(e => e.id_parent == null)
         files.value = fileMap
     } catch {
         files.value = []

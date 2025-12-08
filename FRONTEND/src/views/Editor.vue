@@ -433,8 +433,8 @@
             </div>
         </div>
         <!-- ModalImage -->
+        <ConfigModal v-model:showModal="showConfigModal" @submit="handleConfig" />
     </div>
-    <ConfigModal v-model:showModal="showConfigModal" @submit="handleConfig" />
 </template>
 
 <script setup>
@@ -469,6 +469,7 @@ import ConfigModal from '../components/EditorComponents/ConfigModal.vue';
 import ControlPanel from '../components/EditorComponents/ControlPanel.vue';
 import DropDown from '../components/EditorComponents/DropDown.vue';
 import { useAuthStore } from '../stores/authStore';
+import router from '../router';
 
 // --- Configuration ---
 pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.mjs';
@@ -479,7 +480,12 @@ const authStore = useAuthStore();
 
 // --- State: PDF & Workspace ---
 let pdfDoc;
-const role = authStore.getPayload().role
+let role
+try{
+    role = authStore.getPayload().role
+}catch{
+    router.push('/login')
+}
 const pdfId = ref(route.query.fileId);
 const pdfFile = ref();
 const pageCount = ref();
@@ -1141,6 +1147,7 @@ const getTextStyle = (props) => {
 const saveDraft = () => {
     const draft = {
         'pdfId': pdfId.value,
+        'tableTypeSelected': tableTypeSelected.value,
         'editablePages': pageTemplate.value,
         'objects': objects.value
     }
@@ -1161,6 +1168,7 @@ const loadDraft = async (pdf_id) => {
     if (!draft) return;
 
     const obj = JSON.parse(JSON.stringify(draft.objects));
+    const draftParsed = JSON.parse(JSON.stringify(draft))
     if (Array.from(obj).find(e => e.type == 'qr')) {
         await loadQrSample();
     }
@@ -1169,7 +1177,8 @@ const loadDraft = async (pdf_id) => {
     }
     objects.value = obj
     pageTemplate.value = JSON.parse(JSON.stringify(draft.editablePages));
-
+    tableTypeSelected.value = draftParsed.tableTypeSelected
+   
     console.log('objects', objects.value);
     console.log('template', pageTemplate.value);
 };

@@ -2,7 +2,6 @@
     <div class="min-h-screen p-4 md:p-6 lg:p-8">
         <div class="mb-6">
             <h1 class="text-2xl md:text-3xl font-bold text-white">Dashboard Petugas Scanner</h1>
-            <p class="text-white text-sm md:text-base mt-1">Kelola presensi wisudawan secara realtime</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

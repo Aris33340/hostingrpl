@@ -70,19 +70,10 @@ const form = reactive({
 const error = ref();
 // Handle login
 async function handleLogin() {
-  show()
+  show( "Mencari Toga yang hilang ...")
   try {
     await auth.login(form.email, form.password, form.remember)
-    switch (auth.getPayload().role) {
-      case 'BUKUWISUDA':
-        return router.push({ name: 'DashboardBuku' })
-      case 'SUPERADMIN':
-        return router.push({ name: 'SuperAdminDashboard' })
-      case 'SEKRETARIAT':
-        return router.push({ name: 'DashboardSekre' })
-      default:
-        break;
-    }
+    router.push('/')
   } catch (err) {
     showNotification('error', 'Email atau Password anda salah')
   } finally {

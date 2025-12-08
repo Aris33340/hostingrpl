@@ -1,10 +1,10 @@
 <template>
-  <div class="relative w-full min-h-screen overflow-hidden bg-gray-100">
-    <img 
+  <div class="relative w-full min-h-screen overflow-hidden">
+    <!-- <img 
       src="@/assets/images/Background.png" 
       class="fixed top-0 left-0 w-full h-full object-cover z-0" 
       alt="Background" 
-    />
+    /> -->
     
     <div class="relative z-10 p-8 pt-10 ml-20"> 
       

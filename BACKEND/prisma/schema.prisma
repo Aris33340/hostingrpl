@@ -101,7 +101,7 @@ model file {
   type      String
 
   id_parent Int?
-  parent    file?  @relation("FolderToSubfolders", fields: [id_parent], references: [id_file])
+  parent    file?  @relation("FolderToSubfolders", fields: [id_parent], references: [id_file],onDelete: Cascade)
   children  file[] @relation("FolderToSubfolders")
 
   //relasi balik untuk log email(hanya sebagai folder)

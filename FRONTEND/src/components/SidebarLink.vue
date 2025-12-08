@@ -1,10 +1,10 @@
 <template>
     <router-link :to="route.path" class="group relative w-full flex flex-col items-center">
-        <div class="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 hover:shadow-md"
+        <div class="w-14 h-14 flex items-center justify-center rounded-full transition-all duration-300 hover:shadow-md"
             :class="isActive(route.path)
                 ? 'bg-blue-500 text-white shadow-lg hover:bg-blue-600'
-                : 'text-gray-600 hover:bg-blue-50'">
-            <component :is="route.meta.icon" class="w-4 h-4" />
+                : 'text-gray-600 hover:bg-blue-100'">
+            <component :is="route.meta.icon" class="w-6 h-6" />
         </div>
 
         <div

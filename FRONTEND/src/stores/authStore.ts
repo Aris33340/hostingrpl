@@ -1,10 +1,11 @@
 // src/stores/authStore.ts
 
 import { defineStore } from 'pinia';
-import { authApi } from '../api';
+import { authApi, mainApi } from '../api';
 import { jwtDecode } from 'jwt-decode';
 import type { JwtPayload } from 'jwt-decode';
 import router from '../router';
+import { showNotification } from '../composables/useNotification';
 // import type { PdfEditRequestDto, EditablePage, EditorElement } from '@/types/editorDto';
 
 
@@ -70,7 +71,7 @@ export const useAuthStore = defineStore('auth', {
     getPayload(): MyJwtPayload {
       const access_token = this.access_token ?? localStorage.getItem("access_token");
       if (!access_token) {
-        throw new Error("Access token tidak ditemukan");
+        throw new Error('Payload tidak ditemukan')
       }
       const payload = jwtDecode<MyJwtPayload>(access_token);
       return {
@@ -92,9 +93,19 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem("access_token");
       this.access_token = null;
     },
-    logout() {
-      this.clearAuthData();
-      router.push('/login')
+    isAuth(){
+      const payload = this.access_token ?? localStorage.getItem("access_token")
+      if(payload)return true
+      return false
+    },
+    async logout() {
+      try{
+        const res = await authApi.post('/logout', {}, { withCredentials: true })
+        this.clearAuthData();
+        return router.push('/login')
+      }catch(e){
+        showNotification('error','gagal logout')
+      }
     }
   },
 });
