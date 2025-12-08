@@ -262,7 +262,7 @@ export class TestingPdfRenderProcessor {
 
             if (idPresensi) {
                 try {
-                    const encryptedData = this.cryptoService.encrypt(String(idPresensi));
+                    const encryptedData = await this.cryptoService.encrypt(String(idPresensi));
 
                     const qrBuffer = await this.qrService.createQR(encryptedData);
 

@@ -1182,7 +1182,9 @@ const loadDraft = async (pdf_id) => {
     console.log('objects', objects.value);
     console.log('template', pageTemplate.value);
 };
-
+onMounted(()=>{
+    console.log("panjang:","00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff".length)
+})
 const prepareEditorDto = () => {
     DtoEditorStore.init();
     const editablePages = pageTemplate.value.map((pageNum) => {

@@ -1,55 +1,13 @@
-// import { PrismaClient } from "../generated/prisma";
-// import { users } from "./users";
-
-// const prisma = new PrismaClient();
-
-// async function main() {
-//     await prisma.user.deleteMany({})
-//     // for (let u in users) {
-//     //     await prisma.user.create({
-//     //         data: {
-//     //             username: users[u].username,
-//     //             email: users[u].email,
-//     //             password: users[u].password,
-//     //             role: users[u].role
-//     //         }
-//     //     })
-//     // }
-//     // await prisma.mahasiswa.create({
-//     //     data: {
-//     //         nim: 222313127,
-//     //         nama: "Test Encrypt",
-//     //         kelas: "3SI2"
-//     //     }
-//     // })
-//     // await prisma.tamu.create({
-//     //     data:{
-//     //         asal_instansi:"Universitas Test",
-//     //         email:"test@gmail.com",
-//     //         nama:"aaaa",
-//     //     }
-//     // })
-//     await prisma.presensi.create({
-//         data:{
-//             id_tamu:1,
-//         }
-//     })
-// }
-
-// main().catch(e => {
-//     console.log(e)
-//     process.exit(1)
-// }).finally(() => {
-//     prisma.$disconnect()
-// })
-
-
 import { PrismaClient } from "@prisma/client";
 import { $Enums as Enum } from "@prisma/client";
-
+import * as bcrypt from 'bcryptjs'; // Menggunakan import standar
 const prisma = new PrismaClient();
-
+async function hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    return bcrypt.hash(password, salt);
+}
 async function main() {
+    
     console.log('Seeding database...');
     await prisma.user.deleteMany({})
     await prisma.tamu.deleteMany({})
@@ -61,25 +19,23 @@ async function main() {
     // Kita simpan ID user terakhir untuk dipakai bikin folder
     let lastUserId = 0;
 
-    for (let i = 1; i <= 10; i++) {
-        const user = await prisma.user.create({
-            data: {
-                username: `user${i}`,
-                email: `user${i}@example.com`,
-                password: `password${i}`, // hash password jika diperlukan
-                role: i % 4 === 0 ? Enum.userRole.BUKUWISUDA : (i % 4 === 1 ? Enum.userRole.PETUGAS : (i % 4 === 2 ? Enum.userRole.SEKRETARIAT : Enum.userRole.SUPERADMIN)),
-            },
-        });
-        lastUserId = user.id_user;
-    }
-    // --- [TAMBAHAN BARU 1: BUAT FOLDER DUMMY] ---
-    // Kita butuh folder ini sebagai "induk" dari log email
+    const user = await prisma.user.create({
+        data:{
+            email:'SUPERADMINwisuda65@gmail.com',
+            password: String(await hashPassword('superwisuda65stisadmin')),
+            role:"SUPERADMIN",
+            username:'SUPERADMIN'
+        }
+    })
+    lastUserId = user.id_user
+
+
     const folderDummy = await prisma.file.create({
         data: {
             file_name: "Folder Undangan (Seed)",
             type: "FOLDER",
-            path: "folder-seed-dummy-unique", // Path harus unik
-            id_user: lastUserId, // Gunakan user yang baru dibuat
+            path: "folder-seed-dummy-unique", 
+            id_user: lastUserId, 
         }
     });
 

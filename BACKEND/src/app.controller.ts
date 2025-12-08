@@ -12,15 +12,5 @@ import { user as UserModel } from '@prisma/client';
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    // private readonly UserService: UserService,
   ) {}
-
-  @Get('users')
-  async hello(): Promise<string> {
-    return "Hello World!";
-  }
-  // @Post('login')
-  // async login(): Promise<String>{
-  //   return "Login berhasil";
-  // }
 }

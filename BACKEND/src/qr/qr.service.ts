@@ -76,7 +76,7 @@ export class QrCodeService {
           const nim = data.peserta?.mahasiswa?.nim;
           const id_peserta = data.peserta.id_peserta;
 
-          const encryptedData = this.crypto.encrypt(String(id_presensi));
+          const encryptedData = await this.crypto.encrypt(String(id_presensi));
           const qrBuffer = await this.createQR(encryptedData);
 
           return {
