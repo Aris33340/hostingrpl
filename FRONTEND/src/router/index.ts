@@ -1,4 +1,12 @@
-import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from "vue-router";
+import { 
+  createRouter, 
+  createWebHistory, 
+  type RouteLocationNormalized, 
+  type NavigationGuardNext 
+} from "vue-router";
+
+
+import { useAuthStore } from "../stores/authStore";
 
 import ManajemenPeserta from "../views/ManajemenPeserta.vue";
 import Login from "../views/Login.vue";
@@ -10,12 +18,18 @@ import TulisUndangan from "../views/TulisUndangan.vue"; // <-- IMPORT BARU
 import SuperAdminDashboard from "../views/SuperAdminDashboard.vue";
 import DashboardSekre from "../views/DashboardSekre.vue";
 import DashboardBuku from "../views/DashboardBuku.vue";
-import { UserIcon, QrCodeIcon, UploadIcon, MailIcon, HomeIcon } from "lucide-vue-next";
-import { useAuthStore } from "../stores/authStore";
 import NotFound from "../views/NotFound.vue";
 import Test from "../views/Test.vue";
 import BlankPage from "../views/BlankPage.vue";
 import Settings from "../views/Settings.vue";
+
+import {
+  UserIcon,
+  QrCodeIcon,
+  UploadIcon,
+  MailIcon,
+  HomeIcon,
+} from "lucide-vue-next";
 
 const routes = [
   // LOGIN
@@ -75,7 +89,7 @@ const routes = [
     },
   },
 
-  // --- 3. DASHBOARD KESEKRETARIATAN ---
+  // --- DASHBOARD KESEKRETARIATAN ---
   {
     path: "/dashboard-sekre",
     name: "DashboardSekre",
@@ -103,6 +117,7 @@ const routes = [
     },
   },
 
+  // MANAJEMEN MAHASISWA
   {
     path: "/manajemen-peserta",
     name: "ManajemenPeserta",
@@ -155,6 +170,8 @@ const routes = [
       allowedRoles: ["SUPERADMIN","BUKUWISUDA","SEKRETARIAT"]
     },
   },
+
+  // PETUGAS SCANNER
   {
     path: "/petugas",
     name: "DashboardPetugas",
@@ -167,6 +184,8 @@ const routes = [
       allowedRoles: ["PETUGAS","SEKRETARIAT","SUPERADMIN"]
     },
   },
+
+  // EDITOR
   {
     path: "/editor",
     name: "Editor STIS GRAD",
@@ -185,14 +204,16 @@ const routes = [
       } else {
         next();
       }
-    }
+    },
   },
+
+  // NOT FOUND
   {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: NotFound,
     meta: { title: "Not Found", showNavbar: false },
-  }
+  },
 ];
 
 const router = createRouter({
@@ -204,7 +225,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const isAuth = authStore.isAuth()
-
+  let userRole;
   function getDefaultRouteByRole(role:any) {
     switch (role) {
       case "SUPERADMIN":
@@ -227,7 +248,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.allowedRoles) {
     try {
       const payload = authStore.getPayload();
-      const userRole = payload.role;
+      userRole = payload.role;
       const allowedRoles = Array.isArray(to.meta.allowedRoles) ? to.meta.allowedRoles : Object.values(to.meta.allowedRoles);
       const allowed = allowedRoles.includes(userRole)
       if (!allowed) {
@@ -239,8 +260,10 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  if (to.path === "/login" && isAuth) {
-    return next("/");
+  if (isAuth) {
+    if (to.path === "/" && userRole !== "SUPERADMIN") {
+       return next("/login");
+    }
   }
   return next();
 });
