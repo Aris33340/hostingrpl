@@ -1,13 +1,13 @@
-import { 
-  Controller, 
-  Get, 
-  Query, 
-  Post, 
-  Body, 
-  Put, 
-  Param, 
-  Delete, 
-  ParseIntPipe, 
+import {
+  Controller,
+  Get,
+  Query,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
+  ParseIntPipe,
   BadRequestException,
 } from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
@@ -19,20 +19,20 @@ export class MahasiswaController {
   constructor(
     private readonly mhsService: MahasiswaService,
     private readonly crypto: CryptoService,
-  ) {}
+  ) { }
 
 
   // 🟦 Ambil list kelas unik
-@Get('field/kelas')
-async getAllKelas() {
-  return this.mhsService.getAllKelas();
-}
+  @Get('field/kelas')
+  async getAllKelas() {
+    return this.mhsService.getAllKelas();
+  }
 
-// 🟦 Ambil list prodi unik
-@Get('field/prodi')
-async getAllProdi() {
-  return this.mhsService.getAllProdi();
-}
+  // 🟦 Ambil list prodi unik
+  @Get('field/prodi')
+  async getAllProdi() {
+    return this.mhsService.getAllProdi();
+  }
 
 
   // 🟩 1️⃣ GET /api/mahasiswa (all)
@@ -58,6 +58,7 @@ async getAllProdi() {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('filter') filter?: string,   // ⬅ FILTER TAMBAHAN
+    @Query('status') status?: string
   ) {
     const pageNum = Number(page);
     const limitNum = Number(limit);
@@ -66,11 +67,13 @@ async getAllProdi() {
       throw new BadRequestException('Page dan limit harus berupa angka');
     }
 
+
     return this.mhsService.getMahasiswaWithPagination(
       search,
       pageNum,
       limitNum,
-      filter,   // ⬅ KIRIM KE SERVICE
+      filter,
+      status !== undefined ? Number(status) : undefined // ⬅ KIRIM KE SERVICE
     );
   }
 

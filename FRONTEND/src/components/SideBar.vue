@@ -10,7 +10,8 @@
       <SidebarLink v-for="route in menuRoutes" :key="route.path" :route="route" class="w-full mt-3" />
       <div class="flex-1"></div>
       <div class="flex flex-col gap-2">
-        <router-link :to="'/settings'" class="mt-auto group flex justify-center bottom-0">
+        <router-link v-if="userRole === 'SUPERADMIN'" :to="'/settings'"
+          class="mt-auto group flex justify-center bottom-0">
           <div
             class="w-12 h-12 flex rounded-full items-center justify-center transition-all duration-300 hover:bg-gray-300 hover:shadow-md hover:rotate-45 text-gray-600 hover:text-gray-500">
             <Settings class="w-5 h-5" />
@@ -36,7 +37,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { LogOut, ArrowLeftCircle, Settings } from "lucide-vue-next";
 import SidebarLink from "../components/SidebarLink.vue";
@@ -47,17 +48,15 @@ import { showNotification } from "../composables/useNotification";
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-
+let userRole
 const isNavbarVisible = computed(() => route.meta.showNavbar !== false);
 const menuRoutes = computed(() => {
   const authStore = useAuthStore();
-  let userRole;
   try {
     userRole = authStore.getPayload().role;
   } catch (error) {
     // showNotification('warning',error.message)
   }
-
   const allMenus = router.getRoutes().filter(r => r.meta?.showInNavbar);
   const currentPath = route.path;
   return allMenus.filter(menu => {

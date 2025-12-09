@@ -4,14 +4,7 @@
     <!-- <img src="@/assets/images/Background.png" class="fixed top-0 left-0 w-full h-full object-cover z-0"
       alt="Background" /> -->
 
-    <div class="relative z-10 min-h-screen p-8">
-
-      <!-- Header -->
-      <div class="bg-white rounded-xl p-4 flex justify-between items-center shadow-md mb-6">
-        <h2 class="text-xl font-bold text-[#2e3e85] pl-2">Manajemen Peserta</h2>
-        <span class="text-gray-600 pr-2">Halo, Admin!</span>
-      </div>
-
+    <div class="relative z-10 min-h-screen px-10 mx-8">
       <div class="relative mb-8">
 
         <img :src="WisudawanIcon"

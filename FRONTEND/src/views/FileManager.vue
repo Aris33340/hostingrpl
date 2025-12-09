@@ -1,13 +1,9 @@
 <template>
-    <div class="min-h-screen min-w-full p-6">
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-white mb-2">{{ router?.name || 'File Manager' }}</h1>
-            <p class="text-blue-300">Halo Admin</p>
-        </div>
+    <div class="min-h-screen min-w-full">
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)] mx-10 ">
             <div
-                class="lg:col-span-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 overflow-hidden flex flex-col">
+                class=" lg:col-span-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-blue-500/20">
                     <div class="flex items-center gap-3">
                         <label class="flex-1 cursor-pointer">

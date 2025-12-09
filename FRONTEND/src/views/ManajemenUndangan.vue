@@ -1,9 +1,5 @@
 <template>
-  <div class="page-container">
-    <header class="page-header">
-      <h2 class="page-title">Manajemen Undangan</h2>
-      <span class="user-greeting">Halo, {{  }}</span>
-    </header>
+  <div class="mx-10">
 
     <div class="switch-wrapper">
       <div class="switch-container">
@@ -41,10 +37,6 @@ const activeTab = ref('buat');
 /* src/views/ManajemenUndangan.vue */
 
 <style scoped>
-.page-container {
-  padding: 2rem;
-  width: 100%;
-}
 
 .page-header {
   background: white;

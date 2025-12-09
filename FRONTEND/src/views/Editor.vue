@@ -897,7 +897,7 @@ const confirmPlacement = async () => {
     if (placement.value.mode === 'text') {
         const defaultText = 'TextField';
         const fontSize = 16;
-        const font = 'Arial';
+        const font = 'TimesRoman';
 
         props = { font, content: defaultText, fontSize, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } };
 
@@ -915,9 +915,9 @@ const confirmPlacement = async () => {
 
     } else if (placement.value.mode === 'field') {
         const content = await handleGetFieldText();
-        props = { font: 'Arial', content: content, fieldName: tableFieldSelected.value, fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } };
+        props = { font: 'TimesRoman', content: content, fieldName: tableFieldSelected.value, fontSize: 16, isBold: false, isItalic: false, isUnderline: false, color: { r: 0, g: 0, b: 0 } };
 
-        const dims = getTextDimensions(content, 16, 'Arial');
+        const dims = getTextDimensions(content, 16, 'TimesRoman');
         finalWidth = dims.width;
         finalHeight = dims.height;
 
@@ -1161,7 +1161,6 @@ const saveDraft = () => {
 const loadDraft = async (pdf_id) => {
     const drafts = JSON.parse(localStorage.getItem("drafts")) || {};
     const draft = drafts[pdf_id];
-    // localStorage.removeItem('drafts')
     console.log('drafts loaded :', drafts);
     console.log('draft loaded :', draft);
 
@@ -1182,9 +1181,7 @@ const loadDraft = async (pdf_id) => {
     console.log('objects', objects.value);
     console.log('template', pageTemplate.value);
 };
-onMounted(()=>{
-    console.log("panjang:","00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff".length)
-})
+
 const prepareEditorDto = () => {
     DtoEditorStore.init();
     const editablePages = pageTemplate.value.map((pageNum) => {
@@ -1206,7 +1203,7 @@ const prepareEditorDto = () => {
 
             let textStyleObject = {
                 fontSize: props?.fontSize ?? 13,
-                fontFamily: props?.font ?? 'Arial',
+                fontFamily: props?.font ?? 'TimesRoman',
                 bold: props?.isBold,
                 italic: props?.isItalic,
                 color: colorObject

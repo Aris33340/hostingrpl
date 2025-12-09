@@ -145,7 +145,7 @@ export class PresensiService {
 
         await this.prisma.presensi.update({
             where: { id_presensi: idPresensi },
-            data: { status: 1 },
+            data: { status: 1 ,waktu_presensi:new Date},
         });
 
         return {

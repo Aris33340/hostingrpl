@@ -77,11 +77,11 @@ export class TestingPdfRenderProcessor {
         const outputPath = path.join(`./public/output/rendered/${dto.configuration.projectName}`);
 
         const folderDB = await this.prisma.file.create({
-            data:{
-                file_name:dto.configuration.projectName,
-                path:outputPath,
-                type:'FOLDER',
-                id_user:userId,
+            data: {
+                file_name: dto.configuration.projectName,
+                path: outputPath,
+                type: 'FOLDER',
+                id_user: userId,
             }
         })
         const pagesConfig = dto.editablePages;
@@ -111,17 +111,17 @@ export class TestingPdfRenderProcessor {
             if (dto.configuration.renderOption.saveToDb) {
                 await fs.writeFile(filePath, pdfBytes);
                 await this.prisma.file.create({
-                    data:{
-                        file_name:fileName,
-                        path:filePath,
-                        type:'application/pdf',
-                        id_parent:folderDB.id_file,
-                        id_user:userId,
-                        id_peserta:row.peserta[0].id_peserta
+                    data: {
+                        file_name: fileName,
+                        path: filePath,
+                        type: 'application/pdf',
+                        id_parent: folderDB.id_file,
+                        id_user: userId,
+                        id_peserta: row.peserta[0].id_peserta
                     }
                 })
             }
-            
+
             if (dto.configuration.renderOption.asZip) {
                 zip.file(fileName, pdfBytes)
             }
@@ -151,11 +151,11 @@ export class TestingPdfRenderProcessor {
         const outputPath = path.join(`./public/output/rendered/${dto.configuration.projectName}`);
 
         const folderDB = await this.prisma.file.create({
-            data:{
-                file_name:dto.configuration.projectName,
-                path:outputPath,
-                type:'FOLDER',
-                id_user:userId,
+            data: {
+                file_name: dto.configuration.projectName,
+                path: outputPath,
+                type: 'FOLDER',
+                id_user: userId,
             }
         })
 
@@ -171,11 +171,11 @@ export class TestingPdfRenderProcessor {
         };
 
         for (const pageNum of pageIndices) {
-            const startEdit = pageConfigs.find(e => e.pageNumber-1 === pageNum)
+            const startEdit = pageConfigs.find(e => e.pageNumber - 1 === pageNum)
             if (startEdit) {
                 for (const [index, row] of dataList.entries()) {
                     for (const pageConfig of pageConfigs) {
-                        const [page] = await (pdfDoc).copyPages(templatePdf, [pageConfig.pageNumber-1])
+                        const [page] = await (pdfDoc).copyPages(templatePdf, [pageConfig.pageNumber - 1])
                         await processPageElements(page, pageConfig.elements, row)
                         pdfDoc.addPage(page)
                     }
@@ -192,12 +192,12 @@ export class TestingPdfRenderProcessor {
         if (dto.configuration.renderOption.saveToDb) {
             await fs.writeFile(filePath, pdfBytes);
             await this.prisma.file.create({
-                data:{
-                    file_name:fileName,
-                    path:filePath,
-                    type:'application/pdf',
-                    id_parent:folderDB.id_file,
-                    id_user:userId,
+                data: {
+                    file_name: fileName,
+                    path: filePath,
+                    type: 'application/pdf',
+                    id_parent: folderDB.id_file,
+                    id_user: userId,
                 }
             })
         }
@@ -222,28 +222,54 @@ export class TestingPdfRenderProcessor {
 
         if (el.type === ElementType.TEXT || el.type === ElementType.FIELD) {
             let textToRender = el.content || '';
+
             if (el.type === ElementType.FIELD && el.fieldName) {
                 textToRender = this.resolveFieldData(data, el.fieldName);
-                console.log("texttorender",textToRender)
-                console.log("data",data)
-                console.log("fieldName",el.fieldName)
             }
-            const font = el.textstyle?.fontFamily === 'Helvetica' ? fontMap.Helvetica : fontMap.Times;
-            const size = el.textstyle?.fontSize || 12;
 
-            page.drawText(String(textToRender), {
-                x: xPos,
-                y: yPos - size,
-                size: size,
-                font: font,
-                color: el.textstyle?.color
-                    ? rgb(el.textstyle.color.r / 255, el.textstyle.color.g / 255, el.textstyle.color.b / 255)
-                    : rgb(0, 0, 0),
-                opacity: el.opacity,
-                rotate: el.rotation ? { type: 'degrees', angle: el.rotation } : undefined
-            });
+            const segments = this.parseStyledText(textToRender);
+            let cursorX = xPos;
 
-        } else if (el.type === ElementType.IMAGE && el.fileId) {
+            // Ambil Global Style dari DTO
+            const baseFontFamily = el.textstyle?.fontFamily || 'TimesRoman';
+            const baseFontSize = el.textstyle?.fontSize || 12;
+            const globalBold = el.textstyle?.bold || false;
+            const globalItalic = el.textstyle?.italic || false;
+
+            for (const segment of segments) {
+                // Tentukan apakah segment ini bold/italic berdasarkan 
+                // kombinasi style segment (markdown) ATAU global style (DTO)
+
+                // Logic: Jika di DTO sudah bold, maka text jadi bold. 
+                // Atau jika di markdown ada (**), text jadi bold.
+                const isSegmentBold = segment.style === 'bold' || segment.style === 'boldItalic';
+                const isSegmentItalic = segment.style === 'italic' || segment.style === 'boldItalic';
+
+                const finalBold = globalBold || isSegmentBold;
+                const finalItalic = globalItalic || isSegmentItalic;
+
+                // Panggil chooseFont yang baru
+                const font = this.chooseFont(baseFontFamily, finalBold, finalItalic, fontMap);
+
+                page.drawText(segment.text, {
+                    x: cursorX,
+                    y: yPos - baseFontSize,
+                    size: baseFontSize,
+                    font: font,
+                    color: el.textstyle?.color
+                        ? rgb(
+                            el.textstyle.color.r / 255,
+                            el.textstyle.color.g / 255,
+                            el.textstyle.color.b / 255
+                        )
+                        : rgb(0, 0, 0),
+                });
+
+                cursorX += font.widthOfTextAtSize(segment.text, baseFontSize);
+            }
+        }
+
+        else if (el.type === ElementType.IMAGE && el.fileId) {
             const imgBuffer = imageCache.get(String(el.fileId));
             if (imgBuffer) {
                 const img = await this.embedImageAuto(doc, imgBuffer);
@@ -284,7 +310,7 @@ export class TestingPdfRenderProcessor {
     }
 
     private resolveFieldData(data: any, path: string): string {
-        
+
         return data[path] ?? '';
     }
 
@@ -303,7 +329,67 @@ export class TestingPdfRenderProcessor {
         }
         return map;
     }
+    private chooseFont(family: string, isBold: boolean, isItalic: boolean, fontMap: any) {
+        // Normalisasi input family (default ke TimesRoman jika kosong)
+        const targetFamily = family || 'TimesRoman';
 
+        if (targetFamily === 'Courier') {
+            if (isBold && isItalic) return fontMap.CourierBoldOblique;
+            if (isBold) return fontMap.CourierBold;
+            if (isItalic) return fontMap.CourierOblique;
+            return fontMap.Courier;
+        }
+        else if (targetFamily === 'Helvetica') {
+            if (isBold && isItalic) return fontMap.HelveticaBoldOblique;
+            if (isBold) return fontMap.HelveticaBold;
+            if (isItalic) return fontMap.HelveticaOblique;
+            return fontMap.Helvetica;
+        }
+        else {
+            // Default TimesRoman
+            if (isBold && isItalic) return fontMap.TimesRomanBoldItalic;
+            if (isBold) return fontMap.TimesRomanBold;
+            if (isItalic) return fontMap.TimesRomanItalic;
+            return fontMap.TimesRoman;
+        }
+    }
+    private parseStyledText(text: string) {
+        const tokens: { text: string; style: string }[] = [];
+
+        const boldItalicRegex = /\*\*\*(.*?)\*\*\*/g;
+        const boldRegex = /\*\*(.*?)\*\*/g;
+        const italicRegex = /\*(.*?)\*/g;
+
+        let remaining = text;
+
+        let match: any;
+
+        // Bold-Italic
+        while ((match = boldItalicRegex.exec(text)) !== null) {
+            tokens.push({ text: match[1], style: 'boldItalic' });
+            remaining = remaining.replace(match[0], '');
+        }
+
+        // Bold
+        while ((match = boldRegex.exec(text)) !== null) {
+            tokens.push({ text: match[1], style: 'bold' });
+            remaining = remaining.replace(match[0], '');
+        }
+
+        // Italic
+        while ((match = italicRegex.exec(text)) !== null) {
+            tokens.push({ text: match[1], style: 'italic' });
+            remaining = remaining.replace(match[0], '');
+        }
+
+        // Sisa teks normal
+        remaining = remaining.trim();
+        if (remaining.length) {
+            tokens.push({ text: remaining, style: 'normal' });
+        }
+
+        return tokens;
+    }
     private async embedStandardFonts(doc: PDFDocument) {
         return {
             TimesRoman: await doc.embedFont(StandardFonts.TimesRoman),

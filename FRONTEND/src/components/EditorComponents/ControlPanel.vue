@@ -62,8 +62,11 @@ import DropDown from './DropDown.vue'
 
 const selected = ref("")
 const colorInputRef = ref(null) 
-const menuItems = ["Arial", "Verdana", "Times New Roman"]
-
+const menuItems = [
+    "TimesRoman",
+    "Helvetica",
+    "Courier"
+];
 const props = defineProps({
     prop: {
         font: String,

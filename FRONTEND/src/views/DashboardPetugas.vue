@@ -1,10 +1,7 @@
 <template>
-    <div class="min-h-screen p-4 md:p-6 lg:p-8">
-        <div class="mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold text-white">Dashboard Petugas Scanner</h1>
-        </div>
+    <div class="min-h-screen mx-10 md:p-6 lg:p-8">
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 order-2 md:order-1">
             <InfoContainer :loading="isLoading" :value="totalUndangan" message="Total Undangan" icon="users"
                 color="blue" />
             <InfoContainer :loading="isLoading" :value="totalHadir" message="Hadir" icon="check" color="green" />
@@ -12,8 +9,8 @@
                 color="orange" />
         </div>
 
-        <div class="grid h-full grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20">
+        <div class="grid h-full grid-cols-1 lg:grid-cols-2 gap-6 mb-6 order-1 md:order-2">
+            <div class="bg-white/5 ...">
                 <Scanner ref="scannerRef" @scanned="handleScan" />
             </div>
 
@@ -42,8 +39,10 @@
 
         <div class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                <h2 class="text-xl font-bold text-white">Manajemen Data Kehadiran</h2>
-
+                <div class="flex flex-col">
+                    <h2 class="text-xl font-bold text-white">Manajemen Data Kehadiran</h2>
+                    <KategoriToggle @change="handleKategoriToggle"/>
+                </div>
                 <div
                     class="flex items-center gap-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-2  ">
                     <button @click="viewMode = 'table'"
@@ -128,7 +127,15 @@
                             </th>
                             <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Kelas</th>
                             <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Prodi</th>
-                            <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Status</th>
+                            <th @click="toggleStatusFilter"
+                                class="px-4 py-3 text-center text-sm font-semibold bg-blue-200 text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors">
+                                {{
+                                    filterStatus === 0
+                                        ? 'Belum Hadir'
+                                        : filterStatus === 1
+                                            ? 'Hadir'
+                                            : 'Status'
+                                }} </th>
                             <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Waktu</th>
                         </tr>
                     </thead>
@@ -140,13 +147,22 @@
                             <td class="px-4 py-3 text-sm text-gray-300">{{ item.kelas }}</td>
                             <td class="px-4 py-3 text-sm text-gray-300">{{ item.prodi }}</td>
                             <td class="px-4 py-3">
-                                <span
-                                    :class="item.peserta[0]?.presensis[0]?.status === 1 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'"
-                                    class="icon-status px-3 py-1 rounded-full text-xs font-semibold">
+                                <span @click="canToggleStatus ? toggleStatus(item.peserta[0]?.presensis[0]) : null"
+                                    :class="[
+                                        'icon-status px-3 py-1 rounded-full text-xs font-semibold cursor-pointer',
+                                        item.peserta[0]?.presensis[0]?.status === 1
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-orange-100 text-orange-700',
+                                        canToggleStatus ? 'hover:opacity-70' : 'cursor-not-allowed'
+                                    ]">
                                     {{ item.peserta[0]?.presensis[0]?.status === 1 ? '✓ Hadir' : '○ Belum' }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-300">{{ item.waktu || '-' }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-300">{{ new
+                                Date(item.peserta[0]?.presensis[0]?.waktu_presensi).toLocaleTimeString([], {
+                                    hour:
+                                        '2-digit', minute: '2-digit'
+                                }) || '-' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -299,13 +315,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import InfoContainer from '../components/InfoContainer.vue';
 import Scanner from '../components/QrScanner.vue';
+import KategoriToggle from '../components/DashboardPetugas/KategoriButton.vue';
 import { mainApi } from '@/api'
 import { useModal } from '../composables/useModal';
 import { showNotification } from '../composables/useNotification'
-
+import { useAuthStore } from '../stores/authStore';
 const modal = useModal();
 const scannerRef = ref(null)
 const manualNim = ref('');
@@ -322,26 +339,74 @@ const filterProdi = ref('');
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const totalData = ref(0);
-
-// total halaman dari server
+const filterStatus = ref(null);
 const totalPages = computed(() => Math.ceil(totalData.value / itemsPerPage.value));
-
 const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
 const endIndex = computed(() => Math.min(currentPage.value * itemsPerPage.value, totalData.value));
 
-/* ===========================================
-   🔹 Ambil data mahasiswa (pagination + search)
-   =========================================== */
+
+function toggleStatusFilter() {
+    if (filterStatus.value === null) filterStatus.value = 1;   // tampilkan hadir
+    else if (filterStatus.value === 1) filterStatus.value = 0; // tampilkan belum
+    else filterStatus.value = null;                            // kembali ke semua
+
+    mountTableData(); // refresh data
+}
+
+const handleKategoriToggle = (event) =>{
+    console.log(event)
+}
+
+const authStore = useAuthStore()
+
+let payload = null
+
+try {
+    payload = authStore.getPayload()
+} catch (err) {
+    payload = null
+    console.warn("JWT tidak valid atau belum login")
+}
+const canToggleStatus = computed(() => {
+    if (!payload) return false
+    return payload.role === 'SUPERADMIN' || payload.role === 'SEKRETARIAT'
+})
+const toggleStatus = async (presensi) => {
+    if (!presensi) return
+
+    const id = presensi.id_presensi
+    console.log(id)
+    const current = presensi.status
+
+    try {
+        if (current === 1) {
+            // SET MENJADI TIDAK HADIR (0)
+            await mainApi.patch(`presensi/unmark-status/${id}`)
+            presensi.status = 0
+        } else {
+            // SET MENJADI HADIR (1)
+            await mainApi.patch(`presensi/mark-status/${id}`)
+            presensi.status = 1
+        }
+    } catch (err) {
+        console.error(err)
+    }
+    await mountTableData()
+}
+
 const mountTableData = async () => {
+    await mountStatistikData()
     try {
         isLoading.value = true;
         const res = await mainApi.get(`mahasiswa/pagination`, {
             params: {
                 search: searchQuery.value || undefined,
                 page: currentPage.value,
-                limit: itemsPerPage.value
+                limit: itemsPerPage.value,
+                status: filterStatus.value !== null ? filterStatus.value : undefined
             }
         });
+        console.log(res.data)
         tableData.value = res.data.data || [];
         totalData.value = res.data.total || tableData.value.length;
     } catch (e) {
@@ -396,7 +461,6 @@ watch([searchQuery, currentPage, itemsPerPage], async () => {
 
 onMounted(async () => {
     await mountTableData();
-    await mountStatistikData();
 });
 
 
@@ -438,7 +502,6 @@ const handlePresensi = async (idPresensi) => {
 
             if (modalres) {
                 const res = await mainApi.patch(`presensi/mark-status/${Number(idPresensi)}`)
-                await mountStatistikData();
                 await mountTableData();
                 showNotification('success', res.data.message)
 
@@ -459,4 +522,11 @@ function pauseScan() {
 function resumeScan() {
     scannerRef.value?.resumeScanner()
 }
+const stopCamera = () => {
+    scannerRef.value?.stopScanner(); // PENTING
+};
+
+onBeforeUnmount(() => {
+    stopCamera()
+})
 </script>

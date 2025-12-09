@@ -6,13 +6,7 @@
       alt="Background" 
     /> -->
     
-    <div class="relative z-10 p-8 pt-10 ml-20"> 
-      
-      <div class="bg-white rounded-xl p-4 flex justify-between items-center shadow-md mb-6">
-        <h2 class="text-xl font-bold text-[#2e3e85] pl-2">Beranda Buku Wisuda</h2>
-        <span class="text-gray-600 pr-2">Halo, Admin!</span>
-      </div>
-
+    <div class="relative z-10 mx-10"> 
       <section
         class="bg-white rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-6 md:px-12 py-10 mt-2"
       >

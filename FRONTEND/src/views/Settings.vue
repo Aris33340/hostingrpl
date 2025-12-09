@@ -3,10 +3,16 @@
       <div class="w-full h-full flex flex-col lg:flex-row">
         <div class="w-full lg:w-1/2 h-full p-6 flex flex-col gap-2 text-white">
           <div class="w-full h-16 flex flex-col text-start">
-            <label for="email">Email Pengiriman</label>
-            <input v-model="emailPengiriman" name="email"
+            <label for="mailUser">MAIL USER</label>
+            <input v-model="mailUser" name="maulUser"
               class="h-10 bg-white/50 border outline-none border-white rounded-lg p-2 transition-all duration-100 focus:border-blue-400 focus:border-4"
               type="email">
+          </div>
+          <div class="w-full h-16 flex flex-col text-start">
+            <label for="mailPass">MAIL PASS</label>
+            <input v-model="mailPass" name="mailPass"
+              class="h-10 bg-white/50 border outline-none border-white rounded-lg p-2 transition-all duration-100 focus:border-blue-400 focus:border-4"
+              type="text">
           </div>
           <div class="w-full h-16 flex flex-col text-start">
             <label for="hashKey">Hash Key</label>
@@ -115,7 +121,8 @@
   const message = ref('');
   const success = ref(false);
   const hashKey = ref('');
-  const emailPengiriman = ref('');
+  const mailUser = ref('');
+  const mailPass = ref('');
   
   // edit modal state
   const showEditModal = ref(false);
@@ -130,8 +137,9 @@
   
   const handleSetSettings = async () => {
     try {
-      await mainApi.post('settings', { key: 'hashKey', value: hashKey.value }, { withCredentials: true });
-      await mainApi.post('settings', { key: 'emailPengiriman', value: emailPengiriman.value }, { withCredentials: true });
+      await mainApi.post('settings', { key: 'HASH_KEY', value: hashKey.value }, { withCredentials: true });
+      await mainApi.post('settings', { key: 'MAIL_USER', value: mailUser.value }, { withCredentials: true });
+      await mainApi.post('settings', { key: 'MAIL_PASS', value: mailPass.value }, { withCredentials: true });
       alert("Settings berhasil disimpan!");
     } catch (err) {
       console.error(err);
@@ -142,8 +150,9 @@
   const loadSettings = async () => {
     const res = await mainApi.get('settings');
     res.data.forEach(setting => {
-      if (setting.key === 'hashKey') hashKey.value = setting.value;
-      if (setting.key === 'emailPengiriman') emailPengiriman.value = setting.value;
+      if (setting.key === 'HASH_KEY') hashKey.value = setting.value;
+      if (setting.key === 'MAIL_USER') mailUser.value = setting.value;
+      if (setting.key === 'MAIL_PASS') mailPass.value = setting.value;
     });
   }
   

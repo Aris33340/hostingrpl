@@ -5,19 +5,9 @@
   class="fixed top-0 left-0 w-full h-full object-cover z-0" 
   alt="Background" 
 /> -->
-    
-    <div class="relative z-10 p-8 pt-10 ml-20"> 
-      
-      <div
-        class="bg-white rounded-xl p-4 flex justify-between items-center shadow-md mb-6"
-      >
-        <h2 class="text-xl font-bold text-[#2e3e85] pl-2">Beranda Sekretariat</h2>
-        <span class="text-gray-600 pr-2">Halo, Admin!</span>
-      </div>
 
-      <section
-        class="bg-white rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-6 md:px-12 py-10 mt-2"
-      >
+    <div class="relative z-10 mx-10">
+      <section class="bg-white rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-6 md:px-12 py-10 mt-2">
         <div class="text-center mb-6">
           <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#202020]">
             Selamat Datang di Dashboard Wisuda!!!
@@ -28,53 +18,32 @@
           </p>
         </div>
 
-        <div
-          class="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10 px-2 md:px-6"
-        >
-          <div
-            class="flex-1 flex justify-center items-end gap-2 md:gap-3 mt-[-15px]"
-          >
-            <img
-              :src="cowoImg"
-              class="w-[160px] md:w-[200px] lg:w-[300px] object-contain drop-shadow-2xl"
-            />
-            <img
-              :src="ceweImg"
-              class="w-[160px] md:w-[200px] lg:w-[300px] object-contain drop-shadow-2xl"
-            />
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10 px-2 md:px-6">
+          <div class="flex-1 flex justify-center items-end gap-2 md:gap-3 mt-[-15px]">
+            <img :src="cowoImg" class="w-[160px] md:w-[200px] lg:w-[300px] object-contain drop-shadow-2xl" />
+            <img :src="ceweImg" class="w-[160px] md:w-[200px] lg:w-[300px] object-contain drop-shadow-2xl" />
           </div>
 
           <div class="flex-1 flex justify-center w-full">
             <div
-              class="relative bg-white rounded-[24px] shadow-[0_12px_30px_rgba(0,0,0,0.20)] overflow-hidden w-full max-w-2xl h-[300px] md:h-[320px] lg:h-[360px]"
-            >
+              class="relative bg-white rounded-[24px] shadow-[0_12px_30px_rgba(0,0,0,0.20)] overflow-hidden w-full max-w-2xl h-[300px] md:h-[320px] lg:h-[360px]">
               <button
                 class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-black text-2xl md:text-3xl font-bold hover:bg-gray-200 active:scale-95 transition"
-                @click="prevSlide"
-              >
+                @click="prevSlide">
                 ‹
               </button>
 
-              <img
-                :src="activeSlide.src"
-                :alt="activeSlide.alt"
-                class="w-full h-full object-cover"
-              />
+              <img :src="activeSlide.src" :alt="activeSlide.alt" class="w-full h-full object-cover" />
 
               <button
                 class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-black text-2xl md:text-3xl font-bold hover:bg-gray-200 active:scale-95 transition"
-                @click="nextSlide"
-              >
+                @click="nextSlide">
                 ›
               </button>
 
               <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                <span
-                  v-for="(slide, i) in slides"
-                  :key="slide.id"
-                  class="w-2 h-2 md:w-3 md:h-3 rounded-full transition"
-                  :class="i === activeIndex ? 'bg-[#377dff]' : 'bg-white/70 border border-gray-300'"
-                />
+                <span v-for="(slide, i) in slides" :key="slide.id" class="w-2 h-2 md:w-3 md:h-3 rounded-full transition"
+                  :class="i === activeIndex ? 'bg-[#377dff]' : 'bg-white/70 border border-gray-300'" />
               </div>
             </div>
           </div>
@@ -100,21 +69,23 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
+
             <div class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col min-h-[300px]">
               <div class="flex justify-between items-start mb-4">
                 <div>
                   <h3 class="font-bold text-gray-800">Total Peserta</h3>
                   <p class="text-[11px] text-gray-500">Gabungan Mahasiswa & Tamu</p>
                 </div>
-                <button @click="goToPage('/manajemen-mahasiswa')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
+                <button @click="goToPage('/manajemen-mahasiswa')"
+                  class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
               </div>
               <div class="flex flex-col items-center justify-center flex-1">
                 <div class="relative w-48 h-48">
                   <div class="w-full h-full rounded-full" :style="donutPesertaStyle"></div>
-                  <div class="absolute inset-6 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                  <div
+                    class="absolute inset-6 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
                     <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Total</span>
                     <span class="text-3xl font-bold text-[#202020]">{{ formatNumber(totalPesertaWisuda) }}</span>
                   </div>
@@ -138,11 +109,12 @@
                   <h3 class="font-bold text-gray-800">Kehadiran Mahasiswa per Prodi</h3>
                   <p class="text-[11px] text-gray-500">Gladi Wisuda vs Wisuda</p>
                 </div>
-                <button @click="goToPage('/petugas')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
+                <button @click="goToPage('/petugas')"
+                  class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
               </div>
-              
+
               <div class="mt-6 space-y-5">
                 <div v-for="prodi in prodiStatistik" :key="prodi.nama" class="space-y-2">
                   <div class="flex justify-between text-xs font-semibold text-gray-700">
@@ -179,7 +151,8 @@
             <div class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col items-center">
               <div class="w-full flex justify-between items-start mb-2">
                 <h3 class="font-bold text-gray-800 text-sm">Kehadiran Tamu</h3>
-                <button @click="goToPage('/petugas')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
+                <button @click="goToPage('/petugas')"
+                  class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
               </div>
@@ -187,7 +160,8 @@
                 <div class="w-full h-full rounded-full" :style="donutKehadiranTamuStyle"></div>
                 <div class="absolute inset-4 bg-white rounded-full flex flex-col items-center justify-center">
                   <span class="text-[10px] text-gray-400">Total</span>
-                  <span class="text-xl font-bold text-[#202020]">{{ formatNumber(infoPresensi.totalUndanganTamu) }}</span>
+                  <span class="text-xl font-bold text-[#202020]">{{ formatNumber(infoPresensi.totalUndanganTamu)
+                  }}</span>
                 </div>
               </div>
               <div class="mt-4 w-full grid grid-cols-2 gap-2 text-center text-xs">
@@ -205,7 +179,8 @@
             <div class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col items-center">
               <div class="w-full flex justify-between items-start mb-2">
                 <h3 class="font-bold text-gray-800 text-sm">Undangan Mahasiswa</h3>
-                <button @click="goToPage('/manajemen-undangan')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
+                <button @click="goToPage('/manajemen-undangan')"
+                  class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
               </div>
@@ -213,23 +188,27 @@
                 <div class="w-full h-full rounded-full" :style="donutUndanganMahasiswaStyle"></div>
                 <div class="absolute inset-4 bg-white rounded-full flex flex-col items-center justify-center">
                   <span class="text-[10px] text-gray-400">Terkirim</span>
-                  <span class="text-xl font-bold text-[#202020]">{{ formatNumber(infoPresensi.totalUndanganMahasiswa) }}</span>
+                  <span class="text-xl font-bold text-[#202020]">{{ formatNumber(infoPresensi.totalUndanganMahasiswa)
+                  }}</span>
                 </div>
               </div>
-               <div class="mt-4 w-full text-center text-xs">
+              <div class="mt-4 w-full text-center text-xs">
                 <div class="bg-blue-50 p-2 rounded-lg inline-block w-full">
                   <div class="text-blue-800 font-semibold">Status Pengiriman Email</div>
                   <div class="flex justify-center gap-3 mt-1">
-                     <span class="text-blue-600">Sukses: <b>{{ formatNumber(infoPresensi.totalUndanganMahasiswa) }}</b></span>
+                    <span class="text-blue-600">Sukses: <b>{{ formatNumber(infoPresensi.totalUndanganMahasiswa)
+                        }}</b></span>
                   </div>
                 </div>
               </div>
             </div>
 
-             <div class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col items-center lg:col-span-2 xl:col-span-1">
+            <div
+              class="bg-white rounded-[24px] shadow px-6 py-6 flex flex-col items-center lg:col-span-2 xl:col-span-1">
               <div class="w-full flex justify-between items-start mb-2">
                 <h3 class="font-bold text-gray-800 text-sm">Undangan Tamu</h3>
-                <button @click="goToPage('/manajemen-undangan')" class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
+                <button @click="goToPage('/manajemen-undangan')"
+                  class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
                   More Info ➝
                 </button>
               </div>
@@ -238,17 +217,19 @@
                   <div class="w-full h-full rounded-full" :style="donutUndanganTamuStyle"></div>
                   <div class="absolute inset-4 bg-white rounded-full flex flex-col items-center justify-center">
                     <span class="text-[10px] text-gray-400">Terkirim</span>
-                    <span class="text-xl font-bold text-[#202020]">{{ formatNumber(infoPresensi.totalUndanganTamu) }}</span>
+                    <span class="text-xl font-bold text-[#202020]">{{ formatNumber(infoPresensi.totalUndanganTamu)
+                    }}</span>
                   </div>
                 </div>
                 <div class="flex-1 text-xs space-y-2">
-                   <p class="text-gray-500 leading-relaxed">
-                     Ringkasan undangan yang berhasil dikirim ke tamu via Web Service / Email.
-                   </p>
-                   <div class="bg-blue-50 p-2 rounded-lg">
-                      <span class="text-blue-700 font-bold block">{{ formatNumber(infoPresensi.totalUndanganTamu) }}</span>
-                      <span class="text-blue-600 text-[10px]">Email Terkirim</span>
-                   </div>
+                  <p class="text-gray-500 leading-relaxed">
+                    Ringkasan undangan yang berhasil dikirim ke tamu via Web Service / Email.
+                  </p>
+                  <div class="bg-blue-50 p-2 rounded-lg">
+                    <span class="text-blue-700 font-bold block">{{ formatNumber(infoPresensi.totalUndanganTamu)
+                    }}</span>
+                    <span class="text-blue-600 text-[10px]">Email Terkirim</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -419,5 +400,4 @@ const StatCard = {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -1,25 +1,27 @@
 <template>
-  <div id="app" class="container">
+  <div class="relative w-full min-h-screen">
     <Loading />
-
-    <Sidebar v-if="!$route.meta.hideSidebar" />
-
-    <main class="main-content">
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-    </main>
-
     <Notification :show="notification.show" :type="notification.type" :message="notification.message"
       @close="notification.show = false" />
 
     <Modal />
+    <div class="flex flex-row w-full h-full">
+      <Sidebar class="sticky h-[100vh]" v-if="!$route.meta.hideSidebar" />
+      <div class="flex flex-col w-full h-full">
+        <TopBar />
+        <main class="flex-1 w-full overflow-x-hidden"> <router-view v-slot="{ Component }">
+            <transition name="fade" mode="out-in">
+              <component :is="Component" />
+            </transition>
+          </router-view>
+        </main>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import TopBar from './components/TopBar.vue';
 import { onMounted } from 'vue';
 import Sidebar from './components/SideBar.vue';
 import Notification from './components/Notification.vue';
@@ -39,9 +41,9 @@ import Loading from './components/Loading.vue';
   Jika Navbar adalah sidebar vertikal, 'width: 100vw' 
   mungkin akan terdorong ke samping.
 */
-.main-content {
+/* .main-content {
   width: 100vw;
-}
+} */
 
 .fade-enter-from,
 .fade-leave-to {

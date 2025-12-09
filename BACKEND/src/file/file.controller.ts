@@ -30,9 +30,13 @@ export class FileController {
 
     @Get()
     async getAllFiles(@Req() req: any, @Query('type') type: string, @Query('folder') folder:string) {
-        const userId = req.user.sub;
-        const files = await this.fileService.getAllFiles(Number(userId), type.toLowerCase(), folder.toLowerCase());
-        return files;
+        try{
+            const userId = req.user.sub;
+            const files = await this.fileService.getAllFiles(Number(userId), type, folder);
+            return files;
+        }catch(e){
+            throw new BadRequestException('')
+        }
     }
 
     @Post()

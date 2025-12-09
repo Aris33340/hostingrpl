@@ -6,11 +6,13 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
-      
-      <div @click="$router.push('/dashboard-sekre')" 
-           class="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border border-blue-100 group relative overflow-hidden">
-        <div class="absolute top-0 right-0 bg-blue-500 w-24 h-24 rounded-bl-full opacity-10 group-hover:scale-150 transition-transform"></div>
-        
+
+      <div @click="$router.push('/dashboard-sekre')"
+        class="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border border-blue-100 group relative overflow-hidden">
+        <div
+          class="absolute top-0 right-0 bg-blue-500 w-24 h-24 rounded-bl-full opacity-10 group-hover:scale-150 transition-transform">
+        </div>
+
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Modul Kesekretariatan</h2>
         <p class="text-gray-500 mb-6">Verifikasi berkas, manajemen mahasiswa, undangan, dan presensi.</p>
         <span class="text-blue-600 font-semibold flex items-center gap-2">
@@ -18,10 +20,12 @@
         </span>
       </div>
 
-      <div @click="$router.push('/dashboard-buku')" 
-           class="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border border-purple-100 group relative overflow-hidden">
-        <div class="absolute top-0 right-0 bg-purple-500 w-24 h-24 rounded-bl-full opacity-10 group-hover:scale-150 transition-transform"></div>
-        
+      <div @click="$router.push('/dashboard-buku')"
+        class="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border border-purple-100 group relative overflow-hidden">
+        <div
+          class="absolute top-0 right-0 bg-purple-500 w-24 h-24 rounded-bl-full opacity-10 group-hover:scale-150 transition-transform">
+        </div>
+
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Modul Buku Wisuda</h2>
         <p class="text-gray-500 mb-6">Kelola biodata, upload foto, dan layouting buku wisuda.</p>
         <span class="text-purple-600 font-semibold flex items-center gap-2">

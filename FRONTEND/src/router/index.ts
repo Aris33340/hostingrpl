@@ -39,6 +39,7 @@ const routes = [
     component: Login,
     meta: {
       title: "Login",
+      showTopbar:false,
       showNavbar: false,
       requiresAuth: false
     },
@@ -68,11 +69,12 @@ const routes = [
   // --- 2. ROUTE UTAMA SUPER ADMIN ---
   {
     path: "/super-admin-dashboard",
-    name: "SuperAdminDashboard",
+    name: "SuperAdmin Dashboard",
     component: SuperAdminDashboard,
     meta: {
       title: "Super Admin",
       showNavbar: false,
+      showTopbar:false,
       requiresAuth: true,
       allowedRoles: ["SUPERADMIN"]
     },
@@ -92,7 +94,7 @@ const routes = [
   // --- DASHBOARD KESEKRETARIATAN ---
   {
     path: "/dashboard-sekre",
-    name: "DashboardSekre",
+    name: "Dashboard Sekre",
     component: DashboardSekre,
     meta: {
       title: "Beranda",
@@ -106,7 +108,7 @@ const routes = [
   // --- 4. DASHBOARD BUKU WISUDA ---
   {
     path: "/dashboard-buku",
-    name: "DashboardBuku",
+    name: "Dashboard Buku",
     component: DashboardBuku,
     meta: {
       title: "Beranda Buku",
@@ -120,7 +122,7 @@ const routes = [
   // MANAJEMEN MAHASISWA
   {
     path: "/manajemen-peserta",
-    name: "ManajemenPeserta",
+    name: "Manajemen Peserta",
     component: ManajemenPeserta,
     meta: {
       title: "Manajemen Peserta",
@@ -130,11 +132,21 @@ const routes = [
       allowedRoles: ["SUPERADMIN","SEKRETARIAT","BUKUWISUDA"]
     },
   },
-
-  // DASHBOARD UNDANGAN (TAB MENU)
+  {
+    path: "/input-file",
+    name: "File Manager",
+    component: FileManager,
+    meta: {
+      title: "Manajemen File",
+      icon: UploadIcon,
+      showInNavbar: true,
+      requiresAuth: true,
+      allowedRoles: ["SUPERADMIN","BUKUWISUDA","SEKRETARIAT"]
+    },
+  },
   {
     path: "/manajemen-undangan",
-    name: "ManajemenUndangan",
+    name: "Manajemen Undangan",
     component: ManajemenUndangan,
     meta: {
       title: "Manajemen Undangan",
@@ -143,7 +155,6 @@ const routes = [
       allowedRoles: ["SUPERADMIN","SEKRETARIAT","BUKUWISUDA"]
     },
   },
-  // --- HALAMAN TULIS UNDANGAN DINAMIS ---
   {
     path: "/tulis-undangan/:folderName", // Menerima parameter nama folder
     name: "TulisUndangan",
@@ -156,25 +167,9 @@ const routes = [
       allowedRoles: ["SUPERADMIN"]
     },
   },
-
-  // FILE MANAGER
-  {
-    path: "/input-file",
-    name: "FileManager",
-    component: FileManager,
-    meta: {
-      title: "Input File",
-      icon: UploadIcon,
-      showInNavbar: true,
-      requiresAuth: true,
-      allowedRoles: ["SUPERADMIN","BUKUWISUDA","SEKRETARIAT"]
-    },
-  },
-
-  // PETUGAS SCANNER
   {
     path: "/petugas",
-    name: "DashboardPetugas",
+    name: "Dashboard Petugas",
     component: DashboardPetugas,
     meta: {
       title: "Dashboard Petugas Scanner",

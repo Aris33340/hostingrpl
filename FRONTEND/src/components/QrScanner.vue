@@ -11,6 +11,7 @@
         </div>
         <div id="result"></div>
     </div>
+
 </template>
 
 <script setup>
@@ -51,14 +52,54 @@ onMounted(() => {
     html5QrcodeScanner.render(onScanSuccess, onScanError)
 })
 
+async function killAllCameras() {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+
+  for (const device of devices) {
+    if (device.kind === "videoinput") {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: device.deviceId }
+        });
+        stream.getTracks().forEach(t => t.stop());
+      } catch (err) {
+        console.warn("Failed killing device", err);
+      }
+    }
+  }
+}
+
+
 defineExpose({
     pauseScanner() {
         html5QrcodeScanner?.pause()
     },
     resumeScanner() {
         html5QrcodeScanner?.resume()
+    },
+    async stopScanner() {
+        try {
+            // 1. Hentikan scanner internal
+            if (html5QrcodeScanner?._html5Qrcode) {
+                await html5QrcodeScanner._html5Qrcode.stop();
+            }
+
+            // 2. Bersihkan UI
+            await html5QrcodeScanner?.clear();
+
+            // 3. Matikan semua kamera yg masih aktif (force kill)
+            navigator.mediaDevices.getUserMedia({ video: true }).then(s => {
+                console.log("Tracks:", s.getTracks());
+            });
+            await killAllCameras    ();
+
+        } catch (e) {
+            console.error("Error stop camera:", e);
+        }
     }
+
 })
+
 </script>
 <style>
 #reader__scan_region {

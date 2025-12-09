@@ -42,94 +42,116 @@ export class MahasiswaService {
     });
   }
 
-// 🟩 3️⃣ Ambil mahasiswa dengan search + pagination + filter kelas/prodi
-async getMahasiswaWithPagination(
-  search?: string,
-  page = 1,
-  limit = 10,
-  filter?: string
-) {
-  const skip = (page - 1) * limit;
-  const isNumberSearch = !isNaN(Number(search));
+  // 🟩 3️⃣ Ambil mahasiswa dengan search + pagination + filter kelas/prodi
+  async getMahasiswaWithPagination(
+    search?: string,
+    page = 1,
+    limit = 10,
+    filter?: string,
+    presensiStatus?: number // ⬅️ DITAMBAHKAN
+  ) {
+    const skip = (page - 1) * limit;
+    const isNumberSearch = !isNaN(Number(search));
 
-  // 🔵 BUILD SEARCH CONDITIONS (tanpa undefined)
-  const searchConditions: Prisma.mahasiswaWhereInput[] = [];
+    // 🔵 BUILD SEARCH CONDITIONS
+    const searchConditions: Prisma.mahasiswaWhereInput[] = [];
 
-  if (search) {
-    searchConditions.push(
-      { nama: { contains: search } },
-      { prodi: { contains: search } },
-      { kelas: { contains: search } },
-      { no_telp: { contains: search } },
-      { nama_orang_tua: { contains: search } },
-      { judul_skripsi: { contains: search } },
-      { dosen_pembimbing: { contains: search } },
-      { daerah_asal: { contains: search } },
-      { daerah_penempatan: { contains: search } },
-    );
+    if (search) {
+      searchConditions.push(
+        { nama: { contains: search } },
+        { prodi: { contains: search } },
+        { kelas: { contains: search } },
+        { no_telp: { contains: search } },
+        { nama_orang_tua: { contains: search } },
+        { judul_skripsi: { contains: search } },
+        { dosen_pembimbing: { contains: search } },
+        { daerah_asal: { contains: search } },
+        { daerah_penempatan: { contains: search } }
+      );
 
-    // Jika angka → exact match
-    if (isNumberSearch) {
-      searchConditions.push({ nim: Number(search) });
+      // Jika angka → exact match
+      if (isNumberSearch) {
+        searchConditions.push({ nim: Number(search) });
 
-      const partialMatchNim = await this.prisma.mahasiswa.findMany({
-        select: { nim: true },
-      });
+        const partialMatchNim = await this.prisma.mahasiswa.findMany({
+          select: { nim: true },
+        });
 
-      const matchedNims = partialMatchNim
-        .filter((r) => String(r.nim).includes(search))
-        .map((r) => r.nim);
+        const matchedNims = partialMatchNim
+          .filter((r) => String(r.nim).includes(search))
+          .map((r) => r.nim);
 
-      searchConditions.push({
-        nim: { in: matchedNims }
-      });
+        searchConditions.push({
+          nim: { in: matchedNims }
+        });
+      }
     }
-  }
 
-  // 🔵 FILTER kelas / prodi
-  const filterCondition: Prisma.mahasiswaWhereInput = filter
-    ? {
+    // 🔵 FILTER kelas / prodi
+    const filterCondition: Prisma.mahasiswaWhereInput = filter
+      ? {
         OR: [
           { kelas: filter },
           { prodi: filter },
         ],
       }
-    : {};
+      : {};
 
-  // 🔵 FINAL WHERE
-  const where: Prisma.mahasiswaWhereInput = {
-    AND: [
-      search ? { OR: searchConditions } : {},
-      filterCondition
-    ]
-  };
-
-  // 🔵 QUERY
-  const [data, total] = await Promise.all([
-    this.prisma.mahasiswa.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        peserta: {
-          select: {
-            presensis: {
-              select: {
-                status: true,
-                waktu_presensi: true
+    // 🔵 FILTER berdasarkan status presensi
+    const presensiStatusCondition: Prisma.mahasiswaWhereInput =
+      presensiStatus !== undefined
+        ? {
+          peserta: {
+            some: {
+              presensis: {
+                some: { status: presensiStatus }
               }
             }
           }
         }
-      }
-    }),
+        : {};
 
-    this.prisma.mahasiswa.count({ where }),
-  ]);
+    // 🔵 FINAL WHERE
+    const where: Prisma.mahasiswaWhereInput = {
+      AND: [
+        search ? { OR: searchConditions } : {},
+        filterCondition,
+        presensiStatusCondition
+      ]
+    };
 
-  return { data, page, limit, total };
-}
+    // 🔵 QUERY
+    const [data, total] = await Promise.all([
+      this.prisma.mahasiswa.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          peserta: {
+            select: {
+              presensis: {
+                select: {
+                  status: true,
+                  waktu_presensi: true,
+                  id_presensi:true
+                },
+                where:
+                  presensiStatus !== undefined
+                    ? { status: presensiStatus }
+                    : {},
+              },
+            },
+          },
+        },
+      }),
+
+      this.prisma.mahasiswa.count({ where }),
+    ]);
+
+    return { data, page, limit, total };
+  }
+
 
 
   // 🟩 4️⃣ Tambah satu mahasiswa
@@ -154,42 +176,42 @@ async getMahasiswaWithPagination(
     return mahasiswa;
   }
 
-// 🟩 5️⃣ Tambah banyak mahasiswa (import Excel) - dengan validasi duplicate
-async createManyMahasiswa(
-  data: Prisma.mahasiswaCreateManyInput[],
-): Promise<{ inserted: number; duplicates: string[] }> {
+  // 🟩 5️⃣ Tambah banyak mahasiswa (import Excel) - dengan validasi duplicate
+  async createManyMahasiswa(
+    data: Prisma.mahasiswaCreateManyInput[],
+  ): Promise<{ inserted: number; duplicates: string[] }> {
 
-  const validData = data.filter((d) => d.nim && d.nama);
+    const validData = data.filter((d) => d.nim && d.nama);
 
-  // 🔵 Ambil NIM yang sudah ada di database
-  const existing = await this.prisma.mahasiswa.findMany({
-    where: { nim: { in: validData.map(d => Number(d.nim)) } },
-    select: { nim: true },
-  });
-  const existingNims = existing.map(e => String(e.nim));
-
-  // 🔵 Pisahkan data baru dan duplicate
-  const newData = validData.filter(d => !existingNims.includes(String(d.nim)));
-  const duplicateNims = validData
-    .filter(d => existingNims.includes(String(d.nim)))
-    .map(d => String(d.nim));
-
-  // 🔵 Insert data baru
-  if (newData.length > 0) {
-    await this.prisma.mahasiswa.createMany({ data: newData });
-    await this.prisma.peserta.createMany({
-      data: newData.map(e => ({ nim: Number(e.nim), jenis: 'mahasiswa' })),
+    // 🔵 Ambil NIM yang sudah ada di database
+    const existing = await this.prisma.mahasiswa.findMany({
+      where: { nim: { in: validData.map(d => Number(d.nim)) } },
+      select: { nim: true },
     });
+    const existingNims = existing.map(e => String(e.nim));
 
-    const pesertas = await this.prisma.peserta.findMany();
-    await this.prisma.presensi.createMany({
-      data: pesertas.map(e => ({ id_peserta: Number(e.id_peserta) })),
-      skipDuplicates: true,
-    });
+    // 🔵 Pisahkan data baru dan duplicate
+    const newData = validData.filter(d => !existingNims.includes(String(d.nim)));
+    const duplicateNims = validData
+      .filter(d => existingNims.includes(String(d.nim)))
+      .map(d => String(d.nim));
+
+    // 🔵 Insert data baru
+    if (newData.length > 0) {
+      await this.prisma.mahasiswa.createMany({ data: newData });
+      await this.prisma.peserta.createMany({
+        data: newData.map(e => ({ nim: Number(e.nim), jenis: 'mahasiswa' })),
+      });
+
+      const pesertas = await this.prisma.peserta.findMany();
+      await this.prisma.presensi.createMany({
+        data: pesertas.map(e => ({ id_peserta: Number(e.id_peserta) })),
+        skipDuplicates: true,
+      });
+    }
+
+    return { inserted: newData.length, duplicates: duplicateNims };
   }
-
-  return { inserted: newData.length, duplicates: duplicateNims };
-}
 
 
   // 🟩 6️⃣ Update mahasiswa
