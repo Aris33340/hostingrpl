@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full min-h-screen">
+  <div class="relative w-full h-full">
     <Loading />
     <Notification :show="notification.show" :type="notification.type" :message="notification.message"
       @close="notification.show = false" />
