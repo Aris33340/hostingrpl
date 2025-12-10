@@ -52,6 +52,13 @@ export class TamuService {
         skip,
         take: limit,
         where,
+        include:{
+          peserta:{
+            include:{
+              presensis:true
+            }
+          }
+        },
         orderBy: { id_tamu: 'asc' },
       }),
       this.prisma.tamu.count({ where }),

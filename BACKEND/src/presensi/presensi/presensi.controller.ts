@@ -8,9 +8,9 @@ export class PresensiController {
     async getAll() {
         return this.presensiService.getAllPresensi();
     }
-    @Get('count-status-presensi')
+    @Get('statistik-data')
     async getCountInfoPresensi() {
-        return this.presensiService.getInfoPresensi();
+        return this.presensiService.getStatistikPresensi();
     }
 
     @Get('find-peserta/:id')

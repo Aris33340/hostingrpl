@@ -5,11 +5,12 @@
       @close="notification.show = false" />
 
     <Modal />
-    <div class="flex flex-row w-full h-full">
-      <Sidebar class="sticky h-[100vh]" v-if="!$route.meta.hideSidebar" />
+    <div class="flex flex-row w-full min-h-screen">
+      <Sidebar class="sticky h-screen" v-if="!$route.meta.hideSidebar" />
       <div class="flex flex-col w-full h-full">
         <TopBar />
-        <main class="flex-1 w-full overflow-x-hidden"> <router-view v-slot="{ Component }">
+        <main class="flex-1 w-full overflow-x-hidden"> 
+          <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
               <component :is="Component" />
             </transition>

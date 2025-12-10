@@ -1,18 +1,18 @@
 <template>
   <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto text-gray-800">
-    <table class="w-full text-sm">
+    <table class="w-full text-sm overflow-x-auto">
       <thead class="bg-gray-50 text-gray-700">
         <tr>
-          <th class="p-3 border-b text-left">NIM</th>
-          <th class="p-3 border-b text-left">Nama</th>
-          <th class="p-3 border-b text-left">Prodi</th>
-          <th class="p-3 border-b text-left">Kelas</th>
-          <th class="p-3 border-b text-left">No. Telp</th>
-          <th class="p-3 border-b text-left">Daerah Asal</th>
-          <th class="p-3 border-b text-left">Penempatan</th>
-          <th class="p-3 border-b text-left">Judul Skripsi</th>
-          <th class="p-3 border-b text-left">Pembimbing</th>
-          <th class="p-3 border-b text-left">Orang Tua</th>
+          <th class="p-3 border-b text-center">NIM</th>
+          <th class="p-3 border-b text-center">Nama</th>
+          <th class="p-3 border-b text-center">Prodi</th>
+          <th class="p-3 border-b text-center">Kelas</th>
+          <th class="p-3 border-b text-center">No. Telp</th>
+          <th class="p-3 border-b text-center">Daerah Asal</th>
+          <th class="p-3 border-b text-center">Penempatan</th>
+          <th class="p-3 border-b text-center">Judul Skripsi</th>
+          <th class="p-3 border-b text-center">Pembimbing</th>
+          <th class="p-3 border-b text-center">Orang Tua</th>
           <th class="p-3 border-b text-center">Aksi</th>
         </tr>
       </thead>
@@ -30,8 +30,10 @@
           <td class="p-3 border-b">{{ m.dosen_pembimbing || '-' }}</td>
           <td class="p-3 border-b">{{ m.nama_orang_tua || '-' }}</td>
           <td class="p-3 border-b text-center">
-            <button @click="$emit('edit', m)" class="px-2 py-1 rounded-md bg-yellow-400 hover:bg-yellow-500 text-white mr-2">✏️</button>
-            <button @click="$emit('hapus', m)" class="px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white">🗑️</button>
+            <div class="flex flex-row justify-center">
+              <button @click="$emit('edit', m)" class="px-2 py-1 w-full rounded-md bg-yellow-400 hover:bg-yellow-500 text-white mr-2">✏️</button>
+              <button @click="$emit('hapus', m)" class="px-2 py-1 w-full rounded-md bg-red-500 hover:bg-red-600 text-white">🗑️</button>
+            </div>
           </td>
         </tr>
       </tbody>

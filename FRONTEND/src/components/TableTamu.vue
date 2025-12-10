@@ -1,12 +1,12 @@
 <template>
   <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto text-gray-800">
-    <table class="w-full text-sm">
+    <table class="w-full text-sm overflow-x-auto">
       <thead class="bg-gray-50 text-gray-700">
         <tr>
-          <th class="p-3 border-b text-left">ID Tamu</th>
-          <th class="p-3 border-b text-left">Nama</th>
-          <th class="p-3 border-b text-left">Email</th>
-          <th class="p-3 border-b text-left">Asal Instansi</th>
+          <th class="p-3 border-b text-center">ID Tamu</th>
+          <th class="p-3 border-b text-center">Nama</th>
+          <th class="p-3 border-b text-center">Email</th>
+          <th class="p-3 border-b text-center">Asal Instansi</th>
           <th class="p-3 border-b text-center">Aksi</th>
         </tr>
       </thead>
@@ -23,19 +23,22 @@
           <td class="p-3 border-b">{{ t.asal_instansi || '-' }}</td>
 
           <td class="p-3 border-b text-center">
-            <button
-              @click="$emit('edit', t)"
-              class="px-2 py-1 rounded-md bg-yellow-400 hover:bg-yellow-500 text-white mr-2"
-            >
-              ✏️
-            </button>
+            <div class=" flex flex-row justify-center">
 
-            <button
-              @click="$emit('hapus', t)"
-              class="px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white"
-            >
-              🗑️
-            </button>
+              <button
+                @click="$emit('edit', t)"
+                class="px-2 py-1 rounded-md bg-yellow-400 hover:bg-yellow-500 text-white mr-2"
+              >
+                ✏️
+              </button>
+  
+              <button
+                @click="$emit('hapus', t)"
+                class="px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white"
+              >
+                🗑️
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -48,8 +51,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
-
 defineProps({
   tamu: {
     type: Array,

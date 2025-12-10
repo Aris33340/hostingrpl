@@ -14,12 +14,12 @@ export class PresensiService {
         }
     }
 
-    async getInfoPresensi() {
+    async getStatistikPresensi() {
         try {
             const presensi = await this.prisma.presensi.findMany({
                 select: {
                     status: true,
-                    peserta: { select: { jenis: true } },
+                    peserta: { include: { mahasiswa: true, tamu: true } },
                 },
             });
 
@@ -33,6 +33,13 @@ export class PresensiService {
                 totalUndanganTamu: 0,
                 tamuHadir: 0,
                 tamuTidakHadir: 0,
+                peminatan: [
+                    { SD: { hadir: 0, total: 0 } },
+                    { SI: { hadir: 0, total: 0 } },
+                    { SE: { hadir: 0, total: 0 } },
+                    { SK: { hadir: 0, total: 0 } },
+                    { D3: { hadir: 0, total: 0 } },
+                ]
             };
 
             for (const p of presensi) {
@@ -51,6 +58,20 @@ export class PresensiService {
                     else info.tamuTidakHadir++;
                 }
             }
+            // const kategori = ["SI","SD","SK","SE","D3"]
+            info.peminatan.forEach(p => {
+                const peminatan = Object.keys(p).toString()
+                let hadir = 0
+                let total = 0
+                presensi.forEach(e => {
+                    if(String(e.peserta.mahasiswa?.kelas).includes(peminatan)){
+                        total++
+                        if(e.status === 1)hadir++
+                    }
+                })
+                p[peminatan].hadir = hadir
+                p[peminatan].total = total
+            })
 
             return info;
         } catch (e) {
@@ -58,22 +79,23 @@ export class PresensiService {
         }
     }
 
-    async getPesertaByIdPresensi(id:number){
+    async getPesertaByIdPresensi(id: number) {
         try {
             const res = this.prisma.presensi.findFirst({
-                select:{
-                    peserta:{
-                        select:{
-                            mahasiswa:{
-                                select:{
-                                    nama:true,nim:true,prodi:true,kelas:true
+                select: {
+                    peserta: {
+                        select: {
+                            mahasiswa: {
+                                select: {
+                                    nama: true, nim: true, prodi: true, kelas: true
                                 }
-                            },tamu:true
+                            }, tamu: true
                         }
-                    }
+                    },
+                    status: true
                 },
-                where:{
-                    id_presensi:id
+                where: {
+                    id_presensi: id
                 }
             })
             return res;
@@ -116,13 +138,15 @@ export class PresensiService {
             // }
 
             // return presMahasiswa;
-            return this.prisma.presensi.findMany({where:{
-                peserta:{
-                    mahasiswa:{
-                        nim:nim
+            return this.prisma.presensi.findMany({
+                where: {
+                    peserta: {
+                        mahasiswa: {
+                            nim: nim
+                        }
                     }
                 }
-            }})
+            })
         } catch (e) {
             throw new BadRequestException('Terjadi kesalahan saat mengambil data');
         }
@@ -138,14 +162,15 @@ export class PresensiService {
         }
 
         if (presensi.status === 1) {
-            return {message:'sudah ditandai hadir',
-                STATUS_CODES:HttpStatus.CONFLICT
+            return {
+                message: 'sudah ditandai hadir',
+                STATUS_CODES: HttpStatus.CONFLICT
             }
         }
 
         await this.prisma.presensi.update({
             where: { id_presensi: idPresensi },
-            data: { status: 1 ,waktu_presensi:new Date},
+            data: { status: 1, waktu_presensi: new Date },
         });
 
         return {
@@ -179,14 +204,14 @@ export class PresensiService {
         };
     }
 
-    async setAllPresensiHadir(){
+    async setAllPresensiHadir() {
         try {
             await this.prisma.presensi.updateMany({
-                data:{
-                    status:1
+                data: {
+                    status: 1
                 },
-                where:{
-                    status:0
+                where: {
+                    status: 0
                 }
             })
             return {
@@ -194,18 +219,18 @@ export class PresensiService {
                 STATUS_CODES: HttpStatus.OK,
             }
         } catch (e) {
-            throw new BadRequestException('Gagal menandai hadir',e);
+            throw new BadRequestException('Gagal menandai hadir', e);
         }
     }
-    
-    async setAllPresensiTidakHadir(){
+
+    async setAllPresensiTidakHadir() {
         try {
             await this.prisma.presensi.updateMany({
-                data:{
-                    status:0
+                data: {
+                    status: 0
                 },
-                where:{
-                    status:1
+                where: {
+                    status: 1
                 }
             })
             return {
@@ -213,7 +238,7 @@ export class PresensiService {
                 STATUS_CODES: HttpStatus.OK,
             }
         } catch (e) {
-            throw new BadRequestException('Gagal menandai Tidak hadir',e);
+            throw new BadRequestException('Gagal menandai Tidak hadir', e);
         }
     }
 

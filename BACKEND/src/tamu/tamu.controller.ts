@@ -15,7 +15,7 @@ import { Prisma } from '@prisma/client';
 
 @Controller('api/tamu')
 export class TamuController {
-  constructor(private readonly tamuService: TamuService) {}
+  constructor(private readonly tamuService: TamuService) { }
 
   // 🟦 Ambil list instansi unik (untuk filter)
   @Get('field/instansi')
@@ -45,7 +45,7 @@ export class TamuController {
     @Query('search') search?: string,
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
-    @Query('instansi') instansi?: string,  // ⬅ filter instansi
+    @Query('instansi') instansi?: string,
   ) {
     const pageNum = Number(page);
     const limitNum = Number(limit);
@@ -53,13 +53,16 @@ export class TamuController {
     if (isNaN(pageNum) || isNaN(limitNum)) {
       throw new BadRequestException('Page dan limit harus berupa angka');
     }
-
-    return this.tamuService.getTamuWithPagination(
-      search ?? '',
-      pageNum,
-      limitNum,
-      instansi,  // ⬅ kirim ke service
-    );
+    try {
+      return this.tamuService.getTamuWithPagination(
+        search ?? '',
+        pageNum,
+        limitNum,
+        instansi,  // ⬅ kirim ke service
+      );
+    } catch (e) {
+      console.log(e)
+    }
   }
 
 

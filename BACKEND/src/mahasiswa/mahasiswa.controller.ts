@@ -58,7 +58,10 @@ export class MahasiswaController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('filter') filter?: string,   // ⬅ FILTER TAMBAHAN
-    @Query('status') status?: string
+    @Query('status') status?: string,
+    @Query('peminatan') peminatan?: string,
+    @Query('kelas') kelas?: string,
+
   ) {
     const pageNum = Number(page);
     const limitNum = Number(limit);
@@ -67,14 +70,19 @@ export class MahasiswaController {
       throw new BadRequestException('Page dan limit harus berupa angka');
     }
 
-
-    return this.mhsService.getMahasiswaWithPagination(
-      search,
-      pageNum,
-      limitNum,
-      filter,
-      status !== undefined ? Number(status) : undefined // ⬅ KIRIM KE SERVICE
-    );
+    try{
+      return this.mhsService.getMahasiswaWithPagination(
+        search,
+        pageNum,
+        limitNum,
+        filter,
+        status !== undefined ? Number(status) : undefined ,// ⬅ KIRIM KE SERVICE
+        peminatan,
+        kelas
+      );
+    }catch(e){
+      console.log(e)
+    }
   }
 
   // 🟩 4️⃣ POST bulk

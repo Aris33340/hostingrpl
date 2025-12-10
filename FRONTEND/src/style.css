@@ -35,7 +35,7 @@ a:hover {
 
 body {
   margin: 0;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
 }
 
@@ -70,12 +70,12 @@ h1 {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), /* overlay */
     url(@/assets/images/Background.png);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   filter: blur(3px);
+  transform: scale(1.05);
   z-index: -1;
 }
 

@@ -57,7 +57,7 @@
 
 <script setup>
 import * as XLSX from 'xlsx'
-import { ref, computed, defineEmits } from 'vue'
+import { ref, computed } from 'vue'
 import { mainApi } from '@/api'
 import { showNotification } from '@/composables/useNotification'
 

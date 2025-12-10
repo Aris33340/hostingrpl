@@ -1,50 +1,53 @@
 <template>
     <div class="min-h-screen mx-10 md:p-6 lg:p-8">
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 order-2 md:order-1">
-            <InfoContainer :loading="isLoading" :value="totalUndangan" message="Total Undangan" icon="users"
-                color="blue" />
-            <InfoContainer :loading="isLoading" :value="totalHadir" message="Hadir" icon="check" color="green" />
-            <InfoContainer :loading="isLoading" :value="totalBelumHadir" message="Belum Hadir" icon="clock"
-                color="orange" />
-        </div>
-
-        <div class="grid h-full grid-cols-1 lg:grid-cols-2 gap-6 mb-6 order-1 md:order-2">
-            <div class="bg-white/5 ...">
-                <Scanner ref="scannerRef" @scanned="handleScan" />
+        <div class="flex md:flex-col flex-col">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 order-2 md:order-1">
+                <InfoContainer :loading="isLoading" :value="totalUndangan" message="Total Undangan" icon="users"
+                    color="blue" />
+                <InfoContainer :loading="isLoading" :value="totalHadir" message="Hadir" icon="check" color="green" />
+                <InfoContainer :loading="isLoading" :value="totalBelumHadir" message="Belum Hadir" icon="clock"
+                    color="orange" />
             </div>
 
-            <div class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
-                <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Input Manual
-                </h2>
+            <div class="grid h-full grid-cols-1 lg:grid-cols-2 gap-6 mb-6 order-1 md:order-2">
+                <div class="bg-white/5 border border-blue-500/20 rounded-2xl">
+                    <Scanner ref="scannerRef" @scanned="handleScan" />
+                </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-white mb-2">NIM Wisudawan</label>
-                        <input v-model="manualNim" type="text" placeholder="Contoh: 222011234"
-                            class="w-full px-4 py-3 border-2 bg-transparent border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none" />
+                <div class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Input Manual
+                    </h2>
+
+                    <div class="flex flex-col justify-center h-full p-6">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-2">NIM Wisudawan</label>
+                            <input v-model="manualNim" type="text" placeholder="Contoh: 222011234"
+                                class="w-full px-4 py-3 border-2 mb-4 bg-transparent border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none" />
+                            <button @click="handleManualInput" :disabled="!manualNim"
+                                class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                Tandai Hadir
+                            </button>
+                        </div>
                     </div>
-                    <button @click="handleManualInput" :disabled="!manualNim"
-                        class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                        Tandai Hadir
-                    </button>
                 </div>
             </div>
         </div>
 
         <div class="bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
                 <div class="flex flex-col">
                     <h2 class="text-xl font-bold text-white">Manajemen Data Kehadiran</h2>
-                    <KategoriToggle @change="handleKategoriToggle"/>
+                    <KategoriToggle v-show="viewMode === 'table'" @change="handleKategoriToggle" />
                 </div>
+                <!-- button grafik -->
                 <div
-                    class="flex items-center gap-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-2  ">
+                    class="flex items-center gap-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-2">
                     <button @click="viewMode = 'table'"
                         :class="viewMode === 'table' ? 'border-blue-500 text-blue-400' : 'text-white'"
                         class="px-4 py-2 rounded-md transition-all font-medium text-sm hover:text-blue-600 hover:border-b-blue-700">
@@ -68,7 +71,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div v-show="viewMode === 'table'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div class="md:col-span-2">
                     <div class="relative">
                         <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -81,52 +84,39 @@
                             class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl  focus:border-blue-500 focus:ring-2 backdrop-blur-lg bg-transparent focus:ring-blue-200 transition-all outline-none" />
                     </div>
                 </div>
+                <div v-if="isMahasiswa" class="md:col-span-2">
+                    <select v-model="selectedPeminatan"
+                        class="px-4 py-2.5 border-2 w-1/2 border-gray-200 cursor-pointer rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none backdrop-blur-lg bg-transparent">
+                        <option class="text-gray-700" value="">-- Pilih Peminatan --</option>
+                        <option class="text-gray-700" v-for="p in peminatans" :key="p.kode" :value="p">{{ p.label
+                            }}</option>
+                    </select>
+                    <select v-model="selectedKelas"
+                        class="px-4 py-2.5 border-2 w-1/2 cursor-pointer border-gray-200 rounded-xl  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none backdrop-blur-lg bg-transparent"
+                        :disabled="!selectedPeminatan">
+                        <option class="text-gray-700" value="">-- Pilih Kelas --</option>
+                        <option class="text-gray-700" v-for="k in filteredKelas" :key="k.kode" :value="k">{{
+                            k.label }}</option>
+                    </select>
+                </div>
 
-                <select v-model="filterKelas"
-                    class="px-4 py-2.5 border-2 border-gray-200 cursor-pointer rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none backdrop-blur-lg bg-transparent">
-                    <option class="text-gray-700" value="">Semua Kelas</option>
-                    <option class="text-gray-700" value="SD">Sains Data</option>
-                    <option class="text-gray-700" value="SI">Sistem Informasi</option>
-                    <option class="text-gray-700" value="SK">Statistik Sosial Kependudukan</option>
-                    <option class="text-gray-700" value="SE">Statistik Ekonomi</option>
-                    <option class="text-gray-700" value="D3">D3 Statistika</option>
-                </select>
-
-                <select v-model="filterProdi"
-                    class="px-4 py-2.5 border-2 cursor-pointer border-gray-200 rounded-xl  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none backdrop-blur-lg bg-transparent">
-                    <option class="text-gray-700" value="">Semua Prodi</option>
-                    <option class="text-gray-700" value="d3">D3</option>
-                    <option class="text-gray-700" value="d4st">D4ST</option>
-                    <option class="text-gray-700" value="d4ks">D4KS</option>
-                </select>
             </div>
 
             <div v-if="viewMode === 'table'" class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
                         <tr class="bg-gray-50 border-b-2 border-gray-200">
-                            <th @click="sortBy('nim')"
+                            <th v-for="value in tableKey.slice(0, tableKey.length - 3)" @click="sortBy(value)"
                                 class="px-4 py-3 text-center text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors">
                                 <div class="flex justify-center items-center gap-2">
-                                    NIM
+                                    {{ value }}
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                                     </svg>
                                 </div>
                             </th>
-                            <th @click="sortBy('nama')"
-                                class="px-4 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer transition-colors">
-                                <div class="flex justify-center items-center gap-2">
-                                    Nama
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                                    </svg>
-                                </div>
-                            </th>
-                            <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Kelas</th>
-                            <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Prodi</th>
+
                             <th @click="toggleStatusFilter"
                                 class="px-4 py-3 text-center text-sm font-semibold bg-blue-200 text-gray-700 cursor-pointer hover:bg-blue-100 transition-colors">
                                 {{
@@ -140,26 +130,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item, index) in paginatedData" :key="index"
+                        <tr v-for="(item, index) in tableDataAll" :key="index"
                             class="border-b border-gray-100 hover:border-blue-400 hover:cursor-pointer transition-colors">
-                            <td class="px-4 py-3 text-sm font-bold text-white">{{ item.nim }}</td>
-                            <td class="px-4 py-3 text-sm font-bold text-white">{{ item.nama }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-300">{{ item.kelas }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-300">{{ item.prodi }}</td>
+                            <td v-for="value in tableKey.slice(0, tableKey.length - 3)"
+                                class="px-4 py-3 text-sm font-bold text-white">{{ item[`${value}`] }}</td>
+
                             <td class="px-4 py-3">
-                                <span @click="canToggleStatus ? toggleStatus(item.peserta[0]?.presensis[0]) : null"
-                                    :class="[
-                                        'icon-status px-3 py-1 rounded-full text-xs font-semibold cursor-pointer',
-                                        item.peserta[0]?.presensis[0]?.status === 1
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-orange-100 text-orange-700',
-                                        canToggleStatus ? 'hover:opacity-70' : 'cursor-not-allowed'
-                                    ]">
-                                    {{ item.peserta[0]?.presensis[0]?.status === 1 ? '✓ Hadir' : '○ Belum' }}
+                                <span @click="canToggleStatus ? toggleStatus(item) : null" :class="[
+                                    'icon-status px-3 py-1 rounded-full text-xs font-semibold cursor-pointer',
+                                    item.status === 1
+                                        ? 'bg-green-100 text-green-700'
+                                        : 'bg-orange-100 text-orange-700',
+                                    canToggleStatus ? 'hover:opacity-70' : 'cursor-not-allowed'
+                                ]">
+                                    {{ item.status === 1 ? '✓ Hadir' : '○ Belum' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-300">{{ new
-                                Date(item.peserta[0]?.presensis[0]?.waktu_presensi).toLocaleTimeString([], {
+                                Date(item.waktu).toLocaleTimeString([], {
                                     hour:
                                         '2-digit', minute: '2-digit'
                                 }) || '-' }}</td>
@@ -192,122 +180,21 @@
             </div>
 
             <div v-else class="flex justify-center items-center py-12">
-                <div class="text-center">
-                    <div class="relative inline-block">
-                        <div class="absolute inset-0 blur-2xl opacity-30">
-                            <div class="w-64 h-64 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500"></div>
-                        </div>
+                <div class="flex flex-col  w-full h-full">
 
-                        <svg class="w-64 h-64 relative z-10 transform hover:scale-105 transition-transform duration-500"
-                            viewBox="0 0 200 200">
-                            <defs>
-                                <linearGradient id="pieGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
-                                </linearGradient>
-                                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#f3f4f6;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />
-                                </linearGradient>
-
-                                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                                    <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
-                                    <feOffset dx="0" dy="2" result="offsetblur" />
-                                    <feComponentTransfer>
-                                        <feFuncA type="linear" slope="0.3" />
-                                    </feComponentTransfer>
-                                    <feMerge>
-                                        <feMergeNode />
-                                        <feMergeNode in="SourceGraphic" />
-                                    </feMerge>
-                                </filter>
-                            </defs>
-
-                            <circle cx="100" cy="100" r="80" fill="none" stroke="url(#bgGradient)" stroke-width="24"
-                                opacity="0.5" />
-
-                            <circle cx="100" cy="100" r="80" fill="none" stroke="url(#pieGradient)" stroke-width="24"
-                                stroke-linecap="round"
-                                :stroke-dasharray="`${(totalHadir / totalUndangan * 502.4)} 502.4`"
-                                transform="rotate(-90 100 100)" class="transition-all duration-[2000ms] ease-out"
-                                filter="url(#shadow)" style="transition-delay: 200ms" />
-                            <circle cx="100" cy="100" r="65" fill="white" opacity="0.95" />
-
-                            <text x="100" y="92" text-anchor="middle"
-                                class="text-5xl font-bold fill-transparent animate-pulse" style="background: linear-gradient(135deg, #10b981, #059669); 
-                           -webkit-background-clip: text;
-                           background-clip: text;">
-                                <tspan class="fill-emerald-600">
-                                    {{ Math.round(totalHadir / totalUndangan * 100) }}
-                                </tspan>
-                                <tspan class="text-3xl fill-emerald-500">%</tspan>
-                            </text>
-
-                            <text x="100" y="118" text-anchor="middle"
-                                class="text-sm font-semibold fill-gray-500 tracking-wider uppercase">
-                                Kehadiran
-                            </text>
-                        </svg>
+                    <div class="flex flex-row">
+                        <GrafikLingkaran :labels="['Mahasiswa', 'Non Mahasiswa']" :values="pieChartData"
+                            :key="pieChartData" />
+                        <GrafikBatangVertikalPersentase :labels="['Mahasiswa', 'Non Mahasiswa']" :values="yBarChartData"
+                            :key="yBarChartData" />
                     </div>
 
-                    <div class="mt-10 flex justify-center gap-6">
-                        <div class="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50 
-                        rounded-2xl px-6 py-4 shadow-lg hover:shadow-xl 
-                        transition-all duration-300 hover:-translate-y-1 border border-emerald-100">
-                            <div class="absolute top-0 right-0 w-20 h-20 bg-emerald-400 rounded-full 
-                            opacity-10 -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500"></div>
-                            <div class="relative flex items-center gap-3">
-                                <div class="flex items-center justify-center w-10 h-10 
-                                bg-gradient-to-br from-emerald-500 to-teal-500 
-                                rounded-xl shadow-lg">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Hadir</p>
-                                    <p class="text-2xl font-bold text-emerald-600">{{ totalHadir }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="group relative overflow-hidden bg-gradient-to-br from-gray-50 to-slate-50 
-                        rounded-2xl px-6 py-4 shadow-lg hover:shadow-xl 
-                        transition-all duration-300 hover:-translate-y-1 border border-gray-200">
-                            <div class="absolute top-0 right-0 w-20 h-20 bg-gray-400 rounded-full 
-                            opacity-10 -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500"></div>
-                            <div class="relative flex items-center gap-3">
-                                <div class="flex items-center justify-center w-10 h-10 
-                                bg-gradient-to-br from-gray-400 to-slate-400 
-                                rounded-xl shadow-lg">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Belum</p>
-                                    <p class="text-2xl font-bold text-gray-600">{{ totalBelumHadir }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 inline-flex items-center gap-2 px-4 py-2 
-                    bg-gradient-to-r from-gray-100 to-slate-100 
-                    rounded-full border border-gray-200">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                            </path>
-                        </svg>
-                        <span class="text-sm font-medium text-gray-600">
-                            Total Undangan: <span class="font-bold text-gray-800">{{ totalUndangan }}</span>
-                        </span>
-                    </div>
+                    <GrafikBatangHorizontal :labels="xBarChartData.map(e => String(Object.keys(e)))" :values="xBarChartData.map(e => {
+                        return Math.ceil(e[Object.keys(e).toString()].hadir / e[Object.keys(e).toString()].total * 100)
+                    })" :key="xBarChartData" />
+                    <GrafikBatangVertikalTotal :labels="xBarChartData.map(e => String(Object.keys(e)))" :values="xBarChartData.map(e => {
+                        return e[Object.keys(e).toString()].total
+                    })" :key="yBarChartData" />
                 </div>
             </div>
         </div>
@@ -315,8 +202,13 @@
 </template>
 
 <script setup>
+import Swal from "sweetalert2";
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import InfoContainer from '../components/InfoContainer.vue';
+import GrafikBatangVertikalPersentase from "../components/DashboardPetugas/GrafikBatangVertikalPersentase.vue";
+import GrafikBatangVertikalTotal from "../components/DashboardPetugas/GrafikBatangVertikalTotal.vue";
+import GrafikBatangHorizontal from "../components/DashboardPetugas/GrafikBatangHorizontal.vue";
+import GrafikLingkaran from "../components/DashboardPetugas/GrafikLingkaran.vue";
 import Scanner from '../components/QrScanner.vue';
 import KategoriToggle from '../components/DashboardPetugas/KategoriButton.vue';
 import { mainApi } from '@/api'
@@ -327,39 +219,196 @@ const modal = useModal();
 const scannerRef = ref(null)
 const manualNim = ref('');
 const scanResult = ref("");
-const totalUndangan = ref(0);
-const totalHadir = ref(0);
-const totalBelumHadir = ref(0);
+const statistikData = ref();
+const totalUndangan = computed(() => isMahasiswa.value ? statistikData.value?.totalUndanganMahasiswa ?? 0 : statistikData.value?.totalUndanganTamu ?? 0)
+const totalHadir = computed(() => isMahasiswa.value ? statistikData.value?.mahasiswaHadir ?? 0 : statistikData.value?.tamuHadir ?? 0)
+const totalBelumHadir = computed(() => isMahasiswa.value ? statistikData.value?.mahasiswaTidakHadir ?? 0 : statistikData.value?.tamuTidakHadir ?? 0);
+const tableDataAll = ref([])
 const isLoading = ref(true);
-const viewMode = ref('table');
-const tableData = ref([]);
+const viewMode = ref('chart');
 const searchQuery = ref('');
 const filterKelas = ref('');
 const filterProdi = ref('');
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const totalData = ref(0);
+const tableMode = ref()
 const filterStatus = ref(null);
 const totalPages = computed(() => Math.ceil(totalData.value / itemsPerPage.value));
 const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
 const endIndex = computed(() => Math.min(currentPage.value * itemsPerPage.value, totalData.value));
+const tableKey = ref([])
+const sortState = ref({});
+const isMahasiswa = ref(true)
+const authStore = useAuthStore()
+const pieChartData = ref([1, 1])
+const xBarChartData = ref([])
+const yBarChartData = ref([])
+const peminatans = ref([{ kode: '01', label: "KS" }, { kode: '02', label: "ST" }, { kode: '03', label: "D3" }])
+const kelas = ref([
+    { kode: '0101', label: "4SI1" }, { kode: '0102', label: "4SI2" },
+    { kode: '0103', label: "4SD1" }, { kode: '0104', label: "4SD2" },
+    { kode: '0201', label: "4SE1" }, { kode: '0202', label: "4SE2" },
+    { kode: '0203', label: "4SK1" }, { kode: '0204', label: "4SK2" },
+    { kode: '0301', label: "3D31" }, { kode: '0302', label: "3D32" },
+])
+const selectedPeminatan = ref('')
+const selectedKelas = ref('')
+const filteredKelas = computed(() => {
+    if (!selectedPeminatan.value) return []
+    return kelas.value.filter(k => k.kode.startsWith(selectedPeminatan.value.kode))
+})
+let payload = null
+
+watch(() => ([selectedPeminatan.value, selectedKelas.value]), async () => {
+    await mountTableData(isMahasiswa.value)
+})
+
+watch(selectedPeminatan, async (newVal, oldVal) => {
+    if (newVal !== oldVal && selectedKelas.value) {
+        selectedKelas.value = ''
+    }
+    await mountTableData(isMahasiswa.value)
+})
+
+function showAlert(title, text, icon) {
+    Swal.fire({
+        title: title,
+        text: text,
+        icon: icon,
+        showConfirmButton: false,
+        timer: 1200,
+        timerProgressBar: true,
+    });
+}
+
+async function showConfirm(name) {
+    return Swal.fire({
+        title: "Konfirmasi Kehadiran",
+        text: `Konfirmasi Kehadiran Peserta ${name} ?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Konfirmasi",
+        cancelButtonText: "Batal"
+    }).then((result) => {
+        return result.isConfirmed;
+    });
+}
+
+const mountTableData = async (type) => {
+    console.log('peminatan:', selectedPeminatan.value.label)
+    console.log('kelas:', selectedKelas.value.label)
+    await mountStatistikData()
+    isLoading.value = true;
+    try {
+        let res;
+        if (type) {
+            res = await mainApi.get(`mahasiswa/pagination`, {
+                params: {
+                    search: searchQuery.value || undefined,
+                    page: currentPage.value,
+                    limit: itemsPerPage.value,
+                    status: filterStatus.value !== null ? filterStatus.value : undefined,
+                    peminatan: selectedPeminatan.value.label,
+                    kelas: selectedKelas.value.label
+                }
+            });
+            console.log("data tabel", res.data)
+            tableDataAll.value = res.data.data.map(e => {
+                const presensi = e.peserta[0]?.presensis ?? []
+                const restructuredData = {
+                    nim: e.nim,
+                    nama: e.nama,
+                    kelas: e.kelas,
+                    prodi: e.prodi,
+                    id_presensi: presensi[0]?.id_presensi,
+                    status: presensi[0]?.status,
+                    waktu: presensi[0]?.waktu_presensi,
+                }
+                return restructuredData
+            })
+        } else {
+            res = await mainApi.get('tamu/pagination', {
+                params: {
+                    search: searchQuery.value || undefined,
+                    page: currentPage.value,
+                    limit: itemsPerPage.value,
+                    status: filterStatus.value !== null ? filterStatus.value : undefined,
+                }
+            })
+            tableDataAll.value = res.data.data.map(e => {
+                const presensi = e.peserta[0]?.presensis ?? []
+                const restructuredData = {
+                    nama: e.nama,
+                    asal_instansi: e.asal_instansi,
+                    id_presensi: presensi[0]?.id_presensi,
+                    status: presensi[0]?.status,
+                    waktu: presensi[0]?.waktu_presensi,
+                }
+                return restructuredData
+            })
+        }
+        tableKey.value = Object.keys(tableDataAll.value[0])
+        tableKey.value.forEach(key => {
+            sortState.value[key] = false;
+        });
+        totalData.value = res.data.total
+    } catch (e) {
+        console.log(e)
+        showNotification('error', e.message || 'Gagal memuat data mahasiswa');
+    } finally {
+        isLoading.value = false;
+    }
+};
+
+async function mountStatistikData() {
+    isLoading.value = true
+    try {
+        const res = await mainApi.get(`presensi/statistik-data`);
+        const data = res.data;
+        statistikData.value = data;
+        pieChartData.value = [
+            statistikData.value?.totalUndanganMahasiswa ?? 0,
+            statistikData.value?.totalUndanganTamu ?? 0
+        ]
+        xBarChartData.value = statistikData.value?.peminatan
+        yBarChartData.value = [
+            Math.ceil(statistikData.value?.mahasiswaHadir / statistikData.value?.totalUndanganMahasiswa * 100),
+            Math.ceil(statistikData.value?.tamuHadir / statistikData.value?.totalUndanganTamu * 100)
+        ]
+
+        console.log(xBarChartData.value.map(e => {
+            return e[Object.keys(e).toString()].total
+        }))
+    } catch (e) {
+        showNotification('error', e.message);
+    } finally {
+        isLoading.value = false;
+    }
+}
 
 
 function toggleStatusFilter() {
     if (filterStatus.value === null) filterStatus.value = 1;   // tampilkan hadir
     else if (filterStatus.value === 1) filterStatus.value = 0; // tampilkan belum
     else filterStatus.value = null;                            // kembali ke semua
-
-    mountTableData(); // refresh data
+    mountTableData(isMahasiswa.value); // refresh data
 }
 
-const handleKategoriToggle = (event) =>{
-    console.log(event)
+const handleKategoriToggle = async (event) => {
+    currentPage.value = 1
+    isMahasiswa.value = event
+    await mountTableData(event)
 }
 
-const authStore = useAuthStore()
+function sortBy(key) {
+    sortState.value[key] = !sortState.value[key];
+    const isAsc = sortState.value[key];
+    tableDataAll.value.sort((a, b) => {
+        return isAsc ? String(a[`${key}`]).localeCompare(b[`${key}`]) : String(b[`${key}`]).localeCompare(a[`${key}`])
+    })
+}
 
-let payload = null
 
 try {
     payload = authStore.getPayload()
@@ -371,64 +420,24 @@ const canToggleStatus = computed(() => {
     if (!payload) return false
     return payload.role === 'SUPERADMIN' || payload.role === 'SEKRETARIAT'
 })
+
 const toggleStatus = async (presensi) => {
     if (!presensi) return
-
     const id = presensi.id_presensi
-    console.log(id)
     const current = presensi.status
 
     try {
         if (current === 1) {
-            // SET MENJADI TIDAK HADIR (0)
             await mainApi.patch(`presensi/unmark-status/${id}`)
             presensi.status = 0
         } else {
-            // SET MENJADI HADIR (1)
             await mainApi.patch(`presensi/mark-status/${id}`)
             presensi.status = 1
         }
     } catch (err) {
         console.error(err)
     }
-    await mountTableData()
-}
-
-const mountTableData = async () => {
-    await mountStatistikData()
-    try {
-        isLoading.value = true;
-        const res = await mainApi.get(`mahasiswa/pagination`, {
-            params: {
-                search: searchQuery.value || undefined,
-                page: currentPage.value,
-                limit: itemsPerPage.value,
-                status: filterStatus.value !== null ? filterStatus.value : undefined
-            }
-        });
-        console.log(res.data)
-        tableData.value = res.data.data || [];
-        totalData.value = res.data.total || tableData.value.length;
-    } catch (e) {
-        showNotification('error', e.message || 'Gagal memuat data mahasiswa');
-    } finally {
-        isLoading.value = false;
-    }
-};
-
-
-async function mountStatistikData() {
-    try {
-        const res = await mainApi.get(`presensi/count-status-presensi`);
-        const d = res.data;
-        totalUndangan.value = d.totalUndangan;
-        totalHadir.value = d.totalUndanganHadir;
-        totalBelumHadir.value = d.totalUndanganTidakHadir;
-    } catch (e) {
-        showNotification('error', e.message);
-    } finally {
-        isLoading.value = false;
-    }
+    await mountTableData(isMahasiswa.value)
 }
 
 const visiblePages = computed(() => {
@@ -441,28 +450,41 @@ const visiblePages = computed(() => {
     return pages;
 });
 
-const filteredData = computed(() => {
-    return tableData.value.filter(item => {
-        const matchSearch =
-            String(item.nim)?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-            item.nama?.toLowerCase().includes(searchQuery.value.toLowerCase());
-        const matchKelas = !filterKelas.value || item.kelas?.toLowerCase() === filterKelas.value.toLowerCase();
-        const matchProdi = !filterProdi.value || item.prodi?.toLowerCase() === filterProdi.value.toLowerCase();
-        return matchSearch && matchKelas && matchProdi;
-    });
-});
+const handlePresensi = async (idPresensi) => {
+    try {
+        const resPesertaData = await mainApi.get(`presensi/find-peserta/${Number(idPresensi)}`);
+        const pesertaData = resPesertaData.data;
+        const nama = pesertaData.peserta.mahasiswa ? pesertaData.peserta.mahasiswa.nama : pesertaData.peserta.tamu.nama
+        if (!pesertaData.peserta) {
+            showNotification('error', 'Data tidak ditemukan');
+        } else {
+            if (pesertaData.status == 1) {
+                const title = "Sudah Hadir"
+                const text = `${nama} Sudah Ditandai Hadir !`
+                const icon = "error"
+                return showAlert(title, text, icon)
+            }
+            const modalres = await showConfirm(pesertaData.peserta.mahasiswa ? pesertaData.peserta.mahasiswa.nama : pesertaData.peserta.tamu.nama)
 
-const paginatedData = computed(() => filteredData.value);
+            if (modalres) {
+                const res = await mainApi.patch(`presensi/mark-status/${Number(idPresensi)}`)
+                await mountTableData(isMahasiswa.value);
+                const title = "Sukses"
+                const text = `${nama} berhasil ditandai hadir!`
+                const icon = 'success'
+                return showAlert(title, text, icon)
+            } else {
+                const title = 'Dibatalkan'
+                const text = `${nama} dibatalkan`
+                const icon = 'info'
+                return showAlert(title, text, icon)
+            }
+        }
 
-
-watch([searchQuery, currentPage, itemsPerPage], async () => {
-    await mountTableData();
-});
-
-onMounted(async () => {
-    await mountTableData();
-});
-
+    } catch (error) {
+        showNotification('error', error.response.data.message);
+    }
+}
 
 const handleScan = async (value) => {
     try {
@@ -483,37 +505,12 @@ const handleManualInput = async () => {
         const res = await mainApi.get(`presensi/find-nim/${manualNim.value}`);
         await handlePresensi(res.data[0].id_presensi);
     } catch (error) {
-        showNotification('error', 'NIM tidak ditemukan');
+        const title = 'Not Found'
+        const text = 'NIM tidak ditemukan'
+        const icon = 'error'
+        showAlert(title, text, icon)
     }
 };
-
-const handlePresensi = async (idPresensi) => {
-    try {
-        const resPesertaData = await mainApi.get(`presensi/find-peserta/${Number(idPresensi)}`);
-        const pesertaData = resPesertaData.data;
-        if (!pesertaData.peserta) {
-            showNotification('error', 'Data tidak ditemukan');
-        } else {
-            const modalres = await modal.open({
-                title: "Konfirmasi Kehadiran?",
-                message: `Konfirmasi Kehadiran ${pesertaData.peserta.mahasiswa ? pesertaData.peserta.mahasiswa.nama : pesertaData.peserta.tamu.nama}`,
-                type: 'question'
-            })
-
-            if (modalres) {
-                const res = await mainApi.patch(`presensi/mark-status/${Number(idPresensi)}`)
-                await mountTableData();
-                showNotification('success', res.data.message)
-
-            } else {
-                showNotification('success', "Presensi dibatalkan")
-            }
-        }
-
-    } catch (error) {
-        showNotification('error', error.response.data.message);
-    }
-}
 
 function pauseScan() {
     scannerRef.value?.pauseScanner()
@@ -525,6 +522,13 @@ function resumeScan() {
 const stopCamera = () => {
     scannerRef.value?.stopScanner(); // PENTING
 };
+watch([searchQuery, currentPage, itemsPerPage], async () => {
+    await mountTableData(isMahasiswa.value);
+});
+
+onMounted(async () => {
+    await mountTableData(isMahasiswa.value);
+});
 
 onBeforeUnmount(() => {
     stopCamera()

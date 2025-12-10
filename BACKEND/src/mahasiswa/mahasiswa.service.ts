@@ -48,7 +48,9 @@ export class MahasiswaService {
     page = 1,
     limit = 10,
     filter?: string,
-    presensiStatus?: number // ⬅️ DITAMBAHKAN
+    presensiStatus?: number, // ⬅️ DITAMBAHKAN
+    peminatan?: string,
+    kelas?: string,
   ) {
     const skip = (page - 1) * limit;
     const isNumberSearch = !isNaN(Number(search));
@@ -87,6 +89,21 @@ export class MahasiswaService {
       }
     }
 
+    const prodiKelasFilter: Prisma.mahasiswaWhereInput = {};
+    const list = [
+      { peminatan: "KS", kelas: ["SD", "SI"] },
+      { peminatan: "ST", kelas: ["SE", "SK"] },
+      { peminatan: "D3", kelas: ["D3"] },
+    ]
+    const listSelected = list.filter(e => String(e.peminatan).includes(peminatan ?? ''))
+    if (kelas) {
+      // user pilih kelas lengkap → filter exact
+      prodiKelasFilter.OR = [{kelas:{contains:kelas}}];
+    } else if (peminatan) {
+      // user hanya pilih peminatan → kelas diawali kode prodi
+      prodiKelasFilter.OR = listSelected[0].kelas.map(e => ({ kelas: { contains: e } }))
+    }
+
     // 🔵 FILTER kelas / prodi
     const filterCondition: Prisma.mahasiswaWhereInput = filter
       ? {
@@ -116,6 +133,7 @@ export class MahasiswaService {
       AND: [
         search ? { OR: searchConditions } : {},
         filterCondition,
+        prodiKelasFilter,
         presensiStatusCondition
       ]
     };
@@ -134,7 +152,7 @@ export class MahasiswaService {
                 select: {
                   status: true,
                   waktu_presensi: true,
-                  id_presensi:true
+                  id_presensi: true
                 },
                 where:
                   presensiStatus !== undefined

@@ -10,9 +10,11 @@
       <section class="bg-white rounded-[32px] shadow-[0_18px_40px_rgba(0,0,0,0.18)] px-6 md:px-12 py-10 mt-2">
         <div class="text-center mb-6">
           <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#202020]">
-            Selamat Datang di Dashboard Wisuda!!!
+            Selamat Datang di Dashboard
+            <br>
+            Sistem Persiapan Wisuda
           </h1>
-          <p class="mt-3 text-sm md:text-base lg:text-lg text-gray-600 leading-relaxed">
+          <p class="mt-3 text-lg md:text-base lg:text-xl text-gray-600 leading-relaxed">
             Kelola seluruh kegiatan wisuda dengan mudah dan efisien.<br />
             Mulai dari presensi hingga manajemen undangan.
           </p>
@@ -33,7 +35,10 @@
                 ‹
               </button>
 
-              <img :src="activeSlide.src" :alt="activeSlide.alt" class="w-full h-full object-cover" />
+              <img :src="activeSlide.src" :alt="activeSlide.alt"
+                class="w-full h-full object-cover transition-opacity duration-500 ease-in-out" 
+                :class="{ 'opacity-0': isFading, 'opacity-100': !isFading }"
+                />
 
               <button
                 class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-black text-2xl md:text-3xl font-bold hover:bg-gray-200 active:scale-95 transition"
@@ -197,7 +202,7 @@
                   <div class="text-blue-800 font-semibold">Status Pengiriman Email</div>
                   <div class="flex justify-center gap-3 mt-1">
                     <span class="text-blue-600">Sukses: <b>{{ formatNumber(infoPresensi.totalUndanganMahasiswa)
-                        }}</b></span>
+                    }}</b></span>
                   </div>
                 </div>
               </div>
@@ -248,7 +253,7 @@ import { useRouter } from 'vue-router'
 import { mainApi } from '@/api'
 
 const router = useRouter()
-
+const isFading = ref(false)
 // --- FUNGSI NAVIGASI ---
 const goToPage = (path) => {
   router.push(path)

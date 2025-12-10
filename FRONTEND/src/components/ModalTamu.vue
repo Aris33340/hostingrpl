@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits } from 'vue'
+import { ref, watch } from 'vue'
 import { mainApi } from '@/api'
 import { showNotification } from '@/composables/useNotification'
 
