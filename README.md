@@ -7,9 +7,9 @@ Panduan ini membantu kamu melakukan setup Backend (NestJS) dan Frontend (Vue 3) 
 
 📥 1. Clone Repository
 
-git clone https://github.com/SadewaAri12/STIS-GRAD.git
-cd STIS-GRAD
-git checkout main
+git clone https://github.com/SadewaAri12/STIS-GRAD.git  
+cd STIS-GRAD  
+git checkout main  
 
 
 ---
