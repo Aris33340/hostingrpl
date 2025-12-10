@@ -19,13 +19,14 @@ import { PresensiModule } from './presensi/presensi/presensi.module';
 import { EditorModule } from './editor/editor.module';
 import { QRModule } from './qr/qr.module';
 import { PesertaModule } from './peserta/peserta.module';
-
-import { InvitationModule } from './invitation/invitation.module';//baru
+import { InvitationModule } from './invitation/invitation.module';
 import { UserModule } from './user/user.module';
 import { SettingsModule } from './settings/settings.module';
 
-@Module({
+// 1. IMPORT MODUL DASHBOARD DI ATAS
+import { DashboardModule } from './dashboard/dashboard.module'; // <-- TAMBAHKAN INI
 
+@Module({
   imports: [
     PrismaModule, 
     AuthModule,
@@ -38,18 +39,19 @@ import { SettingsModule } from './settings/settings.module';
     EditorModule,
     QRModule,
     PesertaModule,
-    InvitationModule, //baru 
+    InvitationModule, 
     TamuModule,
     UserModule,
-    SettingsModule
+    SettingsModule,
+    
+    // 2. DAFTARKAN MODUL DI SINI
+    DashboardModule, // <-- TAMBAHKAN INI AGAR DIBACA SYSTEM
   ],
 
   controllers: [AuthController, AppController, ScanController, MahasiswaController],
 
-  providers: [
-    AppService, PrismaService, CryptoService],
+  providers: [AppService, PrismaService, CryptoService],
 })
-
 
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
@@ -63,4 +65,3 @@ export class AppModule {
       .forRoutes('*');
   }
 }
-
