@@ -89,7 +89,7 @@
                         class="px-4 py-2.5 border-2 w-1/2 border-gray-200 cursor-pointer rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none backdrop-blur-lg bg-transparent">
                         <option class="text-gray-700" value="">-- Pilih Peminatan --</option>
                         <option class="text-gray-700" v-for="p in peminatans" :key="p.kode" :value="p">{{ p.label
-                        }}</option>
+                            }}</option>
                     </select>
                     <select v-model="selectedKelas"
                         class="px-4 py-2.5 border-2 w-1/2 cursor-pointer border-gray-200 rounded-xl  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none backdrop-blur-lg bg-transparent"
@@ -214,7 +214,6 @@ import { mainApi } from '@/api'
 import { useModal } from '../composables/useModal';
 import { showNotification } from '../composables/useNotification'
 import { useAuthStore } from '../stores/authStore';
-const modal = useModal();
 const scannerRef = ref(null)
 const manualNim = ref('');
 const scanResult = ref("");
@@ -226,12 +225,9 @@ const tableDataAll = ref([])
 const isLoading = ref(true);
 const viewMode = ref('chart');
 const searchQuery = ref('');
-const filterKelas = ref('');
-const filterProdi = ref('');
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const totalData = ref(0);
-const tableMode = ref()
 const filterStatus = ref(null);
 const totalPages = computed(() => Math.ceil(totalData.value / itemsPerPage.value));
 const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);

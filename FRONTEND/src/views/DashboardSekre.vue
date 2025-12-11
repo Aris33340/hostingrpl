@@ -226,17 +226,33 @@ import { mainApi } from '@/api'
 
 const router = useRouter()
 const goToPage = (path) => router.push(path)
+const statistikData = ref()
 
 // Assets
 import foto1 from '@/assets/images/fotowi1.jpg'
 import foto2 from '@/assets/images/fotowi2.jpg'
+import { showNotification } from '../composables/useNotification'
+import { useLoading } from '../composables/useLoading'
 
+const {show,hide} = useLoading()
 const slides = ref([{ id: 1, src: foto1, alt: 'Suasana wisuda 1' }, { id: 2, src: foto2, alt: 'Suasana wisuda 2' }])
 const activeIndex = ref(0)
 const activeSlide = computed(() => slides.value[activeIndex.value])
 const nextSlide = () => activeIndex.value = (activeIndex.value + 1) % slides.value.length
 const prevSlide = () => activeIndex.value = (activeIndex.value - 1 + slides.value.length) % slides.value.length
 
+const loadStatistikData = async () => {
+  show()
+  try {
+    const response = await mainApi.get('presensi/statistik-data')
+    statistikData.value = response.data
+    console.log(statistikData.value)
+  } catch (error) {
+    showNotification('error',error.message || 'Gagal memuat data statistik.')
+  }finally {
+    hide()
+  }
+}
 // Data State
 const isLoading = ref(false)
 const stats = ref({
@@ -266,7 +282,8 @@ async function fetchDashboardData() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await loadStatistikData()
   fetchDashboardData()
 })
 

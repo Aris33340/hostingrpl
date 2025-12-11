@@ -8,13 +8,11 @@ import { userRole } from '@prisma/client';
 export class AuthController {
   constructor(private authService: AuthService) { }
 
-  // Endpoint 'register' tidak berubah, sudah benar.
   @Post('register')
-  async register(@Body() body: { username: string; email: string; password: string ,token:string, role?:userRole, }) {
+  async register(@Body() body: { username: string; email: string; password: string, token: string, role?: userRole, }) {
     return this.authService.register(body.username, body.email, body.password, body.token, body.role);
   }
 
-  // --- Endpoint 'login' DIMODIFIKASI ---
   @Post('login')
   async login(
     @Body() body: { email: string; password: string },
@@ -39,7 +37,6 @@ export class AuthController {
 
   }
 
-  // --- ENDPOINT BARU 'refresh' ---
   @Post('refresh')
   async refreshTokens(
     @Req() req: Request,
@@ -72,14 +69,13 @@ export class AuthController {
     }
   }
 
-  // --- Endpoint 'logout' DIPERBAIKI ---
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('refresh_token', {
       httpOnly: true,
       secure: false,
       path: '/',
-      sameSite:'lax'
+      sameSite: 'lax'
     });
     return { message: 'Logged out successfully' };
   }

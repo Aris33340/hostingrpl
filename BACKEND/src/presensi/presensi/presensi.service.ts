@@ -22,7 +22,7 @@ export class PresensiService {
                     peserta: { include: { mahasiswa: true, tamu: true } },
                 },
             });
-
+            const undangan = await this.prisma.emailSendStatus.findMany()
             let info = {
                 totalUndangan: presensi.length,
                 totalUndanganHadir: 0,
@@ -33,6 +33,7 @@ export class PresensiService {
                 totalUndanganTamu: 0,
                 tamuHadir: 0,
                 tamuTidakHadir: 0,
+                undanganTerkirim:0,
                 peminatan: [
                     { SD: { hadir: 0, total: 0 } },
                     { SI: { hadir: 0, total: 0 } },
@@ -58,7 +59,6 @@ export class PresensiService {
                     else info.tamuTidakHadir++;
                 }
             }
-            // const kategori = ["SI","SD","SK","SE","D3"]
             info.peminatan.forEach(p => {
                 const peminatan = Object.keys(p).toString()
                 let hadir = 0
