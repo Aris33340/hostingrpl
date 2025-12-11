@@ -86,6 +86,10 @@ model emailSendStatus {
   //status: 0=gagal, 1=pending (queue), 2=berhasil
   status Int @default(1)
 
+  // --- PENAMBAHAN KOLOM BARU (Untuk Custom Email) ---
+  subject String? @db.Text // Menyimpan Subjek yang diinput user
+  message String? @db.Text // Menyimpan Isi Pesan (HTML) yang diinput user
+
   //penambahan kolom 
   errorMessage String? //terisi jika status 0 
   //menunjukan log ini milik kegiatan apa (gladi/wisuda)

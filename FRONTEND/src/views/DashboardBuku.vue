@@ -116,7 +116,7 @@
                     class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
                     <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: item.color }"></span>
                     <span class="text-gray-600">{{ item.jenis }}: <b class="text-gray-900">{{ formatNumber(item.jumlah)
-                    }}</b></span>
+                        }}</b></span>
                   </div>
                 </div>
               </div>

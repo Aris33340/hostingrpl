@@ -60,7 +60,7 @@ export class AppModule {
         { path: 'auth/register', method: RequestMethod.POST },
         { path: 'auth/login', method: RequestMethod.POST },
         { path: 'auth/refresh', method: RequestMethod.POST },
-        { path: 'auth/logout', method: RequestMethod.POST },
+        { path: 'auth/logout', method: RequestMethod.POST },      
       )
       .forRoutes('*');
   }
