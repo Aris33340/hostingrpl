@@ -4,7 +4,7 @@ import { tamu, Prisma } from '@prisma/client';
 
 @Injectable()
 export class TamuService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // 🟦 Ambil list instansi unik (untuk dropdown filter)
   async getAllInstansi() {
@@ -52,10 +52,10 @@ export class TamuService {
         skip,
         take: limit,
         where,
-        include:{
-          peserta:{
-            include:{
-              presensis:true
+        include: {
+          peserta: {
+            include: {
+              presensis: true
             }
           }
         },
@@ -67,39 +67,59 @@ export class TamuService {
     return { data, total, page, limit };
   }
 
-// 🟩 2️⃣ BULK CREATE (Upload banyak tamu dari Excel) - tanpa duplikat nama/email/instansi
-async bulkCreate(data: Prisma.tamuCreateManyInput[]): Promise<{ inserted: number; duplicates: string[] }> {
-  // Filter data valid
-  const validData = data.filter(d => d.nama && d.email && d.asal_instansi)
+  // 🟩 2️⃣ BULK CREATE (Upload banyak tamu dari Excel) - tanpa duplikat nama/email/instansi
+  async bulkCreate(data: Prisma.tamuCreateManyInput[]): Promise<{ inserted: number; duplicates: string[] }> {
+    // Filter data valid
+    const validData = data.filter(d => d.nama && d.email && d.asal_instansi)
 
-  // Ambil data tamu yang sudah ada (kombinasi nama + email + asal_instansi)
-  const existing = await this.prisma.tamu.findMany({
-    where: {
-      OR: validData.map(d => ({
-        nama: d.nama,
-        email: d.email,
-        asal_instansi: d.asal_instansi
-      }))
-    },
-    select: { nama: true, email: true, asal_instansi: true }
-  })
+    // Ambil data tamu yang sudah ada (kombinasi nama + email + asal_instansi)
+    const existing = await this.prisma.tamu.findMany({
+      where: {
+        OR: validData.map(d => ({
+          nama: d.nama,
+          email: d.email,
+          asal_instansi: d.asal_instansi
+        }))
+      },
+      select: { nama: true, email: true, asal_instansi: true }
+    })
 
-  // Buat array string untuk tracking duplicate
-  const existingKeys = existing.map(e => `${e.nama} | ${e.email} | ${e.asal_instansi}`)
+    // Buat array string untuk tracking duplicate
+    const existingKeys = existing.map(e => `${e.nama} | ${e.email} | ${e.asal_instansi}`)
 
-  // Pisahkan data baru dan duplicate
-  const newData = validData.filter(d => !existingKeys.includes(`${d.nama} | ${d.email} | ${d.asal_instansi}`))
-  const duplicateKeys = validData
-    .filter(d => existingKeys.includes(`${d.nama} | ${d.email} | ${d.asal_instansi}`))
-    .map(d => `${d.nama} (${d.email} - ${d.asal_instansi})`)
+    // Pisahkan data baru dan duplicate
+    const newData = validData.filter(d => !existingKeys.includes(`${d.nama} | ${d.email} | ${d.asal_instansi}`))
+    const duplicateKeys = validData
+      .filter(d => existingKeys.includes(`${d.nama} | ${d.email} | ${d.asal_instansi}`))
+      .map(d => `${d.nama} (${d.email} - ${d.asal_instansi})`)
 
-  // Insert data baru
-  if (newData.length > 0) {
-    await this.prisma.tamu.createMany({ data: newData })
+    // Insert data baru
+    if (newData.length > 0) {
+      await this.prisma.tamu.createMany({ data: newData, skipDuplicates: true })
+      const tamu = await this.prisma.tamu.findMany({
+        where: {
+          email: {
+            in: newData.map(e => e.email)
+          }
+        },
+        select:{
+          id_tamu:true
+        }
+      })
+      await this.prisma.peserta.createMany({data:tamu.map(e => ({id_tamu:e.id_tamu,jenis:'tamu'}))})
+      const peserta = await this.prisma.peserta.findMany({
+        where:{
+          id_tamu:{
+            in:tamu.map(e => e.id_tamu)
+          }
+        },
+        select:{id_peserta:true}
+      })
+      await this.prisma.presensi.createMany({data:peserta.map(e => ({id_peserta:e.id_peserta}))})
+    }
+
+    return { inserted: newData.length, duplicates: duplicateKeys }
   }
-
-  return { inserted: newData.length, duplicates: duplicateKeys }
-}
 
 
   // 🟩 3️⃣ GET TAMU by ID

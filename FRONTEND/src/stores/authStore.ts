@@ -19,17 +19,19 @@ interface MyJwtPayload extends JwtPayload {
 interface UserState {
   access_token: string | null;
   remember: boolean;
+  current_role: string;
 }
 
 export const useAuthStore = defineStore('auth', {
   state: (): UserState => ({
     access_token: null,
-    remember: false
+    remember: false,
+    current_role: localStorage.getItem('current_role') ?? 'SUPERADMIN'
   }),
 
   getters: {
     isAuthenticated: (state) => !!(state.access_token ?? localStorage.getItem("access_token")),
-    
+
     authHeader: (state) => {
       const token = state.access_token ?? localStorage.getItem("access_token");
       return token ? { Authorization: `Bearer ${token}` } : {};
@@ -39,7 +41,7 @@ export const useAuthStore = defineStore('auth', {
     user: (state): MyJwtPayload | null => {
       const token = state.access_token ?? localStorage.getItem("access_token");
       if (!token) return null;
-      
+
       try {
         return jwtDecode<MyJwtPayload>(token);
       } catch (error) {
@@ -95,6 +97,10 @@ export const useAuthStore = defineStore('auth', {
         email: payload.email
       }
     },
+    setRole(role: string) {
+      this.current_role = role;
+      localStorage.setItem('current_role', role);
+    },
 
     setAuthData(token: string, remember: boolean) {
       this.access_token = token;
@@ -105,21 +111,22 @@ export const useAuthStore = defineStore('auth', {
     },
 
     clearAuthData() {
+      localStorage.removeItem("current_role")
       localStorage.removeItem("access_token");
       this.access_token = null;
     },
-    isAuth(){
+    isAuth() {
       const payload = this.access_token ?? localStorage.getItem("access_token")
-      if(payload)return true
+      if (payload) return true
       return false
     },
     async logout() {
-      try{
+      try {
         const res = await authApi.post('/logout', {}, { withCredentials: true })
         this.clearAuthData();
         return router.push('/login')
-      }catch(e){
-        showNotification('error','gagal logout')
+      } catch (e) {
+        showNotification('error', 'gagal logout')
       }
     }
   },

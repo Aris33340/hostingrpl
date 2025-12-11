@@ -53,20 +53,19 @@ onMounted(() => {
 })
 
 async function killAllCameras() {
-  const devices = await navigator.mediaDevices.enumerateDevices();
+    const devices = await navigator.mediaDevices.enumerateDevices();
 
-  for (const device of devices) {
-    if (device.kind === "videoinput") {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: device.deviceId }
-        });
-        stream.getTracks().forEach(t => t.stop());
-      } catch (err) {
-        console.warn("Failed killing device", err);
-      }
+    for (const device of devices) {
+        if (device.kind === "videoinput") {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { deviceId: device.deviceId }
+                });
+                stream.getTracks().forEach(t => t.stop());
+            } catch (err) {
+            }
+        }
     }
-  }
 }
 
 
@@ -79,19 +78,15 @@ defineExpose({
     },
     async stopScanner() {
         try {
-            // 1. Hentikan scanner internal
             if (html5QrcodeScanner?._html5Qrcode) {
                 await html5QrcodeScanner._html5Qrcode.stop();
             }
 
-            // 2. Bersihkan UI
             await html5QrcodeScanner?.clear();
 
-            // 3. Matikan semua kamera yg masih aktif (force kill)
             navigator.mediaDevices.getUserMedia({ video: true }).then(s => {
-                console.log("Tracks:", s.getTracks());
             });
-            await killAllCameras    ();
+            await killAllCameras();
 
         } catch (e) {
             console.error("Error stop camera:", e);

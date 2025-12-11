@@ -28,9 +28,10 @@ model user {
   password String
   role     userRole @default(SUPERADMIN)
 
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  presensis presensi[]
   files     file[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model settings {
@@ -52,9 +53,9 @@ model mahasiswa {
   daerah_penempatan String?
   no_kursi          String?
 
-  peserta   peserta[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  peserta   peserta[]
 }
 
 model tamu {
@@ -63,64 +64,64 @@ model tamu {
   email         String
   asal_instansi String
 
-  peserta   peserta[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  peserta   peserta[]
 }
 
 model presensi {
   id_presensi    Int      @id @default(autoincrement())
+  id_user        Int      @unique
+  id_peserta     Int      @unique
   waktu_presensi DateTime @default(now())
   status         Int      @default(0)
 
-  peserta    peserta  @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
-  id_peserta Int      @unique
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  peserta   peserta  @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
+  user      user?    @relation(fields: [id_user], references: [id_user])
 }
 
 model emailSendStatus {
-  id_sendStatus Int      @id @default(autoincrement())
-  waktu_dikirim DateTime @default(now()) //terisi otomatis saat status jadi=2
+  id_sendStatus Int  @id @default(autoincrement())
+  id_peserta    Int?
+  id_folder     Int
 
   //status: 0=gagal, 1=pending (queue), 2=berhasil
-  status Int @default(1)
 
   //penambahan kolom 
-  errorMessage String? //terisi jika status 0 
+  status        Int      @default(1)
+  waktu_dikirim DateTime @default(now()) //terisi otomatis saat status jadi=2
+  errorMessage  String? //terisi jika status 0 
   //menunjukan log ini milik kegiatan apa (gladi/wisuda)
   //relasi diarahkan ke tabel 'file' (karena folder disimpan di situ)
-  folder       file    @relation("LogFolder", fields: [id_folder], references: [id_file], onDelete: Cascade)
-  id_folder    Int
 
   //relasi ke peserta
   //karena "tambah peserta" dialihkan ke tabel tamu maka id_peserta tidak boleh null
-  peserta    peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
-  id_peserta Int?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  folder    file     @relation("LogFolder", fields: [id_folder], references: [id_file], onDelete: Cascade)
+  peserta   peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
 }
 
 model file {
-  id_file   Int    @id @default(autoincrement())
-  file_name String
-  path      String @unique
-  type      String
-  
-
-  id_parent Int?
-  parent    file?  @relation("FolderToSubfolders", fields: [id_parent], references: [id_file], onDelete: Cascade)
-  children  file[] @relation("FolderToSubfolders")
+  id_file    Int    @id @default(autoincrement())
+  id_user    Int
+  id_peserta Int?
+  id_parent  Int?
+  file_name  String
+  path       String @unique
+  type       String
 
   //relasi balik untuk log email(hanya sebagai folder)
-  emailLogs emailSendStatus[] @relation("LogFolder")
 
-  user       user?    @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
-  id_user    Int
-  peserta    peserta? @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
-  id_peserta Int?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  parent    file?             @relation("FolderToSubfolders", fields: [id_parent], references: [id_file], onDelete: Cascade)
+  children  file[]            @relation("FolderToSubfolders")
+  user      user?             @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  peserta   peserta?          @relation(fields: [id_peserta], references: [id_peserta], onDelete: Cascade)
+  emailLogs emailSendStatus[] @relation("LogFolder")
 }
 
 model peserta {
@@ -129,11 +130,11 @@ model peserta {
   nim        Int?   @unique
   id_tamu    Int?   @unique
 
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   mahasiswa       mahasiswa?        @relation(fields: [nim], references: [nim], onDelete: Cascade)
   tamu            tamu?             @relation(fields: [id_tamu], references: [id_tamu], onDelete: Cascade)
   files           file[]
   emailsendstatus emailSendStatus[]
   presensis       presensi[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
 }
