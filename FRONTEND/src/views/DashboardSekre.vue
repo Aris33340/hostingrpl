@@ -1,9 +1,9 @@
 <template>
   <div class="relative w-full min-h-screen overflow-hidden">
-    <div class="relative z-10 p-8 pt-10">
+    <div class="relative z-10 p-8 pt-2">
 
       <section
-        class="relative rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] mt-4 overflow-hidden min-h-[450px] flex items-center group">
+        class="relative rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden min-h-[450px] flex items-center group">
 
         <div class="absolute inset-0 z-0">
           <img :src="foto1"
