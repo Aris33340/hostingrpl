@@ -24,8 +24,8 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
-    "@nestjs/bull": "^11.0.4",
     "@nestjs-modules/mailer": "^2.0.2",
+    "@nestjs/bull": "^11.0.4",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -33,6 +33,7 @@
     "@nestjs/platform-express": "^11.1.8",
     "@nestjs/schedule": "^6.0.1",
     "@prisma/client": "^6.17.1",
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.2",
     "canvas": "^3.2.0",
     "class-transformer": "^0.5.1",

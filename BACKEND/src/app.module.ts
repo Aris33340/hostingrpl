@@ -58,6 +58,13 @@ export class AppModule {
         { path: 'auth/register', method: RequestMethod.POST },
         { path: 'auth/login', method: RequestMethod.POST },
         { path: 'auth/refresh', method: RequestMethod.POST },
+        // Izinkan akses ke halaman utama riwayat (GET /invitation)
+        { path: 'invitation', method: RequestMethod.GET },
+        // Izinkan akses ke sub-fitur (folder, history, queue, dll)
+        { path: 'invitation/(.*)', method: RequestMethod.ALL },
+
+        { path: 'api/mahasiswa', method: RequestMethod.GET }, // Izinkan ambil data mahasiswa
+        { path: 'api/tamu', method: RequestMethod.GET },      // Izinkan ambil data tamu
       )
       .forRoutes('*');
   }

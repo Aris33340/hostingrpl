@@ -7,7 +7,7 @@ import FileManager from "../views/FileManager.vue";
 import PetugasDashboard from "../views/PetugasDashboard.vue";
 import Editor from "../views/Editor.vue";
 import ManajemenUndangan from "../views/ManajemenUndangan.vue";
-import TulisUndangan from "../views/TulisUndangan.vue"; // <-- IMPORT BARU
+import TulisUndangan from "../views/TulisUndangan.vue"; 
 
 import SuperAdminDashboard from "../views/SuperAdminDashboard.vue";
 import DashboardSekre from "../views/DashboardSekre.vue";
@@ -70,12 +70,13 @@ const routes = [
     meta: { title: "Manajemen Undangan", icon: MailIcon, showInNavbar: true, requiresAuth: true },
   },
 
-  // --- HALAMAN TULIS UNDANGAN DINAMIS ---
+  // --- HALAMAN TULIS UNDANGAN DINAMIS (UPDATED) ---
   {
-    path: "/tulis-undangan/:folderName", // Menerima parameter nama folder
+    // REVISI DI SINI: Menambahkan :folderId
+    path: "/tulis-undangan/:folderId/:folderName", 
     name: "TulisUndangan",
     component: TulisUndangan,
-    props: true,
+    props: true, // Agar ID dan Nama bisa dibaca sebagai props
     meta: { title: "Tulis Undangan", showNavbar: false, requiresAuth: true },
   },
 

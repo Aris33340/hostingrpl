@@ -5,6 +5,15 @@ import { InvitationService } from './invitation.service';
 export class InvitationController {
   constructor(private readonly invitationService: InvitationService) {}
 
+  // =================================================================
+  // Endpoint: GET /invitation
+  // Fungsinya: Mengambil SEMUA riwayat untuk tabel utama di Frontend
+  // =================================================================
+  @Get()
+  async findAll() {
+    return this.invitationService.getAllHistory();
+  }
+
   // 1. Ambil Daftar Folder Undangan
   // GET /invitation/folders
   @Get('folders')
@@ -21,17 +30,22 @@ export class InvitationController {
 
   // 3. Tombol "Kirim" (Masuk ke Antrian)
   // POST /invitation/queue
-  // Body: { "folderId": 1, "recipients": [10, 11, 12], "manuals": [] }
   @Post('queue')
   async addToQueue(@Body() body: { 
     folderId: number; 
     recipients: number[]; 
-    manuals: { email: string; name: string }[] 
+    
+    // --- PERUBAHAN DI SINI ---
+    // Menambahkan subject & message (opsional) agar Controller membaca input user
+    subject?: string;
+    message?: string;
+    
+    manuals?: { email: string; name: string }[] 
   }) {
     return this.invitationService.addToQueue(body);
   }
 
-  // 4. Ambil Riwayat Pengiriman
+  // 4. Ambil Riwayat Pengiriman Per Folder
   // GET /invitation/history/1
   @Get('history/:folderId')
   async getHistory(@Param('folderId') folderId: string) {
