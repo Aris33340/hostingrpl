@@ -2,30 +2,39 @@
   <div class="tab-content">
 
     <div class="toolbar-center">
-
-
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Cari Folder" />
+        <input 
+          type="text" 
+          placeholder="Cari Folder" 
+          v-model="searchQuery" 
+        />
       </div>
     </div>
 
     <div class="folder-container-outline">
+      
+      <div v-if="isLoading" class="msg-center">
+        Sedang memuat folder...
+      </div>
 
-      <div class="folder-grid">
-        <div class="folder-card" @click="bukaFolder('Yudisium')">
-          <div class="folder-icon">📁 <span class="badge">🎓</span></div>
-          <span class="folder-name">Yudisium</span>
-        </div>
+      <div v-else-if="filteredFolders.length === 0" class="msg-center">
+        Folder tidak ditemukan.
+      </div>
 
-        <div class="folder-card" @click="bukaFolder('Wisuda')">
+      <div v-else class="folder-grid">
+        <div 
+          v-for="folder in filteredFolders" 
+          :key="folder.id_file" 
+          class="folder-card" 
+          @click="bukaFolder(folder)"
+        >
           <div class="folder-icon">📁 <span class="badge">🎓</span></div>
-          <span class="folder-name">Wisuda</span>
-        </div>
-
-        <div class="folder-card" @click="bukaFolder('Gladi Bersih')">
-          <div class="folder-icon">📁 <span class="badge">🎓</span></div>
-          <span class="folder-name">Gladi Bersih</span>
+          <span class="folder-name">{{ folder.file_name }}</span>
+          
+          <span v-if="folder._count" style="font-size:0.7rem; color:#666; margin-left:auto;">
+             {{ folder._count.children }} file
+           </span>
         </div>
       </div>
 
@@ -34,19 +43,73 @@
 </template>
 
 <script setup>
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-
+import { mainApi } from '../../api';
 const router = useRouter();
 
-const bukaFolder = (namaFolder) => {
-  router.push({
-    name: 'TulisUndangan',
-    params: { folderName: namaFolder }
+// --- STATE ---
+const folders = ref([]);
+const isLoading = ref(true);
+const searchQuery = ref('');
+
+// URL Backend (Sesuaikan jika port beda)
+
+// --- FETCH DATA ---
+const fetchFolders = async () => {
+  isLoading.value = true;
+  try {
+    // Backend Anda sudah punya endpoint ini: GET /invitation/folders
+    const response = await mainApi.get('invitation/folders');
+    folders.value = response.data;
+  } catch (error) {
+    console.error("Gagal ambil folder:", error);
+    alert("Gagal memuat folder undangan.");
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// --- FILTER SEARCH ---
+const filteredFolders = computed(() => {
+  if (!searchQuery.value) return folders.value;
+  return folders.value.filter(f => 
+    f.file_name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
+
+// --- NAVIGASI ---
+const bukaFolder = (folder) => {
+  console.log("Membuka folder:", folder);
+  
+  // Kita kirim ID dan NAMA ke halaman berikutnya (TulisUndangan)
+  router.push({ 
+    name: 'TulisUndangan', 
+    params: { 
+      folderId: folder.id_file, // Penting: Kirim ID untuk query backend nanti
+      folderName: folder.file_name 
+    } 
   });
 };
+
+onMounted(() => {
+  fetchFolders();
+});
 </script>
 
 <style scoped>
+/* --- STYLE ASLI ANDA (TIDAK SAYA UBAH, HANYA TAMBAH HELPER) --- */
+
+.msg-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #666;
+  font-style: italic;
+  width: 100%;
+}
+
 .tab-content {
   background: white;
   border-radius: 12px;
@@ -57,32 +120,14 @@ const bukaFolder = (namaFolder) => {
   flex-direction: column;
 }
 
-/* --- REVISI: Toolbar Center --- */
 .toolbar-center {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  /* Menambah jarak yang cukup antara tombol dan box di bawahnya */
-  margin-bottom: 2rem;
+  margin-bottom: 2rem; 
   position: relative;
   z-index: 2;
-}
-
-.btn-import {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
-}
-
-.btn-import:hover {
-  background-color: #0056b3;
 }
 
 .search-box {
@@ -103,35 +148,29 @@ const bukaFolder = (namaFolder) => {
   background: transparent;
 }
 
-/* --- REVISI UTAMA: Box Outline Biru --- */
-/* src/components/manajemen-undangan/BuatUndangan.vue */
-
 .folder-container-outline {
   border: 1px solid #3B82F6;
   border-radius: 16px;
-
-  /* REVISI DI SINI: */
-  /* Ubah dari '3rem 2rem' menjadi '1.5rem 2rem' */
-  /* Ini akan mengurangi jarak atas secara signifikan */
-  padding: 1.5rem 2rem;
-
+  padding: 1.5rem 2rem; 
   flex: 1;
   min-height: 300px;
   position: relative;
   margin-top: 0;
   background: white;
+  display: flex;      /* Tambahan agar loading/empty state bisa ditengah */
+  flex-direction: column;
 }
 
 .folder-grid {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
+  align-content: flex-start; /* Agar folder mulai dari atas */
+  width: 100%;
 }
 
 .folder-card {
-  /* REVISI 1: Border lebih tebal dan biru lebih tegas */
-  border: 2px solid #60A5FA;
-  /* Biru muda yang lebih vibrant (Tailwind Blue-400) */
+  border: 2px solid #60A5FA; 
   border-radius: 16px;
   padding: 1rem 1.5rem;
   display: flex;
@@ -141,60 +180,37 @@ const bukaFolder = (namaFolder) => {
   transition: all 0.3s ease;
   min-width: 200px;
   background: white;
-
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
   position: relative;
   overflow: hidden;
 }
 
-/* Update di bagian <style scoped> */
-
 .folder-card::before {
   content: "";
   position: absolute;
-
-  /* Kita sesuaikan ukurannya agar menutupi seluruh tombol
-     supaya linear gradient bisa berjalan mulus dari ujung ke ujung */
-  width: 100%;
+  width: 100%; 
   height: 100%;
   top: 0;
   left: 0;
-
-  /* --- GANTI MENJADI LINEAR GRADIENT --- */
-  background: linear-gradient(135deg,
-      /* Arah diagonal ke kanan-bawah */
-      rgba(255, 255, 255, 0) 50%,
-      /* Transparan total di separuh awal */
-      rgba(59, 131, 246, 0.63) 75%,
-      /* Mulai membiru halus */
-      rgb(0, 98, 255) 100%
-      /* Biru lebih tegas di pojok kanan bawah */
-    );
-
-  /* Blur opsional: Jika ingin terlihat sangat tajam, hapus baris ini.
-     Tapi sedikit blur biasanya membuat gradasi lebih menyatu. */
-  filter: blur(5px);
-
-  /* Hapus border-radius 50% karena kita mau memenuhi kotak */
-  border-radius: 16px;
-
+  background: linear-gradient(
+    135deg,                      
+    rgba(255, 255, 255, 0) 50%,   
+    rgba(59, 131, 246, 0.63) 75%,  
+    rgb(0, 98, 255) 100%  
+  );
+  filter: blur(5px); 
+  border-radius: 16px; 
   z-index: 0;
   pointer-events: none;
 }
 
-
-/* Efek Hover: Lebih 'naik' dan border lebih biru */
-.folder-card:hover {
-  transform: translateY(-4px);
+.folder-card:hover { 
+  transform: translateY(-4px); 
   box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
-  border-color: #2563EB;
-  /* Biru lebih gelap saat hover */
+  border-color: #2563EB; 
 }
 
-/* Pastikan teks & ikon di atas gradasi */
-.folder-icon,
-.folder-name {
+.folder-icon, .folder-name {
   position: relative;
   z-index: 1;
 }

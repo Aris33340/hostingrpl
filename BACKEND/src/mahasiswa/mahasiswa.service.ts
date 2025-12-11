@@ -39,6 +39,11 @@ export class MahasiswaService {
   async mahasiswas(): Promise<mahasiswa[]> {
     return this.prisma.mahasiswa.findMany({
       orderBy: { createdAt: 'desc' },
+      include: {
+        peserta: {
+          include: { files: true } // Update agar konsisten
+        }
+      }
     });
   }
 
@@ -188,7 +193,7 @@ export class MahasiswaService {
     await this.prisma.presensi.create({
       data: {
         id_peserta: Number(peserta.id_peserta),
-        id_user:userId
+        // id_user:userId
       }
     });
 

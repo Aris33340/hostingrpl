@@ -60,6 +60,13 @@ export class TamuService {
           }
         },
         orderBy: { id_tamu: 'asc' },
+        // --- PERBAIKAN DI SINI ---
+        // Update include agar membawa data files
+        // include: {
+        //   peserta: {
+        //     include: { files: true }
+        //   }
+        // }
       }),
       this.prisma.tamu.count({ where }),
     ]);
@@ -124,7 +131,15 @@ export class TamuService {
 
   // 🟩 3️⃣ GET TAMU by ID
   async tamu(where: Prisma.tamuWhereUniqueInput): Promise<tamu | null> {
-    return this.prisma.tamu.findUnique({ where });
+    return this.prisma.tamu.findUnique({ 
+      where,
+      // --- PERBAIKAN DI SINI ---
+      include: { 
+        peserta: {
+          include: { files: true }
+        } 
+      } 
+    });
   }
 
   // 🟩 4️⃣ GET SEMUA TAMU
@@ -143,6 +158,12 @@ export class TamuService {
       cursor,
       where,
       orderBy,
+      // --- PERBAIKAN DI SINI ---
+      include: {
+        peserta: {
+          include: { files: true }
+        }
+      }
     });
   }
 

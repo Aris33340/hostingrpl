@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { $Enums as Enum } from "@prisma/client";
 import * as bcrypt from 'bcryptjs'; // Menggunakan import standar
 const prisma = new PrismaClient();
 async function hashPassword(password: string): Promise<string> {
@@ -7,7 +6,7 @@ async function hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, salt);
 }
 async function main() {
-    
+
     console.log('Seeding database...');
     await prisma.user.deleteMany({})
     await prisma.tamu.deleteMany({})
@@ -18,15 +17,38 @@ async function main() {
     // ----------- Users -----------
     // Kita simpan ID user terakhir untuk dipakai bikin folder
     let lastUserId = 0;
-
     const user = await prisma.user.create({
-        data:{
-            email:'SUPERADMINwisuda65@gmail.com',
+        data: {
+            email: 'SUPERADMINwisuda65@gmail.com',
             password: String(await hashPassword('superwisuda65stisadmin')),
-            role:"SUPERADMIN",
-            username:'SUPERADMIN'
+            role: "SUPERADMIN",
+            username: 'SUPERADMIN'
         }
     })
+    const folder = await prisma.file.create({
+        data: {
+            file_name: "Folder Utama",
+            path: "/uploads/folder-utama",
+            type: "FOLDER",
+            id_user: user.id_user,
+            id_peserta: null
+        }
+    });
+    for (let i = 1; i <= 5; i++) {
+        const pdf = await prisma.file.create({
+            data: {
+                file_name: `file_${i}.pdf`,
+                path: `/uploads/folder-utama/file_${i}.pdf`,
+                type: "PDF",
+                id_parent: folder.id_file,   // relasi parent
+                id_user:  user.id_user,
+                id_peserta: null
+            }
+        });
+
+        console.log(`PDF dibuat: ${pdf.file_name}`);
+    }
+
     lastUserId = user.id_user
 
 
@@ -34,8 +56,8 @@ async function main() {
         data: {
             file_name: "Folder Undangan (Seed)",
             type: "FOLDER",
-            path: "folder-seed-dummy-unique", 
-            id_user: lastUserId, 
+            path: "folder-seed-dummy-unique",
+            id_user: lastUserId,
         }
     });
 
@@ -55,29 +77,29 @@ async function main() {
                 daerah_penempatan: `Penempatan ${i}`,
             },
         });
-        const pesertares =  await prisma.peserta.create({
-            data:{
-                jenis:"mahasiswa",
-                nim:res.nim,
-                createdAt:new Date()
+        const pesertares = await prisma.peserta.create({
+            data: {
+                jenis: "mahasiswa",
+                nim: res.nim,
+                createdAt: new Date()
             }
         })
 
         await prisma.presensi.create({
-            data:{
-                id_peserta:pesertares.id_peserta,
-                status:0,
+            data: {
+                id_peserta: pesertares.id_peserta,
+                status: 0,
                 waktu_presensi: new Date(),
                 createdAt:new Date(),
                 id_user:user.id_user
             }
         })
         await prisma.emailSendStatus.create({
-            data:{
-                id_peserta:pesertares.id_peserta,
-                status:0,
-                waktu_dikirim:new Date(),
-                createdAt:new Date(),
+            data: {
+                id_peserta: pesertares.id_peserta,
+                status: 0,
+                waktu_dikirim: new Date(),
+                createdAt: new Date(),
                 // --- [TAMBAHAN BARU 2] ---
                 id_folder: folderDummy.id_file
             }
@@ -91,20 +113,20 @@ async function main() {
                 nama: `Tamu ${i}`,
                 email: `tamu${i}@example.com`,
                 asal_instansi: `Instansi ${i}`,
-                createdAt:new Date()
+                createdAt: new Date()
             },
         });
         const pesertares = await prisma.peserta.create({
-            data:{
-                jenis:"tamu",
-                id_tamu:res.id_tamu,
-                createdAt:new Date()
+            data: {
+                jenis: "tamu",
+                id_tamu: res.id_tamu,
+                createdAt: new Date()
             }
         })
         await prisma.presensi.create({
-            data:{
-                id_peserta:pesertares.id_peserta,
-                status:0,
+            data: {
+                id_peserta: pesertares.id_peserta,
+                status: 0,
                 waktu_presensi: new Date(),
                 createdAt:new Date(),
                 id_user:user.id_user
@@ -112,10 +134,10 @@ async function main() {
         })
         await prisma.emailSendStatus.create({
             data: {
-                id_peserta:pesertares.id_peserta,
+                id_peserta: pesertares.id_peserta,
                 status: 0,
                 waktu_dikirim: new Date(),
-                createdAt:new Date(),
+                createdAt: new Date(),
                 // --- [TAMBAHAN BARU 3] ---
                 id_folder: folderDummy.id_file
             },

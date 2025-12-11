@@ -156,7 +156,8 @@ const routes = [
     },
   },
   {
-    path: "/tulis-undangan/:folderName", // Menerima parameter nama folder
+    // REVISI DI SINI: Menambahkan :folderId
+    path: "/tulis-undangan/:folderId/:folderName", 
     name: "TulisUndangan",
     component: TulisUndangan,
     props: true,
