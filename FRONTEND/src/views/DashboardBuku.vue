@@ -1,6 +1,7 @@
 <template>
   <div class="relative w-full min-h-screen overflow-hidden">
     <div class="relative z-10 p-8 pt-10">
+      
       <section
         class="relative rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] mt-4 overflow-hidden min-h-[450px] flex items-center group">
 
@@ -90,7 +91,7 @@
               class="bg-white rounded-[32px] border border-gray-100 shadow-lg px-8 py-8 flex flex-col min-h-[380px] hover:translate-y-[-5px] transition-all duration-300">
               <div class="flex justify-between items-start mb-6">
                 <div>
-                  <h3 class="text-xl font-bold text-gray-800">Total File Terupload</h3>
+                  <h3 class="text-xl font-bold text-gray-800">Total File Tersimpan</h3>
                   <p class="text-sm text-gray-500 mt-1">Klasifikasi berdasarkan jenis file</p>
                 </div>
                 <button @click="goToPage('/input-file')"
@@ -107,7 +108,7 @@
                     class="absolute inset-8 bg-white rounded-full flex flex-col items-center justify-center shadow-[inset_0_0_20px_rgba(0,0,0,0.05)]">
                     <span class="text-sm text-gray-400 font-semibold uppercase tracking-wider">Total</span>
                     <span class="text-5xl font-extrabold text-[#202020] mt-1">{{ formatNumber(totalTemplateBuku)
-                    }}</span>
+                      }}</span>
                   </div>
                 </div>
 
@@ -122,84 +123,52 @@
               </div>
             </div>
 
-            <<<<<<< HEAD <div class="bg-white rounded-[24px] shadow px-4 py-4">
-              <div class="flex justify-between items-center mb-2">
-                <h3 class="font-semibold text-sm">
-                  Mahasiswa berdasarkan Prodi
-                </h3>
-                <button @click="goToPage('/manajemen-mahasiswa')"
-                  class="text-xs font-semibold text-[#2366d1] hover:underline bg-blue-50 px-2 py-1 rounded">
-                  More Info ➝
-                </button>
-              </div>
+            <div
+              class="bg-white rounded-[32px] border border-gray-100 shadow-lg px-8 py-8 min-h-[380px] flex flex-col hover:translate-y-[-5px] transition-all duration-300">
+              <div class="flex justify-between items-start mb-8">
+                <div>
+                  <h3 class="text-xl font-bold text-gray-800">Mahasiswa per Prodi</h3>
+                  <p class="text-sm text-gray-500 mt-1">Jumlah mahasiswa terdaftar berdasarkan prodi</p>
+                </div>
+                <div class="flex flex-col items-end gap-3">
 
-              <div class="mt-4 space-y-4 text-xs">
-                <div v-for="row in mahasiswaByProdiWithPercent" :key="row.prodi" class="space-y-1">
-                  <div class="flex justify-between">
-                    <span class="font-semibold text-gray-700">
-                      {{ row.prodi }}
-                    </span>
-                    <span class="text-gray-600">
-                      {{ formatNumber(row.jumlah) }} mahasiswa
-                    </span>
-                  </div>
-                  <div class="w-full bg-gray-100 rounded-full h-2">
-                    <div class="h-2 rounded-full bg-[#2366d1]" :style="{ width: row.percent + '%' }"></div>
+                  <button @click="goToPage('/manajemen-peserta')"
+                    class="text-sm font-semibold text-[#2366d1] bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition">
+                    Detail Data ➝
+                  </button>
+
+                  <div class="text-xs font-medium text-gray-600">
+                    Total: <b>{{ formatNumber(totalMahasiswa) }}</b> Mhs
                   </div>
                 </div>
-
-                <p v-if="!mahasiswaByProdiWithPercent.length" class="text-[11px] text-gray-500 italic">
-                  Belum ada data mahasiswa yang dapat ditampilkan.
-                </p>
               </div>
-          </div>
-          =======
-          <div
-            class="bg-white rounded-[32px] border border-gray-100 shadow-lg px-8 py-8 min-h-[380px] flex flex-col hover:translate-y-[-5px] transition-all duration-300">
-            <div class="flex justify-between items-start mb-8">
-              <div>
-                <h3 class="text-xl font-bold text-gray-800">Mahasiswa per Prodi</h3>
-                <p class="text-sm text-gray-500 mt-1">Jumlah mahasiswa terdaftar berdasarkan prodi</p>
-              </div>
-              <div class="flex flex-col items-end gap-3">
 
-                <button @click="goToPage('/manajemen-peserta')"
-                  class="text-sm font-semibold text-[#2366d1] bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition">
-                  Detail Data ➝
-                </button>
+              <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[300px]">
+                <div class="space-y-5">
+                  <div v-for="row in mahasiswaByProdiWithPercent" :key="row.prodi" class="group">
+                    <div class="flex justify-between items-end mb-2">
+                      <span class="text-sm font-bold text-gray-700">{{ row.prodi }}</span>
+                      <span class="text-xs font-semibold text-[#2366d1] bg-blue-50 px-2 py-0.5 rounded">{{
+                        formatNumber(row.jumlah) }} Mhs</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                      <div
+                        class="h-full bg-[#377dff] rounded-full transition-all duration-1000 group-hover:bg-[#2e3e85]"
+                        :style="{ width: row.percent + '%' }"></div>
+                    </div>
+                  </div>
 
-                <div class="text-xs font-medium text-gray-600">
-                  Total: <b>{{ formatNumber(totalMahasiswa) }}</b> Mhs
+                  <div v-if="!mahasiswaByProdiWithPercent.length" class="text-center text-gray-400 py-10 italic">
+                    Belum ada data mahasiswa.
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[300px]">
-              <div class="space-y-5">
-                <div v-for="row in mahasiswaByProdiWithPercent" :key="row.prodi" class="group">
-                  <div class="flex justify-between items-end mb-2">
-                    <span class="text-sm font-bold text-gray-700">{{ row.prodi }}</span>
-                    <span class="text-xs font-semibold text-[#2366d1] bg-blue-50 px-2 py-0.5 rounded">{{
-                      formatNumber(row.jumlah) }} Mhs</span>
-                  </div>
-                  <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-                    <div class="h-full bg-[#377dff] rounded-full transition-all duration-1000 group-hover:bg-[#2e3e85]"
-                      :style="{ width: row.percent + '%' }"></div>
-                  </div>
-                </div>
-
-                <div v-if="!mahasiswaByProdiWithPercent.length" class="text-center text-gray-400 py-10 italic">
-                  Belum ada data mahasiswa.
-                </div>
-              </div>
-            </div>
           </div>
-
-          >>>>>>> origin/tya10des
         </div>
+      </section>
     </div>
-    </section>
-  </div>
   </div>
 </template>
 

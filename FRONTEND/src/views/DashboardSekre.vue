@@ -113,12 +113,12 @@
                   <div class="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
                     <span class="w-3 h-3 rounded-full bg-[#0f4ba0]"></span>
                     <span class="text-gray-600">Mhs: <b class="text-gray-900">{{
-                      formatNumber(stats.summary.breakdownPeserta.mahasiswa) }}</b></span>
+                        formatNumber(stats.summary.breakdownPeserta.mahasiswa) }}</b></span>
                   </div>
                   <div class="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
                     <span class="w-3 h-3 rounded-full bg-[#22c1c3]"></span>
                     <span class="text-gray-600">Tamu: <b class="text-gray-900">{{
-                      formatNumber(stats.summary.breakdownPeserta.tamu) }}</b></span>
+                        formatNumber(stats.summary.breakdownPeserta.tamu) }}</b></span>
                   </div>
                 </div>
               </div>
@@ -271,29 +271,31 @@ onMounted(() => {
 })
 
 // --- COMPUTED FOR CHARTS ---
+// FIX: Menggunakan PIXEL (px) alih-alih % untuk memastikan bar muncul
+const MAX_BAR_HEIGHT = 200; // Tinggi maksimal bar dalam pixel
 
-// 1. Bar Height: Scanner (Minimal 5% agar bar terlihat)
+// 1. Bar Height: Scanner
 const barHeightScannerTamu = computed(() => {
   const val = stats.value.summary.attendance.tamu
   const max = Math.max(val, stats.value.summary.attendance.mahasiswa, 10)
-  return `${Math.max((val / max) * 100, 5)}%`
+  return `${Math.max((val / max) * MAX_BAR_HEIGHT, 10)}px`
 })
 const barHeightScannerMhs = computed(() => {
   const val = stats.value.summary.attendance.mahasiswa
   const max = Math.max(val, stats.value.summary.attendance.tamu, 10)
-  return `${Math.max((val / max) * 100, 5)}%`
+  return `${Math.max((val / max) * MAX_BAR_HEIGHT, 10)}px`
 })
 
 // 2. Bar Height: Undangan
 const barHeightInviteTamu = computed(() => {
   const val = stats.value.invitation.tamu.terkirim
   const max = Math.max(val, stats.value.invitation.mahasiswa.terkirim, 10)
-  return `${Math.max((val / max) * 100, 5)}%`
+  return `${Math.max((val / max) * MAX_BAR_HEIGHT, 10)}px`
 })
 const barHeightInviteMhs = computed(() => {
   const val = stats.value.invitation.mahasiswa.terkirim
   const max = Math.max(val, stats.value.invitation.tamu.terkirim, 10)
-  return `${Math.max((val / max) * 100, 5)}%`
+  return `${Math.max((val / max) * MAX_BAR_HEIGHT, 10)}px`
 })
 
 // 3. Donut Chart Colors
