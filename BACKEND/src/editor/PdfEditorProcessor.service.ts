@@ -70,7 +70,7 @@ export class TestingPdfRenderProcessor {
         imageCache: Map<string, Buffer>,
         userId: number,
         folderParentId: number
-    ): Promise<string> {
+    ): Promise<any> {
         const zip = new JSZip();
         const templatePdf = await PDFDocument.load(templateBuffer);
 
@@ -129,6 +129,7 @@ export class TestingPdfRenderProcessor {
         if (dto.configuration.renderOption.asZip) {
             const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
             await fs.writeFile(outputPath, zipContent)
+            return {zipContent}
         }
         return outputPath;
     }
@@ -140,7 +141,7 @@ export class TestingPdfRenderProcessor {
         imageCache: Map<string, Buffer>,
         userId: number,
         id_parent: number
-    ): Promise<string> {
+    ): Promise<any> {
         const zip = new JSZip();
 
         const templatePdf = await PDFDocument.load(templateBuffer);
@@ -203,6 +204,8 @@ export class TestingPdfRenderProcessor {
         }
         if (dto.configuration.renderOption.asZip) {
             zip.file(fileName, pdfBytes)
+            const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
+            return {zipContent}
         }
 
         return outputPath

@@ -14,6 +14,16 @@ CREATE TABLE `user` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `settings` (
+    `id_settings` INTEGER NOT NULL AUTO_INCREMENT,
+    `key` VARCHAR(191) NOT NULL,
+    `value` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `settings_key_key`(`key`),
+    PRIMARY KEY (`id_settings`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `mahasiswa` (
     `nim` INTEGER NOT NULL,
     `nama` VARCHAR(191) NOT NULL,
@@ -25,6 +35,7 @@ CREATE TABLE `mahasiswa` (
     `dosen_pembimbing` VARCHAR(191) NULL,
     `daerah_asal` VARCHAR(191) NULL,
     `daerah_penempatan` VARCHAR(191) NULL,
+    `no_kursi` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -61,7 +72,7 @@ CREATE TABLE `emailSendStatus` (
     `id_sendStatus` INTEGER NOT NULL AUTO_INCREMENT,
     `waktu_dikirim` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `status` INTEGER NOT NULL DEFAULT 1,
-    `erroMessage` VARCHAR(191) NULL,
+    `errorMessage` VARCHAR(191) NULL,
     `id_folder` INTEGER NOT NULL,
     `id_peserta` INTEGER NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -110,7 +121,7 @@ ALTER TABLE `emailSendStatus` ADD CONSTRAINT `emailSendStatus_id_folder_fkey` FO
 ALTER TABLE `emailSendStatus` ADD CONSTRAINT `emailSendStatus_id_peserta_fkey` FOREIGN KEY (`id_peserta`) REFERENCES `peserta`(`id_peserta`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `file` ADD CONSTRAINT `file_id_parent_fkey` FOREIGN KEY (`id_parent`) REFERENCES `file`(`id_file`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `file` ADD CONSTRAINT `file_id_parent_fkey` FOREIGN KEY (`id_parent`) REFERENCES `file`(`id_file`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `file` ADD CONSTRAINT `file_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE CASCADE ON UPDATE CASCADE;

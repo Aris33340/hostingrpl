@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { join } from 'path';
-import { unlinkSync, existsSync, rmSync} from 'fs';
+import { unlinkSync, existsSync, rmSync } from 'fs';
 
 @Injectable()
 export class FileService {
@@ -30,10 +30,14 @@ export class FileService {
 
 
   async getAllFiles(userId: number, query?: string, folder?: string) {
-    return this.prisma.file.findMany({
+    const user = await this.prisma.user.findUnique({
+      where: { id_user: userId },
+      select: { role: true }
+    })
+    return await this.prisma.file.findMany({
       where: {
         user: {
-          id_user: userId
+          role:user?.role
         },
         OR: [
           { type: { contains: query } },
@@ -56,7 +60,7 @@ export class FileService {
     try {
       if (existsSync(filePath)) {
         try {
-          if(fileRecord.type == 'FOLDER')rmSync(filePath, { recursive: true, force: true });
+          if (fileRecord.type == 'FOLDER') rmSync(filePath, { recursive: true, force: true });
           else unlinkSync(filePath);
         } catch (err) {
           throw new InternalServerErrorException(`Failed to delete file from disk: ${err.message}`);

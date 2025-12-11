@@ -12,8 +12,6 @@ export class EditorService {
     constructor(@InjectQueue('pdf-render-queue') private pdfQueue: Queue) {}
 
     async addToQueue(dto: PdfEditRequestDto, userId: number) {
-        // Masukkan job ke antrian
-        // Job ID bisa kita set agar bisa ditrack statusnya nanti
         const outputPath = path.join(`./public/output/rendered/${dto.configuration.projectName}`);
         if (!existsSync(outputPath)) {
             await fs.mkdir(outputPath, { recursive: true })
@@ -24,11 +22,10 @@ export class EditorService {
             dto,
             userId
         }, {
-            priority: 1, // Prioritas
-            attempts: 3, // Coba lagi 3x jika gagal
-            removeOnComplete: true, // Hapus dari redis jika sukses (hemat memori)
+            priority: 1, 
+            attempts: 3,
+            removeOnComplete: true, 
         });
-        console.log('add to queue')
 
         return {
             message: 'Render job has been queued',

@@ -50,6 +50,7 @@ model mahasiswa {
   dosen_pembimbing  String?
   daerah_asal       String?
   daerah_penempatan String?
+  no_kursi          String?
 
   peserta   peserta[]
   createdAt DateTime  @default(now())
@@ -105,6 +106,7 @@ model file {
   file_name String
   path      String @unique
   type      String
+  
 
   id_parent Int?
   parent    file?  @relation("FolderToSubfolders", fields: [id_parent], references: [id_file], onDelete: Cascade)
