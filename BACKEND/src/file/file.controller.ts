@@ -29,12 +29,12 @@ export class FileController {
     constructor(private readonly fileService: FileService, private readonly authService: AuthService) { }
 
     @Get()
-    async getAllFiles(@Req() req: any, @Query('type') type: string, @Query('folder') folder:string) {
-        try{
+    async getAllFiles(@Req() req: any, @Query('type') type: string, @Query('folder') folder: string) {
+        try {
             const userId = req.user.sub;
             const files = await this.fileService.getAllFiles(Number(userId), type, folder);
             return files;
-        }catch(e){
+        } catch (e) {
             throw new BadRequestException('')
         }
     }

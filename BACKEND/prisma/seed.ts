@@ -68,7 +68,8 @@ async function main() {
                 id_peserta:pesertares.id_peserta,
                 status:0,
                 waktu_presensi: new Date(),
-                createdAt:new Date()
+                createdAt:new Date(),
+                id_user:user.id_user
             }
         })
         await prisma.emailSendStatus.create({
@@ -105,7 +106,8 @@ async function main() {
                 id_peserta:pesertares.id_peserta,
                 status:0,
                 waktu_presensi: new Date(),
-                createdAt:new Date()
+                createdAt:new Date(),
+                id_user:user.id_user
             }
         })
         await prisma.emailSendStatus.create({

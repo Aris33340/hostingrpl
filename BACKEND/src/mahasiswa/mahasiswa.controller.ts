@@ -9,6 +9,7 @@ import {
   Delete,
   ParseIntPipe,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
 import { Prisma } from '@prisma/client'
@@ -87,14 +88,16 @@ export class MahasiswaController {
 
   // 🟩 4️⃣ POST bulk
   @Post('bulk')
-  async createMany(@Body() data: Prisma.mahasiswaCreateManyInput[]) {
-    return this.mhsService.createManyMahasiswa(data);
+  async createMany(@Body() data: Prisma.mahasiswaCreateManyInput[],@Req() req: any) {
+    const userId = req.user.sub; 
+    return this.mhsService.createManyMahasiswa(data,userId);
   }
 
   // 🟩 5️⃣ POST normal
   @Post()
-  async createMahasiswa(@Body() body: any) {
+  async createMahasiswa(@Body() body: any,@Req() req: any) {
     try {
+      const userId = req.user.sub;
       const data: Prisma.mahasiswaCreateInput = {
         nim: Number(body.nim),
         nama: body.nama,
@@ -112,7 +115,7 @@ export class MahasiswaController {
         throw new BadRequestException('NIM harus berupa angka');
       }
 
-      return this.mhsService.createMahasiswa(data);
+      return this.mhsService.createMahasiswa(data,userId);
 
     } catch (error) {
       throw new BadRequestException(error.message || 'Gagal menambah mahasiswa');

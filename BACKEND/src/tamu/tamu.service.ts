@@ -68,7 +68,7 @@ export class TamuService {
   }
 
   // 🟩 2️⃣ BULK CREATE (Upload banyak tamu dari Excel) - tanpa duplikat nama/email/instansi
-  async bulkCreate(data: Prisma.tamuCreateManyInput[]): Promise<{ inserted: number; duplicates: string[] }> {
+  async bulkCreate(data: Prisma.tamuCreateManyInput[],userId:number): Promise<{ inserted: number; duplicates: string[] }> {
     // Filter data valid
     const validData = data.filter(d => d.nama && d.email && d.asal_instansi)
 
@@ -115,7 +115,7 @@ export class TamuService {
         },
         select:{id_peserta:true}
       })
-      await this.prisma.presensi.createMany({data:peserta.map(e => ({id_peserta:e.id_peserta}))})
+      await this.prisma.presensi.createMany({data:peserta.map(e => ({id_peserta:e.id_peserta,id_user:userId}))})
     }
 
     return { inserted: newData.length, duplicates: duplicateKeys }

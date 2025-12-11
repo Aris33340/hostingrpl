@@ -9,6 +9,7 @@ import {
   Delete,
   ParseIntPipe,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { TamuService } from './tamu.service';
 import { Prisma } from '@prisma/client';
@@ -112,9 +113,10 @@ export class TamuController {
   }
   // 🟩 7️⃣ POST /api/tamu/bulk  → upload banyak tamu dari Excel
   @Post('bulk')
-  async bulkCreate(@Body() body: any[]) {
+  async bulkCreate(@Body() body: any[],@Req() req:any) {
     try {
-      return this.tamuService.bulkCreate(body);
+      const userId = req.user.sub;
+      return this.tamuService.bulkCreate(body,userId);
     } catch (error) {
       throw new BadRequestException(error.message || 'Gagal upload data tamu');
     }

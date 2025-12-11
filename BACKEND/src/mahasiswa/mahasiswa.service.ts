@@ -174,7 +174,7 @@ export class MahasiswaService {
 
   // 🟩 4️⃣ Tambah satu mahasiswa
   async createMahasiswa(
-    data: Prisma.mahasiswaCreateInput,
+    data: Prisma.mahasiswaCreateInput,userId:number
   ): Promise<mahasiswa> {
     const mahasiswa = await this.prisma.mahasiswa.create({ data });
 
@@ -187,7 +187,8 @@ export class MahasiswaService {
 
     await this.prisma.presensi.create({
       data: {
-        id_peserta: Number(peserta.id_peserta)
+        id_peserta: Number(peserta.id_peserta),
+        id_user:userId
       }
     });
 
@@ -196,7 +197,7 @@ export class MahasiswaService {
 
   // 🟩 5️⃣ Tambah banyak mahasiswa (import Excel) - dengan validasi duplicate
   async createManyMahasiswa(
-    data: Prisma.mahasiswaCreateManyInput[],
+    data: Prisma.mahasiswaCreateManyInput[],userId:number
   ): Promise<{ inserted: number; duplicates: string[] }> {
 
     const validData = data.filter((d) => d.nim && d.nama);
@@ -223,7 +224,7 @@ export class MahasiswaService {
 
       const pesertas = await this.prisma.peserta.findMany();
       await this.prisma.presensi.createMany({
-        data: pesertas.map(e => ({ id_peserta: Number(e.id_peserta) })),
+        data: pesertas.map(e => ({ id_peserta: Number(e.id_peserta), id_user:userId})),
         skipDuplicates: true,
       });
     }
