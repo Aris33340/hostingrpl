@@ -4,7 +4,7 @@ import { tamu, Prisma } from '@prisma/client';
 
 @Injectable()
 export class TamuService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // 🟦 Ambil list instansi unik (untuk dropdown filter)
   async getAllInstansi() {
@@ -52,6 +52,7 @@ export class TamuService {
         skip,
         take: limit,
         where,
+<<<<<<< HEAD
         // include:{
         //   peserta:{
         //     include:{
@@ -59,6 +60,15 @@ export class TamuService {
         //     }
         //   }
         // },
+=======
+        include: {
+          peserta: {
+            include: {
+              presensis: true
+            }
+          }
+        },
+>>>>>>> f2987f993564a5fd3b889d81fc00a3ec5ed768b8
         orderBy: { id_tamu: 'asc' },
         // --- PERBAIKAN DI SINI ---
         // Update include agar membawa data files
@@ -102,9 +112,33 @@ export class TamuService {
 
     // Insert data baru
     if (newData.length > 0) {
+<<<<<<< HEAD
       // Catatan: Pastikan logika backend Anda juga membuat data di tabel 'peserta' 
       // agar tamu ini punya id_peserta nantinya.
       await this.prisma.tamu.createMany({ data: newData })
+=======
+      await this.prisma.tamu.createMany({ data: newData, skipDuplicates: true })
+      const tamu = await this.prisma.tamu.findMany({
+        where: {
+          email: {
+            in: newData.map(e => e.email)
+          }
+        },
+        select:{
+          id_tamu:true
+        }
+      })
+      await this.prisma.peserta.createMany({data:tamu.map(e => ({id_tamu:e.id_tamu,jenis:'tamu'}))})
+      const peserta = await this.prisma.peserta.findMany({
+        where:{
+          id_tamu:{
+            in:tamu.map(e => e.id_tamu)
+          }
+        },
+        select:{id_peserta:true}
+      })
+      await this.prisma.presensi.createMany({data:peserta.map(e => ({id_peserta:e.id_peserta}))})
+>>>>>>> f2987f993564a5fd3b889d81fc00a3ec5ed768b8
     }
 
     return { inserted: newData.length, duplicates: duplicateKeys }

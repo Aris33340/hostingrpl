@@ -1,9 +1,9 @@
 <template>
   <div class="relative w-full min-h-screen overflow-hidden">
-    <div class="relative z-10 p-8 pt-10">
+    <div class="relative z-10 p-8 pt-2">
 
       <section
-        class="relative rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] mt-4 overflow-hidden min-h-[450px] flex items-center group">
+        class="relative rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden min-h-[450px] flex items-center group">
 
         <div class="absolute inset-0 z-0">
           <img :src="foto1"
@@ -234,7 +234,7 @@ import foto2 from '@/assets/images/fotowi2.jpg'
 import { showNotification } from '../composables/useNotification'
 import { useLoading } from '../composables/useLoading'
 
-const {show,hide} = useLoading()
+const { show, hide } = useLoading()
 const slides = ref([{ id: 1, src: foto1, alt: 'Suasana wisuda 1' }, { id: 2, src: foto2, alt: 'Suasana wisuda 2' }])
 const activeIndex = ref(0)
 const activeSlide = computed(() => slides.value[activeIndex.value])
@@ -248,8 +248,8 @@ const loadStatistikData = async () => {
     statistikData.value = response.data
     console.log(statistikData.value)
   } catch (error) {
-    showNotification('error',error.message || 'Gagal memuat data statistik.')
-  }finally {
+    showNotification('error', error.message || 'Gagal memuat data statistik.')
+  } finally {
     hide()
   }
 }

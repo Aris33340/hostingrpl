@@ -223,7 +223,7 @@ const totalHadir = computed(() => isMahasiswa.value ? statistikData.value?.mahas
 const totalBelumHadir = computed(() => isMahasiswa.value ? statistikData.value?.mahasiswaTidakHadir ?? 0 : statistikData.value?.tamuTidakHadir ?? 0);
 const tableDataAll = ref([])
 const isLoading = ref(true);
-const viewMode = ref('chart');
+const viewMode = ref('table');
 const searchQuery = ref('');
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
@@ -291,8 +291,6 @@ async function showConfirm(name) {
 }
 
 const mountTableData = async (type) => {
-    console.log('peminatan:', selectedPeminatan.value.label)
-    console.log('kelas:', selectedKelas.value.label)
     await mountStatistikData()
     isLoading.value = true;
     try {
@@ -308,7 +306,6 @@ const mountTableData = async (type) => {
                     kelas: selectedKelas.value.label
                 }
             });
-            console.log("data tabel", res.data)
             tableDataAll.value = res.data.data.map(e => {
                 const presensi = e.peserta[0]?.presensis ?? []
                 const restructuredData = {
@@ -349,7 +346,6 @@ const mountTableData = async (type) => {
         });
         totalData.value = res.data.total
     } catch (e) {
-        console.log(e)
         showNotification('error', e.message || 'Gagal memuat data mahasiswa');
     } finally {
         isLoading.value = false;
@@ -372,9 +368,6 @@ async function mountStatistikData() {
             Math.ceil(statistikData.value?.tamuHadir / statistikData.value?.totalUndanganTamu * 100)
         ]
 
-        console.log(xBarChartData.value.map(e => {
-            return e[Object.keys(e).toString()].total
-        }))
     } catch (e) {
         showNotification('error', e.message);
     } finally {
@@ -409,7 +402,6 @@ try {
     payload = authStore.getPayload()
 } catch (err) {
     payload = null
-    console.warn("JWT tidak valid atau belum login")
 }
 const canToggleStatus = computed(() => {
     if (!payload) return false
@@ -430,7 +422,7 @@ const toggleStatus = async (presensi) => {
             presensi.status = 1
         }
     } catch (err) {
-        console.error(err)
+        showNotification('error', err.response?.data?.message || 'Gagal memperbarui status presensi.')
     }
     await mountTableData(isMahasiswa.value)
 }
@@ -521,11 +513,21 @@ watch([searchQuery, currentPage, itemsPerPage], async () => {
     await mountTableData(isMahasiswa.value);
 });
 
+const intervalId = ref(null);
+
 onMounted(async () => {
     await mountTableData(isMahasiswa.value);
+
+    intervalId.value = window.setInterval(async () => {
+        await mountTableData(isMahasiswa.value);
+    }, 3000);
 });
 
 onBeforeUnmount(() => {
-    stopCamera()
-})
+    stopCamera();
+    if (intervalId.value !== null) {
+        clearInterval(intervalId.value);
+    }
+});
+
 </script>

@@ -7,7 +7,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
 
-      <div @click="$router.push('/dashboard-sekre')"
+      <div @click="modulKesekretariatan"
         class="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border border-blue-100 group relative overflow-hidden">
         <div
           class="absolute top-0 right-0 bg-blue-500 w-24 h-24 rounded-bl-full opacity-10 group-hover:scale-150 transition-transform">
@@ -20,7 +20,7 @@
         </span>
       </div>
 
-      <div @click="$router.push('/dashboard-buku')"
+      <div @click="modulBukuWisuda"
         class="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border border-purple-100 group relative overflow-hidden">
         <div
           class="absolute top-0 right-0 bg-purple-500 w-24 h-24 rounded-bl-full opacity-10 group-hover:scale-150 transition-transform">
@@ -36,3 +36,19 @@
     </div>
   </div>
 </template>
+<script setup>
+import { useAuthStore } from '../stores/authStore';
+import { useRouter } from 'vue-router';
+const authStore = useAuthStore();
+const route = useRouter();
+
+const modulKesekretariatan = () => {
+  authStore.setRole('SEKRETARIAT');
+  route.push('/dashboard-sekre');
+}
+const modulBukuWisuda = () => {
+  authStore.setRole('BUKUWISUDA');
+  route.push('/dashboard-buku');
+}
+
+</script>
