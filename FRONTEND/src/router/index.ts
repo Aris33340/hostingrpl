@@ -226,7 +226,7 @@ router.beforeEach(async (to, from, next) => {
     userRole.value = payload.role;
   } catch (error) {
     authStore.clearAuthData();
-    return next({ path: "/login" });
+    // return next({ path: "/login" });
   }
   function getDefaultRouteByRole(role: any) {
     switch (role) {

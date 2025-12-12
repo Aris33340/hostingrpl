@@ -69,7 +69,7 @@ const menuRoutes = computed(() => {
     current_role.value = isEmpty(authStore.current_role) ? authStore.getPayload().role : authStore.current_role;
     role.value = authStore.getPayload().role
   } catch (error) {
-    // showNotification('warning',error.message)
+    
   }
   const allMenus = router.getRoutes().filter(r => r.meta?.showInNavbar);
   const currentPath = route.path;
