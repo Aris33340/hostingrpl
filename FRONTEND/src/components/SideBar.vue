@@ -48,28 +48,26 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { LogOut, ArrowLeftCircle, Settings, StepBackIcon } from "lucide-vue-next";
 import SidebarLink from "../components/SidebarLink.vue";
 import { useAuthStore } from "../stores/authStore";
 import logoImg from '@/assets/images/LogoStisGrad.png';
 import { showNotification } from "../composables/useNotification";
+import { isEmpty } from "class-validator";
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-let current_role
-let role
+const current_role = ref('')
+const role = ref('')
 const isNavbarVisible = computed(() => route.meta.showNavbar !== false);
 const menuRoutes = computed(() => {
   const authStore = useAuthStore();
   try {
-    current_role = authStore.current_role;
-    if (!current_role) {
-      current_role = authStore.getPayload().role
-    }
-    role = authStore.getPayload().role
+    current_role.value = isEmpty(authStore.current_role) ? authStore.getPayload().role : authStore.current_role;
+    role.value = authStore.getPayload().role
   } catch (error) {
     // showNotification('warning',error.message)
   }
@@ -82,8 +80,8 @@ const menuRoutes = computed(() => {
         ? menu.meta.allowedRoles
         : Object.values(menu.meta.allowedRoles);
       console.log("allowed", allowed)
-
-      if (!allowed.includes(current_role)) return false;
+      console.log("current role", current_role.value)
+      if (!allowed.includes(current_role.value)) return false;
     }
     return true;
   });
