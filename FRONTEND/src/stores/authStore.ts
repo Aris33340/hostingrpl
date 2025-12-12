@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
   state: (): UserState => ({
     access_token: null,
     remember: false,
-    current_role: localStorage.getItem('current_role') ?? 'SUPERADMIN'
+    current_role: localStorage.getItem('current_role') ?? ''
   }),
 
   getters: {
@@ -113,6 +113,7 @@ export const useAuthStore = defineStore('auth', {
     clearAuthData() {
       localStorage.removeItem("current_role")
       localStorage.removeItem("access_token");
+      this.current_role = ''
       this.access_token = null;
     },
     isAuth() {
