@@ -20,7 +20,8 @@ export class TamuService {
     search: string,
     page: number,
     limit: number,
-    instansi?: string,   // ⬅ filter tambahan
+    instansi?: string,
+    presensiStatus?:number   // ⬅ filter tambahan
   ) {
     const skip = (page - 1) * limit;
 
@@ -40,12 +41,27 @@ export class TamuService {
       : {};
 
     // 🔵 Final WHERE
+    const presensiCondition: Prisma.tamuWhereInput = 
+    presensiStatus !== undefined ?
+    {
+      peserta:{
+        some:{
+          presensis:{
+            some:{
+              status:presensiStatus
+            }
+          }
+        }
+      }
+    }:{};
+
     const where: Prisma.tamuWhereInput = {
       AND: [
         search ? { OR: searchConditions } : {},
-        filterCondition,
+        filterCondition,presensiCondition
       ],
     };
+
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.tamu.findMany({
@@ -71,7 +87,7 @@ export class TamuService {
       this.prisma.tamu.count({ where }),
     ]);
 
-    return { data, total, page, limit };
+    return { data, total, page, limit};
   }
 
   // 🟩 2️⃣ BULK CREATE (Upload banyak tamu dari Excel) - tanpa duplikat nama/email/instansi

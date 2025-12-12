@@ -103,7 +103,7 @@ export class MahasiswaService {
     const listSelected = list.filter(e => String(e.peminatan).includes(peminatan ?? ''))
     if (kelas) {
       // user pilih kelas lengkap → filter exact
-      prodiKelasFilter.OR = [{kelas:{contains:kelas}}];
+      prodiKelasFilter.OR = [{ kelas: { contains: kelas } }];
     } else if (peminatan) {
       // user hanya pilih peminatan → kelas diawali kode prodi
       prodiKelasFilter.OR = listSelected[0].kelas.map(e => ({ kelas: { contains: e } }))
@@ -179,7 +179,7 @@ export class MahasiswaService {
 
   // 🟩 4️⃣ Tambah satu mahasiswa
   async createMahasiswa(
-    data: Prisma.mahasiswaCreateInput,userId:number
+    data: Prisma.mahasiswaCreateInput, userId: number
   ): Promise<mahasiswa> {
     const mahasiswa = await this.prisma.mahasiswa.create({ data });
 
@@ -193,7 +193,7 @@ export class MahasiswaService {
     await this.prisma.presensi.create({
       data: {
         id_peserta: Number(peserta.id_peserta),
-        // id_user:userId
+        id_user: userId
       }
     });
 
@@ -202,7 +202,7 @@ export class MahasiswaService {
 
   // 🟩 5️⃣ Tambah banyak mahasiswa (import Excel) - dengan validasi duplicate
   async createManyMahasiswa(
-    data: Prisma.mahasiswaCreateManyInput[],userId:number
+    data: Prisma.mahasiswaCreateManyInput[], userId: number
   ): Promise<{ inserted: number; duplicates: string[] }> {
 
     const validData = data.filter((d) => d.nim && d.nama);
@@ -229,7 +229,7 @@ export class MahasiswaService {
 
       const pesertas = await this.prisma.peserta.findMany();
       await this.prisma.presensi.createMany({
-        data: pesertas.map(e => ({ id_peserta: Number(e.id_peserta), id_user:userId})),
+        data: pesertas.map(e => ({ id_peserta: Number(e.id_peserta), id_user: userId })),
         skipDuplicates: true,
       });
     }

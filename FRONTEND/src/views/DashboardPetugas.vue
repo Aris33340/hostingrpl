@@ -89,7 +89,7 @@
                         class="px-4 py-2.5 border-2 w-1/2 border-gray-200 cursor-pointer rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none backdrop-blur-lg bg-transparent">
                         <option class="text-gray-700" value="">-- Pilih Peminatan --</option>
                         <option class="text-gray-700" v-for="p in peminatans" :key="p.kode" :value="p">{{ p.label
-                            }}</option>
+                        }}</option>
                     </select>
                     <select v-model="selectedKelas"
                         class="px-4 py-2.5 border-2 w-1/2 cursor-pointer border-gray-200 rounded-xl  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none backdrop-blur-lg bg-transparent"
@@ -130,7 +130,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item, index) in tableDataAll" :key="index"
+                        <tr v-for="(item, index) in tableData" :key="index"
                             class="border-b border-gray-100 hover:border-blue-400 hover:cursor-pointer transition-colors">
                             <td v-for="value in tableKey.slice(0, tableKey.length - 3)"
                                 class="px-4 py-3 text-sm font-bold text-white">{{ item[`${value}`] }}</td>
@@ -214,6 +214,7 @@ import { mainApi } from '@/api'
 import { useModal } from '../composables/useModal';
 import { showNotification } from '../composables/useNotification'
 import { useAuthStore } from '../stores/authStore';
+import { isArray } from "class-validator";
 const scannerRef = ref(null)
 const manualNim = ref('');
 const scanResult = ref("");
@@ -221,7 +222,7 @@ const statistikData = ref();
 const totalUndangan = computed(() => isMahasiswa.value ? statistikData.value?.totalUndanganMahasiswa ?? 0 : statistikData.value?.totalUndanganTamu ?? 0)
 const totalHadir = computed(() => isMahasiswa.value ? statistikData.value?.mahasiswaHadir ?? 0 : statistikData.value?.tamuHadir ?? 0)
 const totalBelumHadir = computed(() => isMahasiswa.value ? statistikData.value?.mahasiswaTidakHadir ?? 0 : statistikData.value?.tamuTidakHadir ?? 0);
-const tableDataAll = ref([])
+const tableData = ref([])
 const isLoading = ref(true);
 const viewMode = ref('table');
 const searchQuery = ref('');
@@ -306,7 +307,8 @@ const mountTableData = async (type) => {
                     kelas: selectedKelas.value.label
                 }
             });
-            tableDataAll.value = res.data.data.map(e => {
+
+            tableData.value = res.data.data.map(e => {
                 const presensi = e.peserta[0]?.presensis ?? []
                 const restructuredData = {
                     nim: e.nim,
@@ -319,16 +321,17 @@ const mountTableData = async (type) => {
                 }
                 return restructuredData
             })
+
         } else {
             res = await mainApi.get('tamu/pagination', {
                 params: {
                     search: searchQuery.value || undefined,
                     page: currentPage.value,
                     limit: itemsPerPage.value,
-                    status: filterStatus.value !== null ? filterStatus.value : undefined,
+                    presensiStatus: filterStatus.value !== null ? filterStatus.value : undefined,
                 }
             })
-            tableDataAll.value = res.data.data.map(e => {
+            tableData.value = res.data.data.map(e => {
                 const presensi = e.peserta[0]?.presensis ?? []
                 const restructuredData = {
                     nama: e.nama,
@@ -340,11 +343,13 @@ const mountTableData = async (type) => {
                 return restructuredData
             })
         }
-        tableKey.value = Object.keys(tableDataAll.value[0])
-        tableKey.value.forEach(key => {
-            sortState.value[key] = false;
-        });
-        totalData.value = res.data.total
+        if (tableData.value.length > 0) {
+            tableKey.value = Object.keys(tableData.value[0])
+            tableKey.value.forEach(key => {
+                sortState.value[key] = false;
+            });
+            totalData.value = res.data.total
+        }
     } catch (e) {
         showNotification('error', e.message || 'Gagal memuat data mahasiswa');
     } finally {
@@ -377,10 +382,10 @@ async function mountStatistikData() {
 
 
 function toggleStatusFilter() {
-    if (filterStatus.value === null) filterStatus.value = 1;   // tampilkan hadir
-    else if (filterStatus.value === 1) filterStatus.value = 0; // tampilkan belum
-    else filterStatus.value = null;                            // kembali ke semua
-    mountTableData(isMahasiswa.value); // refresh data
+    if (filterStatus.value === null) filterStatus.value = 1;
+    else if (filterStatus.value === 1) filterStatus.value = 0;
+    else filterStatus.value = null;
+    mountTableData(isMahasiswa.value);
 }
 
 const handleKategoriToggle = async (event) => {
@@ -392,7 +397,7 @@ const handleKategoriToggle = async (event) => {
 function sortBy(key) {
     sortState.value[key] = !sortState.value[key];
     const isAsc = sortState.value[key];
-    tableDataAll.value.sort((a, b) => {
+    tableData.value.sort((a, b) => {
         return isAsc ? String(a[`${key}`]).localeCompare(b[`${key}`]) : String(b[`${key}`]).localeCompare(a[`${key}`])
     })
 }
@@ -513,20 +518,27 @@ watch([searchQuery, currentPage, itemsPerPage], async () => {
     await mountTableData(isMahasiswa.value);
 });
 
-const intervalId = ref(null);
+const intervalStatistikDataId = ref(null);
+const intervalTableDataId = ref(null);
 
 onMounted(async () => {
     await mountTableData(isMahasiswa.value);
 
-    intervalId.value = window.setInterval(async () => {
-        await mountTableData(isMahasiswa.value);
+    intervalStatistikDataId.value = window.setInterval(async () => {
+        await mountStatistikData();
     }, 3000);
+    intervalTableDataId.value = window.setInterval(async () => {
+        await mountTableData(isMahasiswa.value);
+    }, 5000)
 });
 
 onBeforeUnmount(() => {
     stopCamera();
-    if (intervalId.value !== null) {
-        clearInterval(intervalId.value);
+    if (intervalStatistikDataId.value !== null) {
+        clearInterval(intervalStatistikDataId.value);
+    }
+    if (intervalTableDataId !== null) {
+        clearInterval(intervalTableDataId.value);
     }
 });
 

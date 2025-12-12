@@ -24,8 +24,9 @@ export class PresensiController {
     }
 
     @Patch('mark-status/:id')
-    async setPresensiHadir(@Param('id') id: string) {
-        return this.presensiService.setPresensiHadir(Number(id));
+    async setPresensiHadir(@Param('id') id: string,@Req() req:any) {
+        const userId = req.user.sub
+        return this.presensiService.setPresensiHadir(Number(id),userId);
     }
 
     @Patch('unmark-status/:id')

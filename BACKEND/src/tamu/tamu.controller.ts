@@ -47,6 +47,7 @@ export class TamuController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('instansi') instansi?: string,
+    @Query('presensiStatus') presensiStatus?:number
   ) {
     const pageNum = Number(page);
     const limitNum = Number(limit);
@@ -55,11 +56,13 @@ export class TamuController {
       throw new BadRequestException('Page dan limit harus berupa angka');
     }
     try {
+      presensiStatus = presensiStatus !== undefined ? Number(presensiStatus) : undefined;
       return this.tamuService.getTamuWithPagination(
         search ?? '',
         pageNum,
         limitNum,
-        instansi,  // ⬅ kirim ke service
+        instansi,
+        presensiStatus  // ⬅ kirim ke service
       );
     } catch (e) {
       console.log(e)

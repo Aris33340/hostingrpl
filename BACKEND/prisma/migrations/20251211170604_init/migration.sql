@@ -72,6 +72,8 @@ CREATE TABLE `emailSendStatus` (
     `id_sendStatus` INTEGER NOT NULL AUTO_INCREMENT,
     `id_peserta` INTEGER NULL,
     `id_folder` INTEGER NOT NULL,
+    `subject` TEXT NULL,
+    `message` TEXT NULL,
     `status` INTEGER NOT NULL DEFAULT 1,
     `waktu_dikirim` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `errorMessage` VARCHAR(191) NULL,

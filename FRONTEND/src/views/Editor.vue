@@ -101,7 +101,7 @@
                         position: 'absolute',
                     }" @mousedown="handleObjectMouseDown($event, object)" :class="[
                         'cursor-move border border-dashed transition-all duration-100',
-                        selectedObjectId === object.id ? 'border-blue-500' : 'border-transparent hover:border-red-300'
+                        selectedObjectId === object.id ? 'border-blue-500' : 'border-transparent hover:border-blue-300'
                     ]">
                         <div v-if="object.pageNumber == activePage"
                             class="w-full h-full flex items-center justify-center">
@@ -109,7 +109,8 @@
                             <span v-if="object.type === 'text'">
                                 <!-- Mode view -->
                                 <span v-if="editingObjectId !== object.id" :style="getTextStyle(object.props)"
-                                    class="absolute left-1 -top-1 flex items-start justify-start text-left" @dblclick="handleInputText(object)">
+                                    class="absolute left-1 -top-1 flex items-start justify-start text-left"
+                                    @dblclick="handleInputText(object)">
                                     {{ object.props.content }}
                                 </span>
 
@@ -481,9 +482,9 @@ const authStore = useAuthStore();
 // --- State: PDF & Workspace ---
 let pdfDoc;
 let role
-try{
+try {
     role = authStore.getPayload().role
-}catch{
+} catch {
     router.push('/login')
 }
 const pdfId = ref(route.query.fileId);
@@ -549,7 +550,7 @@ const qrSampleUrl = ref();
 const pdfFileName = ref();
 const renderOption = ref();
 const formConfiguration = reactive({ pdfFileName: '', renderOption: '', entityTarget: '' });
-const tableTypeSelected = ref(role === 'BUKUWISUDA' ? 'mahasiswa' : '');
+const tableTypeSelected = ref('mahasiswa');
 const tableFieldSelected = ref();
 const tableFields = ref();
 const isTableTypeSet = role == 'BUKUWISUDA' || computed(() => objects.value.some(e => e.type == 'field' || e.type == 'qr'));
@@ -708,16 +709,16 @@ const startResize = (e, objectId) => {
     e.preventDefault();
     isResizing.value = true;
     resizeObjectId.value = objectId;
-    
+
     const obj = objects.value.find(o => o.id === objectId);
-    
+
     if (obj && workspaceDiv.value) {
         const rect = workspaceDiv.value.getBoundingClientRect();
-        
+
         // Simpan ukuran & posisi mouse awal
         initialSize.value = { width: obj.width, height: obj.height };
         initialMouse.value = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-        
+
         // 1. Simpan Aspect Ratio (Penting untuk Gambar & Teks proporsional)
         initialAspectRatio.value = obj.width / obj.height;
 
@@ -726,7 +727,7 @@ const startResize = (e, objectId) => {
             initialFontSize.value = obj.props.fontSize || 16;
         }
     }
-    
+
     window.addEventListener('mousemove', onResize);
     window.addEventListener('mouseup', stopResize);
 };
@@ -745,9 +746,9 @@ const onResize = (e) => {
     // --- KALKULASI UKURAN BARU ---
     // Kita gunakan width sebagai patokan utama ("driver") pergerakan mouse
     let newWidth = initialSize.value.width + deltaX;
-    
+
     // --- ATURAN 1: MINIMUM SIZE (1% Canvas) ---
-    const minWidth = rect.width * 0.01; 
+    const minWidth = rect.width * 0.01;
     newWidth = Math.max(minWidth, newWidth);
 
     // --- ATURAN 2: ASPECT RATIO (Untuk Image & Text) ---
@@ -775,15 +776,15 @@ const onResize = (e) => {
         // Hitung skala perubahan berdasarkan tinggi (lebih akurat untuk font)
         const scaleFactor = newHeight / initialSize.value.height;
         const newFs = Math.floor(initialFontSize.value * scaleFactor);
-        
+
         // Batasi font size minimal (misal 8px)
         obj.props.fontSize = Math.max(8, newFs);
     }
 
     // --- APPLY TRANSFORM ---
-    updateObjectTransform(resizeObjectId.value, { 
-        width: newWidth, 
-        height: newHeight 
+    updateObjectTransform(resizeObjectId.value, {
+        width: newWidth,
+        height: newHeight
     });
 };
 
@@ -938,7 +939,7 @@ const confirmPlacement = async () => {
         finalWidth = targetWidth;
         finalHeight = targetHeight;
 
-        showNotification('warning',"Object too big, scaled down to 10% of canvas");
+        showNotification('warning', "Object too big, scaled down to 10% of canvas");
     }
 
     const newObj = {
@@ -947,8 +948,8 @@ const confirmPlacement = async () => {
         type: placement.value.mode,
         x: placement.value.dotPosition.x,
         y: placement.value.dotPosition.y,
-        width: finalWidth,  
-        height: finalHeight, 
+        width: finalWidth,
+        height: finalHeight,
         rotation: 0,
         pageNumber: activePage.value,
         opacity: 1,
@@ -958,7 +959,7 @@ const confirmPlacement = async () => {
     objects.value.push(newObj);
     selectObject(newObj);
     cancelPlacement();
-    showNotification('success',`Object placed: ${newObj.type} size: ${finalWidth}x${finalHeight}`);
+    showNotification('success', `Object placed: ${newObj.type} size: ${finalWidth}x${finalHeight}`);
 };
 
 const cancelPlacement = () => {
@@ -1177,7 +1178,7 @@ const loadDraft = async (pdf_id) => {
     objects.value = obj
     pageTemplate.value = JSON.parse(JSON.stringify(draft.editablePages));
     tableTypeSelected.value = draftParsed.tableTypeSelected
-   
+
     console.log('objects', objects.value);
     console.log('template', pageTemplate.value);
 };
@@ -1219,12 +1220,12 @@ const prepareEditorDto = () => {
 
                 position: {
                     x: Number(obj.x),
-                    y: Number(obj.y)
+                    y: Number(obj.y) - 6
                 },
 
                 size: {
-                    width: obj.width,
-                    height: obj.height
+                    width: obj.width - 3,
+                    height: obj.height - 3
                 },
 
                 textstyle: textStyleObject,
