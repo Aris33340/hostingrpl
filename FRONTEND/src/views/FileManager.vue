@@ -307,7 +307,6 @@ const viewFile = async (file) => {
                 : 'other';
     } catch (err) {
         showNotification('error', 'Gagal menampilkan file.');
-        console.error('View error:', err);
     }
 };
 

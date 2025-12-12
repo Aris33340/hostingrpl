@@ -165,7 +165,7 @@ const routes = [
       title: "Tulis Undangan",
       showNavbar: false,
       requiresAuth: true,
-      allowedRoles: ["SUPERADMIN"]
+      allowedRoles: ["SUPERADMIN","SEKRETARIAT","BUKUWISUDA"]
     },
   },
   {

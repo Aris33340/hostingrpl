@@ -215,8 +215,7 @@ const handleSetSettings = async () => {
     await mainApi.post('settings', { key: 'MAIL_PASS', value: mailPass.value }, { withCredentials: true });
     alert("Settings berhasil disimpan!");
   } catch (err) {
-    console.error(err);
-    alert('Gagal menyimpan settings');
+    showNotification('error','gagal menyimpan perubahan')
   }
 }
 import Swal from "sweetalert2";
@@ -238,7 +237,7 @@ const handleResetPresensi = async () => {
   try {
     if (await showConfirm()) {
       show('Mereset Data Presensi...')
-      mainApi.patch('presensi/unMark-status-all').then(showNotification('success', 'Semua peserta di set tidak hadir')) 
+      mainApi.patch('presensi/unMark-status-all').then(showNotification('success', 'Semua peserta di set tidak hadir'))
     }
   } catch (error) {
     showNotification('error', error.message)
@@ -310,7 +309,6 @@ const updateUser = async () => {
     await getUserData();
     closeEdit();
   } catch (err) {
-    console.error(err);
     const msg = err?.response?.data?.message ?? 'Gagal update user';
     showNotification('error', msg)
   } finally {
@@ -327,7 +325,6 @@ const confirmDelete = async (id) => {
     alert('User berhasil dihapus');
     await getUserData();
   } catch (err) {
-    console.error(err);
     const msg = err?.response?.data?.message ?? 'Gagal menghapus user';
     showNotification('error', msg)
   } finally {
@@ -347,8 +344,7 @@ const getTemplate = async () => {
     a.remove();
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Download gagal:', error);
-    alert('Gagal download template. Silakan coba lagi.');
+    showNotification('error','Gagal download template. Silakan coba lagi.')
   }
 };
 
@@ -370,7 +366,6 @@ const uploadFile = async () => {
     selectedFile.value = null;
     await getUserData();
   } catch (err) {
-    console.error(err);
     showNotification('error', err.message)
   } finally {
     loading.value = false;

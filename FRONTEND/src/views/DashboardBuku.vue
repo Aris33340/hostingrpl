@@ -215,6 +215,7 @@ const goToPage = (path) => router.push(path)
 // Assets
 import foto1 from '@/assets/images/fotowi1.jpg'
 import foto2 from '@/assets/images/fotowi2.jpg'
+import { showNotification } from '../composables/useNotification'
 
 const slides = ref([
   { id: 1, src: foto1, alt: 'Suasana wisuda 1' },
@@ -266,7 +267,7 @@ async function fetchSummary() {
     totalTemplateBuku.value = uniqueFiles.length
 
   } catch (err) {
-    console.error('Gagal memuat data ringkasan:', err)
+    showNotification('error',err.message)
   } finally {
     isLoading.value = false
   }

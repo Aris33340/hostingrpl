@@ -152,7 +152,7 @@ export class PresensiService {
         }
     }
 
-    async setPresensiHadir(idPresensi: number) {
+    async setPresensiHadir(idPresensi: number,userId:number) {
         const presensi = await this.prisma.presensi.findUnique({
             where: { id_presensi: idPresensi },
         });
@@ -170,7 +170,7 @@ export class PresensiService {
 
         await this.prisma.presensi.update({
             where: { id_presensi: idPresensi },
-            data: { status: 1, waktu_presensi: new Date },
+            data: { status: 1, waktu_presensi: new Date, id_user: userId},
         });
 
         return {

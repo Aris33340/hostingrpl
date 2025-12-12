@@ -1,6 +1,6 @@
 <template>
   <div class="tab-content">
-    
+
     <div class="toolbar-center">
       <div class="search-box">
         <span class="search-icon">🔍</span>
@@ -115,7 +115,7 @@ onMounted(() => {
   border-radius: 12px;
   padding: 2rem;
   min-height: 500px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
 }
@@ -139,6 +139,7 @@ onMounted(() => {
   padding: 0.5rem 1rem;
   width: 250px;
 }
+
 .search-box input {
   border: none;
   outline: none;
@@ -181,7 +182,7 @@ onMounted(() => {
   background: white;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   position: relative;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .folder-card::before {
@@ -214,13 +215,18 @@ onMounted(() => {
   z-index: 1;
 }
 
-.folder-icon { font-size: 2rem; position: relative; }
+.folder-icon {
+  font-size: 2rem;
+  position: relative;
+}
+
 .folder-icon .badge {
   font-size: 1rem;
   position: absolute;
   bottom: 0;
   right: -5px;
 }
+
 .folder-name {
   font-weight: 700;
   font-size: 1.1rem;

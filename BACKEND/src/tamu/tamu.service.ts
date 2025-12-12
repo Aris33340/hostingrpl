@@ -20,7 +20,8 @@ export class TamuService {
     search: string,
     page: number,
     limit: number,
-    instansi?: string,   // ⬅ filter tambahan
+    instansi?: string,
+    presensiStatus?: number   // ⬅ filter tambahan
   ) {
     const skip = (page - 1) * limit;
 
@@ -40,27 +41,33 @@ export class TamuService {
       : {};
 
     // 🔵 Final WHERE
+    const presensiCondition: Prisma.tamuWhereInput =
+      presensiStatus !== undefined ?
+        {
+          peserta: {
+            some: {
+              presensis: {
+                some: {
+                  status: presensiStatus
+                }
+              }
+            }
+          }
+        } : {};
+
     const where: Prisma.tamuWhereInput = {
       AND: [
         search ? { OR: searchConditions } : {},
-        filterCondition,
+        filterCondition, presensiCondition
       ],
     };
+
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.tamu.findMany({
         skip,
         take: limit,
         where,
-<<<<<<< HEAD
-        // include:{
-        //   peserta:{
-        //     include:{
-        //       presensis:true
-        //     }
-        //   }
-        // },
-=======
         include: {
           peserta: {
             include: {
@@ -68,15 +75,21 @@ export class TamuService {
             }
           }
         },
->>>>>>> f2987f993564a5fd3b889d81fc00a3ec5ed768b8
+        // include:{
+        //   peserta:{
+        //     include:{
+        //       presensis:true
+        //     }
+        //   }
+        // },
         orderBy: { id_tamu: 'asc' },
         // --- PERBAIKAN DI SINI ---
         // Update include agar membawa data files
-        include: {
-          peserta: {
-            include: { files: true }
-          }
-        }
+        // include: {
+        //   peserta: {
+        //     include: { files: true }
+        //   }
+        // }
       }),
       this.prisma.tamu.count({ where }),
     ]);
@@ -85,7 +98,7 @@ export class TamuService {
   }
 
   // 🟩 2️⃣ BULK CREATE (Upload banyak tamu dari Excel) - tanpa duplikat nama/email/instansi
-  async bulkCreate(data: Prisma.tamuCreateManyInput[]): Promise<{ inserted: number; duplicates: string[] }> {
+  async bulkCreate(data: Prisma.tamuCreateManyInput[], userId: number): Promise<{ inserted: number; duplicates: string[] }> {
     // Filter data valid
     const validData = data.filter(d => d.nama && d.email && d.asal_instansi)
 
@@ -112,11 +125,6 @@ export class TamuService {
 
     // Insert data baru
     if (newData.length > 0) {
-<<<<<<< HEAD
-      // Catatan: Pastikan logika backend Anda juga membuat data di tabel 'peserta' 
-      // agar tamu ini punya id_peserta nantinya.
-      await this.prisma.tamu.createMany({ data: newData })
-=======
       await this.prisma.tamu.createMany({ data: newData, skipDuplicates: true })
       const tamu = await this.prisma.tamu.findMany({
         where: {
@@ -124,21 +132,20 @@ export class TamuService {
             in: newData.map(e => e.email)
           }
         },
-        select:{
-          id_tamu:true
+        select: {
+          id_tamu: true
         }
       })
-      await this.prisma.peserta.createMany({data:tamu.map(e => ({id_tamu:e.id_tamu,jenis:'tamu'}))})
+      await this.prisma.peserta.createMany({ data: tamu.map(e => ({ id_tamu: e.id_tamu, jenis: 'tamu' })) })
       const peserta = await this.prisma.peserta.findMany({
-        where:{
-          id_tamu:{
-            in:tamu.map(e => e.id_tamu)
+        where: {
+          id_tamu: {
+            in: tamu.map(e => e.id_tamu)
           }
         },
-        select:{id_peserta:true}
+        select: { id_peserta: true }
       })
-      await this.prisma.presensi.createMany({data:peserta.map(e => ({id_peserta:e.id_peserta}))})
->>>>>>> f2987f993564a5fd3b889d81fc00a3ec5ed768b8
+      await this.prisma.presensi.createMany({ data: peserta.map(e => ({ id_peserta: e.id_peserta, id_user: userId })) })
     }
 
     return { inserted: newData.length, duplicates: duplicateKeys }
@@ -147,14 +154,14 @@ export class TamuService {
 
   // 🟩 3️⃣ GET TAMU by ID
   async tamu(where: Prisma.tamuWhereUniqueInput): Promise<tamu | null> {
-    return this.prisma.tamu.findUnique({ 
+    return this.prisma.tamu.findUnique({
       where,
       // --- PERBAIKAN DI SINI ---
-      include: { 
+      include: {
         peserta: {
           include: { files: true }
-        } 
-      } 
+        }
+      }
     });
   }
 

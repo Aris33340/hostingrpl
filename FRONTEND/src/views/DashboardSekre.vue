@@ -246,7 +246,6 @@ const loadStatistikData = async () => {
   try {
     const response = await mainApi.get('presensi/statistik-data')
     statistikData.value = response.data
-    console.log(statistikData.value)
   } catch (error) {
     showNotification('error', error.message || 'Gagal memuat data statistik.')
   } finally {
@@ -276,7 +275,7 @@ async function fetchDashboardData() {
     if (resSummary.data) stats.value.summary = resSummary.data
     if (resInvite.data) stats.value.invitation = resInvite.data
   } catch (err) {
-    console.error('Gagal memuat dashboard:', err)
+    showNotification('error',err.message)
   } finally {
     isLoading.value = false
   }

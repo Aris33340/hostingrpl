@@ -57,24 +57,26 @@ CREATE TABLE `tamu` (
 -- CreateTable
 CREATE TABLE `presensi` (
     `id_presensi` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_user` INTEGER NOT NULL,
+    `id_peserta` INTEGER NOT NULL,
     `waktu_presensi` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `status` INTEGER NOT NULL DEFAULT 0,
-    `id_peserta` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `presensi_id_peserta_key`(`id_peserta`),
     PRIMARY KEY (`id_presensi`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `emailSendStatus` (
     `id_sendStatus` INTEGER NOT NULL AUTO_INCREMENT,
-    `waktu_dikirim` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `status` INTEGER NOT NULL DEFAULT 1,
-    `errorMessage` VARCHAR(191) NULL,
-    `id_folder` INTEGER NOT NULL,
     `id_peserta` INTEGER NULL,
+    `id_folder` INTEGER NOT NULL,
+    `subject` TEXT NULL,
+    `message` TEXT NULL,
+    `status` INTEGER NOT NULL DEFAULT 1,
+    `waktu_dikirim` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `errorMessage` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -84,12 +86,12 @@ CREATE TABLE `emailSendStatus` (
 -- CreateTable
 CREATE TABLE `file` (
     `id_file` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_user` INTEGER NOT NULL,
+    `id_peserta` INTEGER NULL,
+    `id_parent` INTEGER NULL,
     `file_name` VARCHAR(191) NOT NULL,
     `path` VARCHAR(191) NOT NULL,
     `type` VARCHAR(191) NOT NULL,
-    `id_parent` INTEGER NULL,
-    `id_user` INTEGER NOT NULL,
-    `id_peserta` INTEGER NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -113,6 +115,9 @@ CREATE TABLE `peserta` (
 
 -- AddForeignKey
 ALTER TABLE `presensi` ADD CONSTRAINT `presensi_id_peserta_fkey` FOREIGN KEY (`id_peserta`) REFERENCES `peserta`(`id_peserta`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `presensi` ADD CONSTRAINT `presensi_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `emailSendStatus` ADD CONSTRAINT `emailSendStatus_id_folder_fkey` FOREIGN KEY (`id_folder`) REFERENCES `file`(`id_file`) ON DELETE CASCADE ON UPDATE CASCADE;
