@@ -1,8 +1,8 @@
-import { 
-  createRouter, 
-  createWebHistory, 
-  type RouteLocationNormalized, 
-  type NavigationGuardNext 
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalized,
+  type NavigationGuardNext
 } from "vue-router";
 
 
@@ -39,7 +39,7 @@ const routes = [
     component: Login,
     meta: {
       title: "Login",
-      showTopbar:false,
+      showTopbar: false,
       showNavbar: false,
       requiresAuth: false
     },
@@ -63,7 +63,7 @@ const routes = [
       title: "Test",
       showNavbar: true,
       requiresAuth: true,
-      allowedRoles: ["SUPERADMIN","SEKRETARIAT"]
+      allowedRoles: ["SUPERADMIN", "SEKRETARIAT"]
     },
   },
   // --- 2. ROUTE UTAMA SUPER ADMIN ---
@@ -74,7 +74,7 @@ const routes = [
     meta: {
       title: "Super Admin",
       showNavbar: false,
-      showTopbar:false,
+      showTopbar: false,
       requiresAuth: true,
       allowedRoles: ["SUPERADMIN"]
     },
@@ -87,9 +87,8 @@ const routes = [
       title: "blank",
       showNavbar: false,
       requiresAuth: true,
-      allowedRoles: []
     },
-  },
+  },  
 
   // --- DASHBOARD KESEKRETARIATAN ---
   {
@@ -101,7 +100,7 @@ const routes = [
       icon: HomeIcon,
       showInNavbar: true,
       requiresAuth: true,
-      allowedRoles: ["SUPERADMIN","SEKRETARIAT"]
+      allowedRoles: ["SUPERADMIN", "SEKRETARIAT"]
     },
   },
 
@@ -115,7 +114,7 @@ const routes = [
       icon: HomeIcon,
       showInNavbar: true,
       requiresAuth: true,
-      allowedRoles: ["SUPERADMIN","BUKUWISUDA"]
+      allowedRoles: ["SUPERADMIN", "BUKUWISUDA"]
     },
   },
 
@@ -129,7 +128,7 @@ const routes = [
       icon: UserIcon,
       showInNavbar: true,
       requiresAuth: true,
-      allowedRoles: ["SUPERADMIN","SEKRETARIAT","BUKUWISUDA"]
+      allowedRoles: ["SUPERADMIN", "SEKRETARIAT", "BUKUWISUDA"]
     },
   },
   {
@@ -141,7 +140,7 @@ const routes = [
       icon: UploadIcon,
       showInNavbar: true,
       requiresAuth: true,
-      allowedRoles: ["SUPERADMIN","BUKUWISUDA","SEKRETARIAT"]
+      allowedRoles: ["SUPERADMIN", "BUKUWISUDA", "SEKRETARIAT"]
     },
   },
   {
@@ -152,12 +151,12 @@ const routes = [
       title: "Manajemen Undangan",
       icon: MailIcon, showInNavbar: true,
       requiresAuth: true,
-      allowedRoles: ["SUPERADMIN","SEKRETARIAT","BUKUWISUDA"]
+      allowedRoles: ["SUPERADMIN", "SEKRETARIAT", "BUKUWISUDA"]
     },
   },
   {
     // REVISI DI SINI: Menambahkan :folderId
-    path: "/tulis-undangan/:folderId/:folderName", 
+    path: "/tulis-undangan/:folderId/:folderName",
     name: "TulisUndangan",
     component: TulisUndangan,
     props: true,
@@ -165,7 +164,7 @@ const routes = [
       title: "Tulis Undangan",
       showNavbar: false,
       requiresAuth: true,
-      allowedRoles: ["SUPERADMIN","SEKRETARIAT","BUKUWISUDA"]
+      allowedRoles: ["SUPERADMIN", "SEKRETARIAT", "BUKUWISUDA"]
     },
   },
   {
@@ -177,7 +176,7 @@ const routes = [
       icon: QrCodeIcon,
       showInNavbar: true,
       requiresAuth: true,
-      allowedRoles: ["PETUGAS","SEKRETARIAT","SUPERADMIN"]
+      allowedRoles: ["PETUGAS", "SEKRETARIAT", "SUPERADMIN"]
     },
   },
 
@@ -192,7 +191,7 @@ const routes = [
       showInNavbar: false,
       requiresAuth: true,
       showNavbar: false,
-      allowedRoles: ["SUPERADMIN","BUKUWISUDA","SEKRETARIAT"]
+      allowedRoles: ["SUPERADMIN", "BUKUWISUDA", "SEKRETARIAT"]
     },
     beforeEnter: (to: any, from: any, next: any) => {
       if (!to.query.fileId) {
@@ -217,12 +216,19 @@ const router = createRouter({
   routes,
 });
 
-
+import { ref } from "vue";
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const isAuth = authStore.isAuth()
-  let userRole;
-  function getDefaultRouteByRole(role:any) {
+  const userRole = ref();
+  try {
+    const payload = authStore.getPayload();
+    userRole.value = payload.role;
+  } catch (error) {
+    authStore.clearAuthData();
+    return next({ path: "/login" });
+  }
+  function getDefaultRouteByRole(role: any) {
     switch (role) {
       case "SUPERADMIN":
         return "/super-admin-dashboard";
@@ -241,24 +247,21 @@ router.beforeEach(async (to, from, next) => {
     return next({ path: "/login" });
   }
 
+  if ((to.path === '/login' || to.path === '/') && isAuth) {
+    return next(getDefaultRouteByRole(userRole.value));
+  }
+
   if (to.meta.allowedRoles) {
-    try {
-      const payload = authStore.getPayload();
-      userRole = payload.role;
-      const allowedRoles = Array.isArray(to.meta.allowedRoles) ? to.meta.allowedRoles : Object.values(to.meta.allowedRoles);
-      const allowed = allowedRoles.includes(userRole)
-      if (!allowed) {
-        return next(getDefaultRouteByRole(userRole));
-      }
-    } catch (e) {
-      authStore.clearAuthData();
-      return next({ path: "/login" });
+    const allowedRoles = Array.isArray(to.meta.allowedRoles) ? to.meta.allowedRoles : Object.values(to.meta.allowedRoles);
+    const allowed = allowedRoles.includes(userRole.value)
+    if (!allowed) {
+      return next(getDefaultRouteByRole(userRole.value));
     }
   }
 
   if (isAuth) {
-    if (to.path === "/" && userRole !== "SUPERADMIN") {
-       return next("/login");
+    if (to.path === "/" && userRole.value !== "SUPERADMIN") {
+      return next("/login");
     }
   }
   return next();

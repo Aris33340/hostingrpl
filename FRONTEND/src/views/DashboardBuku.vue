@@ -90,7 +90,7 @@
               class="bg-white rounded-[32px] border border-gray-100 shadow-lg px-8 py-8 flex flex-col min-h-[380px] hover:translate-y-[-5px] transition-all duration-300">
               <div class="flex justify-between items-start mb-6">
                 <div>
-                  <h3 class="text-xl font-bold text-gray-800">Total File Terupload</h3>
+                  <h3 class="text-xl font-bold text-gray-800">Total File Tersimpan</h3>
                   <p class="text-sm text-gray-500 mt-1">Klasifikasi berdasarkan jenis file</p>
                 </div>
                 <button @click="goToPage('/input-file')"
@@ -116,15 +116,15 @@
                     class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
                     <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: item.color }"></span>
                     <span class="text-gray-600">{{ item.jenis }}: <b class="text-gray-900">{{ formatNumber(item.jumlah)
-                        }}</b></span>
+                    }}</b></span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white rounded-[24px] shadow px-4 py-4">
+            <<<<<<< HEAD <div class="bg-white rounded-[24px] shadow px-4 py-4">
               <div class="flex justify-between items-center mb-2">
-                <h3 class="font-semibold text-sm text-black">
+                <h3 class="font-semibold text-sm">
                   Mahasiswa berdasarkan Prodi
                 </h3>
                 <button @click="goToPage('/manajemen-mahasiswa')"
@@ -152,16 +152,16 @@
                   Belum ada data mahasiswa yang dapat ditampilkan.
                 </p>
               </div>
-            </div>
-
-            <div
-              class="bg-white rounded-[32px] lg:col-span-2 border border-gray-100 shadow-lg px-8 py-8 min-h-[380px] flex flex-col hover:translate-y-[-5px] transition-all duration-300">
-              <div class="flex justify-between items-start mb-8">
-                <div>
-                  <h3 class="text-xl font-bold text-gray-800">Mahasiswa per Prodi</h3>
-                  <p class="text-sm text-gray-500 mt-1">Jumlah mahasiswa terdaftar berdasarkan prodi</p>
-                </div>
-                <div class="flex flex-col items-end gap-3">
+          </div>
+          =======
+          <div
+            class="bg-white rounded-[32px] border border-gray-100 shadow-lg px-8 py-8 min-h-[380px] flex flex-col hover:translate-y-[-5px] transition-all duration-300">
+            <div class="flex justify-between items-start mb-8">
+              <div>
+                <h3 class="text-xl font-bold text-gray-800">Mahasiswa per Prodi</h3>
+                <p class="text-sm text-gray-500 mt-1">Jumlah mahasiswa terdaftar berdasarkan prodi</p>
+              </div>
+              <div class="flex flex-col items-end gap-3">
 
                   <button @click="goToPage('/manajemen-peserta')"
                     class="text-sm font-semibold text-[#2366d1] bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition">
@@ -196,7 +196,6 @@
               </div>
             </div>
 
-            >>>>>>> origin/tya10des
           </div>
         </div>
       </section>
@@ -267,7 +266,7 @@ async function fetchSummary() {
     totalTemplateBuku.value = uniqueFiles.length
 
   } catch (err) {
-    showNotification('error',err.message)
+    showNotification('error', err.message)
   } finally {
     isLoading.value = false
   }
