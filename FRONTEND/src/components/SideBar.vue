@@ -7,7 +7,7 @@
 
     <nav
       class="relative flex-1 flex bg-white p-3 rounded-full flex-col items-center space-y-4 w-12 sm:w-12 md:w-12 lg:w-16 px-2 transition-all duration-300 hover:scale-105">
-      <router-link v-if="role === 'SUPERADMIN'" :to="'/super-admin-dashboard'"
+      <router-link v-if="role === 'SUPERADMIN' " :to="'/super-admin-dashboard'"
         class="mt-auto group flex justify-center bottom-0">
         <div
           class="w-12 group h-12 flex rounded-full items-center justify-center transition-all duration-300 hover:bg-gray-300 hover:shadow-md text-gray-600 hover:text-gray-500">
@@ -22,7 +22,7 @@
       <SidebarLink v-for="route in menuRoutes" :key="route.path" :route="route" class="w-full mt-3" />
       <div class="flex-1"></div>
       <div class="flex flex-col gap-2">
-        <router-link v-if="role === 'SUPERADMIN'" :to="'/settings'" class="mt-auto group flex justify-center bottom-0">
+        <router-link v-if="role === 'SUPERADMIN' || role === 'SEKRETARIAT'" :to="'/settings'" class="mt-auto group flex justify-center bottom-0">
           <div
             class="w-12 h-12 flex rounded-full items-center justify-center transition-all duration-300 hover:bg-gray-300 hover:shadow-md hover:rotate-45 text-gray-600 hover:text-gray-500">
             <Settings class="w-5 h-5" />

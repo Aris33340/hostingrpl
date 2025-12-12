@@ -13,19 +13,15 @@ export class InvitationService {
   ) { }
 
   // ==========================================================
-  // A. READ DATA
+  // A. READ DATA (TIDAK BERUBAH)
   // ==========================================================
 
-  // [BARU] Method ini dipanggil oleh Controller @Get() tanpa parameter
-  // Fungsinya mengambil SEMUA riwayat untuk ditampilkan di tabel utama Frontend
   async getAllHistory() {
     return this.prisma.emailSendStatus.findMany({
       include: {
-        // 1. Ambil Nama Folder (Untuk kolom 'Undangan')
         folder: {
           select: { file_name: true }
         },
-        // 2. Ambil Nama & Data Peserta
         peserta: {
           include: {
             mahasiswa: true,
@@ -33,7 +29,7 @@ export class InvitationService {
           }
         }
       },
-      orderBy: { createdAt: 'desc' } // Urutkan dari yang terbaru
+      orderBy: { createdAt: 'desc' }
     });
   }
 
@@ -52,7 +48,6 @@ export class InvitationService {
     });
   }
 
-  // Ini untuk melihat detail per folder (opsional, jika nanti ada fiturnya)
   async getHistory(folderId: number) {
     return this.prisma.emailSendStatus.findMany({
       where: { id_folder: folderId },
@@ -60,14 +55,14 @@ export class InvitationService {
         peserta: {
           include: { mahasiswa: true, tamu: true }
         },
-        folder: true // Tambahkan ini biar konsisten
+        folder: true
       },
       orderBy: { createdAt: 'desc' }
     });
   }
 
   // ==========================================================
-  // B. MASUK ANTRIAN (QUEUE LOGIC) - UPDATE SAVE CUSTOM MESSAGE
+  // B. MASUK ANTRIAN (QUEUE LOGIC) - UPDATE: SIMPAN PESAN CUSTOM
   // ==========================================================
   async addToQueue(dto: {
     folderId: number;
@@ -84,7 +79,7 @@ export class InvitationService {
         id_folder: folderId,
         status: 1, // 1 = PENDING
 
-        // --- SIMPAN INPUT USER KE DATABASE ---
+        // --- UPDATE: SIMPAN INPUT USER KE DATABASE ---
         // Jika user tidak mengisi (undefined/null), database menyimpan null
         subject: subject || null,
         message: message || null
@@ -123,7 +118,7 @@ export class InvitationService {
   }
 
   // ==========================================================
-  // D. PROSES PENGIRIMAN (INTI) - LOGIC CUSTOM MESSAGE
+  // D. PROSES PENGIRIMAN (INTI) - UPDATE: LOGIC PESAN CUSTOM
   // ==========================================================
   private async processSingleEmail(logItem: any) {
     let targetEmail = '';
@@ -193,7 +188,7 @@ export class InvitationService {
       // 4. Kirim Email (HTML DYNAMIC)
       await this.mailerService.sendMail({
         to: targetEmail,
-        subject: finalSubject, // <--- Gunakan Subjek Dinamis
+        subject: finalSubject, // <--- Gunakan Subjek Dinamis (User/Default)
         html: `
           <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <p>Yth. <b>${targetName}</b>,</p>
@@ -235,7 +230,7 @@ export class InvitationService {
   }
 
   // ==========================================================
-  // E. RETRY
+  // E. RETRY (TIDAK BERUBAH)
   // ==========================================================
   async retryEmail(logId: number) {
     return this.prisma.emailSendStatus.update({
